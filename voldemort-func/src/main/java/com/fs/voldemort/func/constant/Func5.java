@@ -1,4 +1,4 @@
-package com.fs.func.constant;
+package com.fs.voldemort.func.constant;
 
 @FunctionalInterface
 public interface Func5<T1,T2,T3,T4,T5,R> {

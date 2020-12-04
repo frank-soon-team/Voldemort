@@ -1,7 +1,7 @@
-package com.fs.business.support;
+package com.fs.voldemort.business.support;
 
-import com.fs.core.caller.exception.CallerException;
-import com.fs.core.caller.support.Param;
+import com.fs.voldemort.core.exception.CallerException;
+import com.fs.voldemort.core.support.Param;
 import lombok.NonNull;
 
 import java.lang.reflect.Field;

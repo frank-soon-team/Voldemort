@@ -1,6 +1,6 @@
-package com.fs.core.caller.support;
+package com.fs.voldemort.core.support;
 
-import com.fs.core.caller.exception.CallerException;
+import com.fs.voldemort.core.exception.CallerException;
 import lombok.NonNull;
 
 import java.math.BigDecimal;

@@ -11,5 +11,13 @@
 
     <artifactId>voldemort-springboot-starter</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.fs</groupId>
+            <artifactId>voldemort-springboot-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+    </dependencies>
 
 </project>

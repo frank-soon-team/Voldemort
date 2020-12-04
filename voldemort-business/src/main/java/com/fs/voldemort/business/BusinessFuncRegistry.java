@@ -1,10 +1,10 @@
-package com.fs.business;
+package com.fs.voldemort.business;
 
-import com.fs.business.support.BusinessFuncHorcruxes;
-import com.fs.business.support.BusinessFuncMark;
-import com.fs.core.caller.exception.CallerException;
-import com.fs.func.DynamicFunc;
-import com.fs.func.Func;
+import com.fs.voldemort.business.support.BusinessFuncHorcruxes;
+import com.fs.voldemort.business.support.BusinessFuncMark;
+import com.fs.voldemort.core.exception.CallerException;
+import com.fs.voldemort.func.DynamicFunc;
+import com.fs.voldemort.func.Func;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -31,6 +31,7 @@ public class BusinessFuncRegistry {
 
     private void init(){
         funcRegistry = new ConcurrentHashMap<>();
+        BusinessCaller.businessFuncRegistry = this;
     }
 
     private void scanAndFill() {

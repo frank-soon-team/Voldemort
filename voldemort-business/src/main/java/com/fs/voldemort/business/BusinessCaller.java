@@ -1,7 +1,7 @@
-package com.fs.business;
+package com.fs.voldemort.business;
 
 
-import com.fs.core.caller.Caller;
+import com.fs.voldemort.core.Caller;
 
 /**
  * Polymerize caller
@@ -12,7 +12,7 @@ public class BusinessCaller extends Caller {
 
     private Caller caller;
 
-    public static BusinessFuncRegistry settleFuncRegistry;
+    public static BusinessFuncRegistry businessFuncRegistry;
 
     private BusinessCaller(Caller caller) {
         this.caller = caller;

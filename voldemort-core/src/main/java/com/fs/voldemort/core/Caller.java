@@ -1,8 +1,8 @@
-package com.fs.core.caller;
+package com.fs.voldemort.core;
 
-import com.fs.core.caller.support.Param;
-import com.fs.func.Act;
-import com.fs.func.Func;
+import com.fs.voldemort.core.support.Param;
+import com.fs.voldemort.func.Act;
+import com.fs.voldemort.func.Func;
 import lombok.NonNull;
 
 import java.util.HashMap;

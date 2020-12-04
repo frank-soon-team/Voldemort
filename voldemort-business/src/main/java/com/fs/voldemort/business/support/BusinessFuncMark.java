@@ -1,4 +1,4 @@
-package com.fs.business.support;
+package com.fs.voldemort.business.support;
 
 import java.lang.annotation.*;
 

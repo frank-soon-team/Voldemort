@@ -1,4 +1,4 @@
-package com.fs.core.caller.exception;
+package com.fs.voldemort.core.exception;
 
 /**
  * @author frank
