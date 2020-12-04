@@ -1,7 +1,6 @@
 package com.fs.core.caller.support;
 
 import com.fs.core.caller.exception.CallerException;
-import com.sun.javafx.binding.StringFormatter;
 import lombok.NonNull;
 
 import java.math.BigDecimal;
@@ -35,17 +34,15 @@ public class Param<T> {
         }
 
         public BigDecimal getBigDecimal(@NonNull final String key) {
-            Object result = container.get(key);
-            if(result == null) {
+            Object r= container.get(key);
+            if(r == null) {
                 return null;
             }
 
-            if(!(result instanceof BigDecimal)) {
-                throw new CallerException(StringFormatter
-                        .format("Param.Context get error, please check the type of target result![Key:%S]",key)
-                        .getValue());
+            if(!(r instanceof BigDecimal)) {
+                throw new CallerException(String.format("Param.Context get error, please check the type of target result![Key:%s]",key));
             }
-            return (BigDecimal)result;
+            return (BigDecimal)r;
         }
 
         @SuppressWarnings("unchecked")
