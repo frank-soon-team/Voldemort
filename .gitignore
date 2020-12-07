@@ -21,3 +21,6 @@ voldemort-springboot-autoconfigure/.project
 voldemort-springboot-starter/.classpath
 voldemort-springboot-starter/.project
 .project
+voldemort-springboot-autoconfigure/target
+.vscode
+voldemort-springboot-autoconfigure/.factorypath
