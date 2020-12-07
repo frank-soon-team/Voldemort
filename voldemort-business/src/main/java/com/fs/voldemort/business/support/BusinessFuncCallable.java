@@ -93,7 +93,7 @@ public interface BusinessFuncCallable {
         return false;
     }
 
-    class Args{
+    static class Args{
         public final String name;
         public Object value;
 

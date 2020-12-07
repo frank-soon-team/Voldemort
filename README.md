@@ -7,4 +7,44 @@
 
 <br />
 
-> 一种思想，This is inception.
+## Caller
+```
+public class Caller
+```
+
+## BusinessCaller
+```
+public class BusinessCaller extends Caller
+```
+
+## TCCCaller 
+```
+public class TCCCaller extends BusinessCaller
+```
+
+## AsyncCaller
+```
+public class AsyncCaller extends Caller
+```
+
+## Voldemort
+```
+// Lambda调用链
+Voldemort.caller().call().exec();
+
+// 函数调用链
+Voldemort.businessCaller().call().exec();
+
+// TCC事务链
+Voldemort.tccCaller().call().exec();
+
+// 多事务链
+Voldemort.caller()
+    .call(
+        Voldmort.tccCaller().call(ITCCNode.class)
+    )
+    .call(
+        Voldmort.tccCaller().call(ITCCNode.class)
+    )
+    .exec();
+```

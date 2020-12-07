@@ -6,7 +6,7 @@ import java.util.Objects;
 public interface Func<T,R> {
     R call(T t);
 
-    default <V> Func<T, V> then(Func<R,V> after) {
+    default <V> Func<T, V> then(Func<R, V> after) {
         Objects.requireNonNull(after);
         return (T t) -> after.call(call(t));
     }

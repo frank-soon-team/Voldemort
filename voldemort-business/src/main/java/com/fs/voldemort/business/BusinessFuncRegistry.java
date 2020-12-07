@@ -21,9 +21,9 @@ public class BusinessFuncRegistry {
 
     private Map<Class, DynamicFunc> funcRegistry ;
 
-    private final Func<Class,Map<String, Object>> getBusinessFuncHorcruxesFunc;
+    private final Func<Class, Map<String, Object>> getBusinessFuncHorcruxesFunc;
 
-    public BusinessFuncRegistry(Func<Class,Map<String, Object>> getBusinessFuncHorcruxesFunc){
+    public BusinessFuncRegistry(Func<Class, Map<String, Object>> getBusinessFuncHorcruxesFunc){
         this.getBusinessFuncHorcruxesFunc = getBusinessFuncHorcruxesFunc;
         init();
         scanAndFill();
