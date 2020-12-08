@@ -21,7 +21,7 @@ public class Caller {
 
     public static Caller create(@NonNull Act<Object> rootAct) {
         Caller caller = create();
-        caller.funcList.add(r -> rootAct.act());
+        caller.funcList.add(p -> rootAct.act());
         return caller;
     }
 

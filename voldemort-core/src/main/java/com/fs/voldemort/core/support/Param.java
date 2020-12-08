@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * @author frank
  */
+@Deprecated
 public class Param<T> {
 
     public final T result;
