@@ -2,11 +2,8 @@ package com.fs.voldemort.business;
 
 import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.support.Param;
+import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.func.Func;
-
-import lombok.NonNull;
-
 /**
  * Polymerize caller
  *
@@ -18,13 +15,12 @@ public class BusinessCaller extends Caller {
 
     public static BusinessCaller create(){
         BusinessCaller caller = new BusinessCaller();
-        caller.callFunc = r -> new Param<>(null, caller.context);
         return caller;
     }
 
     public BusinessCaller call(Class<BusinessFuncCallable> funcClazz) {
 
-        this.call(p -> null);
+        // this.call(p -> null);
 
         // 1. 获取bean businessFuncRegistry.get(funcClazz);
         // 2. 找到要执行的函数 Method
@@ -37,8 +33,8 @@ public class BusinessCaller extends Caller {
     }
 
     @Override
-    public <T,R> Caller call(@NonNull Func<Param<T>,R> callFunc) {
-        super.call(callFunc);
+    public BusinessCaller call(Func<CallerParameter, Object> func) {
+        super.call(func);
         return this;
     }
 

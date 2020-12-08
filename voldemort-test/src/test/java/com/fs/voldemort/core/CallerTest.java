@@ -12,19 +12,19 @@ public class CallerTest {
         String result = Caller
            .create()
            .call(p -> {
-               System.out.println("call1:"+p.result);
-               p.context.set("c_key","c_value1");
+               System.out.println("call1:" + String.valueOf(p.result));
+               p.context().set("c_key","c_value1");
                return new BigDecimal("1");
            })
            .call(p -> {
                System.out.println("call2:"+p.result);
-               p.context.set("c_num_key", new BigDecimal("2"));
+               p.context().set("c_num_key", new BigDecimal("2"));
                return ((BigDecimal)p.result).add(new BigDecimal("1"));
            })
            .call(p -> {
                System.out.println("call3:" + p.result);
-               System.out.println("p.context.c_key:" + p.context.get("c_key"));
-               System.out.println("p.context.c_num_key" + p.context.getBigDecimal("c_num_key"));
+               System.out.println("p.context.c_key:" + p.context().get("c_key"));
+               System.out.println("p.context.c_num_key" + p.context().get("c_num_key"));
                return "success";
            })
            .exec();
