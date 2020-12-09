@@ -17,7 +17,7 @@ public class CallerTest {
                return new BigDecimal("1");
            })
            .call(p -> {
-               System.out.println("call2:"+p.result);
+               System.out.println("call2: " + p.result);
                p.context().set("c_num_key", new BigDecimal("2"));
                return ((BigDecimal)p.result).add(new BigDecimal("1"));
            })
@@ -26,16 +26,20 @@ public class CallerTest {
                 .create()
                 .call(p -> {
                     BigDecimal num = (BigDecimal) p.context().get("c_num_key");
-                    System.out.println("value: " + num);
+                    System.out.println("c_num_key: " + num);
+                    return null;
+                })
+                .call(p -> {
+                    p.context().update("c_num_key", new BigDecimal("3"));
                     return null;
                 })
                 .call(p -> "Hello")
                 .call(p -> p.result + " World !")
            )
            .call(p -> {
-               System.out.println("call3:" + p.result);
-               System.out.println("p.context.c_key:" + p.context().get("c_key"));
-               System.out.println("p.context.c_num_key" + p.context().get("c_num_key"));
+               System.out.println("call3: " + p.result);
+               System.out.println("p.context.c_key: " + p.context().get("c_key"));
+               System.out.println("p.context.c_num_key: " + p.context().get("c_num_key"));
                return "success";
            })
            .exec();
