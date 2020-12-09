@@ -21,6 +21,17 @@ public class CallerTest {
                p.context().set("c_num_key", new BigDecimal("2"));
                return ((BigDecimal)p.result).add(new BigDecimal("1"));
            })
+           .call(
+               Caller
+                .create()
+                .call(p -> {
+                    BigDecimal num = (BigDecimal) p.context().get("c_num_key");
+                    System.out.println("value: " + num);
+                    return null;
+                })
+                .call(p -> "Hello")
+                .call(p -> p.result + " World !")
+           )
            .call(p -> {
                System.out.println("call3:" + p.result);
                System.out.println("p.context.c_key:" + p.context().get("c_key"));

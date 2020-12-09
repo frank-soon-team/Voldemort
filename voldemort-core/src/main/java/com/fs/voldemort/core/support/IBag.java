@@ -6,4 +6,6 @@ public interface IBag<K, V> {
 
     void set(K key, V value);
 
+    boolean contains(K key);
+
 }

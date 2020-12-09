@@ -7,21 +7,18 @@ import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.func.Act;
 import com.fs.voldemort.func.Func;
-import lombok.NonNull;
 
 import java.util.function.Consumer;
 
 public class Caller {
 
-    protected final CallerContext context = new CallerContext();
-    protected FuncLinkedList funcList = new FuncLinkedList();
+    protected final FuncLinkedList funcList = new FuncLinkedList();
 
-    protected Caller() {
-    }
-
-    public static Caller create(@NonNull Act<Object> rootAct) {
+    public static Caller create(Act<Object> rootAct) {
         Caller caller = create();
-        caller.funcList.add(p -> rootAct.act());
+        if(rootAct != null) {
+            caller.funcList.add(p -> rootAct.act());
+        }
         return caller;
     }
 
@@ -34,15 +31,31 @@ public class Caller {
         return this;
     }
 
-    public void exec(@NonNull Consumer<Object> consumer) {
+    public Caller call(Caller caller) {
+        if(caller == null) {
+            throw new IllegalArgumentException("the parameter caller is required.");
+        }
+
+        funcList.add(p -> caller.exec(p));
+        return this;
+    }
+
+    public void exec(Consumer<Object> consumer) {
+        if(consumer == null) {
+            throw new IllegalArgumentException("the parameter consumer is required.");
+        }
         Object result = exec();
         consumer.accept(result);
     }
 
     @SuppressWarnings("unchecked")
     public <R> R exec() {
-        CallerParameter resultParam = funcList.execute();
-        return (R) resultParam.result;
+        return (R) exec((CallerParameter) null);
+    }
+    
+    protected Object exec(CallerParameter parameter) {
+        CallerParameter resultParam = funcList.execute(parameter);
+        return resultParam.result;
     }
 
     protected static class FuncLinkedList {
@@ -75,8 +88,13 @@ public class Caller {
             lastNode = node;
         }
 
-        public CallerParameter execute() {
-            CallerParameter result = CallerParameter.Empty;
+        public CallerParameter execute(CallerParameter parameter) {
+            CallerParameter result = null;
+            if(parameter == null) {
+                result = new CallerParameter(null, new CallerContext());
+            } else {
+                result = new CallerParameter(parameter);
+            }
             CallerNode currentNode = firstNode;
 
             int count = 0;

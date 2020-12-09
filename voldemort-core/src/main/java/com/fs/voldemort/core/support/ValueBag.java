@@ -13,12 +13,23 @@ public class ValueBag implements IBag<String, Object>, IConverter<String> {
 
     @Override
     public Object get(String key) {
+        if(key == null || key.length() == 0) {
+            return null;
+        }
         return contextStore.get(key);
     }
 
     @Override
     public void set(String key, Object value) {
+        if(key == null || key.length() == 0) {
+            throw new IllegalArgumentException("the parameter key is required.");
+        }
         contextStore.put(key, value);
+    }
+
+    @Override
+    public boolean contains(String key) {
+        return contextStore.containsKey(key);
     }
 
     @Override

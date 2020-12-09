@@ -6,10 +6,13 @@ public class CallerParameter {
     private final CallerContext context;
     private final ValueBag valueBag;
 
-    protected CallerParameter() {
-        this.valueBag = null;
-        this.result = null;
-        this.context = new CallerContext();
+    public CallerParameter(CallerParameter parameter) {
+        if(parameter == null) {
+            throw new IllegalArgumentException("the parameter is required.");
+        }
+        this.valueBag = parameter.valueBag;
+        this.result = parameter.result;
+        this.context = new CallerContext(parameter.context());
     }
 
     public CallerParameter(Object result, CallerContext context) {
@@ -36,11 +39,5 @@ public class CallerParameter {
         }
 
         return value;
-    }
-
-    private static class EmptyCallerParameter extends CallerParameter {}
-    public final static CallerParameter Empty = new EmptyCallerParameter();
-    public static boolean isEmpty(CallerParameter parameter) {
-        return parameter == Empty;
     }
 }
