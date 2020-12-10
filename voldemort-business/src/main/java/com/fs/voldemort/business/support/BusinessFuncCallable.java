@@ -1,7 +1,7 @@
 package com.fs.voldemort.business.support;
 
 import com.fs.voldemort.core.exception.CallerException;
-import com.fs.voldemort.core.support.Param;
+import com.fs.voldemort.core.support.CallerParameter;
 import lombok.NonNull;
 
 import java.lang.reflect.Field;
@@ -14,8 +14,7 @@ import java.util.stream.Collectors;
  */
 public interface BusinessFuncCallable {
 
-    @SuppressWarnings("unchecked")
-    default Set<Args> paramFit(@NonNull final Param p) {
+    default Set<Args> paramFit(@NonNull final CallerParameter p) {
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
                 .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
@@ -28,7 +27,7 @@ public interface BusinessFuncCallable {
             return new HashSet<>();
         }
 
-        final Set<Args> argsSet = new HashSet<>();
+        Set<Args> argsSet = new HashSet<>();
 
         final Method funcMethod = funcMethodList.get(0);
         Arrays.stream(funcMethod.getParameters()).forEach(param->{
@@ -36,14 +35,16 @@ public interface BusinessFuncCallable {
             argsSet.add(new Args(paramName));
         });
 
-        //Get Param.result field collection
+        final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
+
+        //Get args from param.result fields
         Object result = p.result;
         if(null != result) {
             //Check result is fundamental type
             final Class resultClazz = result.getClass();
             if(!isAssignableFromMulti(resultClazz,Number.class,CharSequence.class,Collection.class,Map.class)) {
                 final Field[] resultFields = result.getClass().getDeclaredFields();
-                final Map<String,Object> resultFieldMap = Arrays.stream(resultFields)
+                resultFieldMap.putAll(Arrays.stream(resultFields)
                         .collect(Collectors.toMap(Field::getName,field -> {
                             boolean isAccessible = field.isAccessible();
                             if(!isAccessible) {
@@ -54,32 +55,25 @@ public interface BusinessFuncCallable {
                             } catch (IllegalAccessException e) {
                                 throw new CallerException("SettleFuncCallable paramFit error:"+e.getMessage());
                             }finally {
-                                if(!isAccessible) {
-                                    field.setAccessible(false);
-                                }
+                                field.setAccessible(isAccessible);
                             }
-                        }));
-
-                return argsSet.stream().peek(arg-> arg.value = resultFieldMap.get(arg.name))
-                        .filter(arg-> arg.value != null)
-                        .collect(Collectors.toSet());
+                        }
+                        )
+                        )
+                );
             }
         }
 
-        if(!p.context.isEmpty()) {
-
-
-        }
-
-
-        //get Param.context mapper field collection
-
-
-
-        return null;
-
-
-
+        //Get args from context
+        return argsSet.stream().peek(arg-> {
+                Object value = resultFieldMap.get(arg.name);
+                if(value!=null) {
+                    arg.value = value;
+                }else {
+                    arg.value = p.context().get(arg.name);
+                }
+            }).filter(arg-> arg.value != null)
+            .collect(Collectors.toSet());
     }
 
     static boolean isAssignableFromMulti(Class testClazz, Class... clazzes) {
@@ -93,7 +87,7 @@ public interface BusinessFuncCallable {
         return false;
     }
 
-    static class Args{
+    class Args{
         public final String name;
         public Object value;
 
