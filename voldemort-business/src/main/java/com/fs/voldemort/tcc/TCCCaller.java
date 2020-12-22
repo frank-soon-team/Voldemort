@@ -17,5 +17,9 @@ public class TCCCaller extends Caller {
     public TCCManager getTCCManager() {
         return (TCCManager) this.funcList;
     }
+
+    public static TCCCaller create() {
+        return new TCCCaller();
+    }
     
 }
