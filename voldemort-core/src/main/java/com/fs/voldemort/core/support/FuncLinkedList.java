@@ -6,6 +6,8 @@ import com.fs.voldemort.func.Func;
 
 public class FuncLinkedList {
 
+    protected final static int OVERFLOW_COUNT = 1024;
+
     private CallerNode firstNode;
     private CallerNode lastNode;
     private int _size = 0;
@@ -46,7 +48,7 @@ public class FuncLinkedList {
 
         int count = 0;
         while(currentNode != null) {
-            if(count > 1024) {
+            if(count > OVERFLOW_COUNT) {
                 throw new CrucioException("overflow");
             }
             try {
