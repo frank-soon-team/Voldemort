@@ -14,8 +14,7 @@ public class BusinessCaller extends Caller {
     public static BusinessFuncRegistry businessFuncRegistry;
 
     public static BusinessCaller create(){
-        BusinessCaller caller = new BusinessCaller();
-        return caller;
+        return new BusinessCaller();
     }
 
     public BusinessCaller call(Class<BusinessFuncCallable> funcClazz) {
@@ -25,6 +24,7 @@ public class BusinessCaller extends Caller {
         // 1. 获取bean businessFuncRegistry.get(funcClazz);
         // 2. 找到要执行的函数 Method
         // 3. 得到Method参数列表
+
         // 4. 准备参数，如果bean instanceof BusinessFuncCallable 调用paramFit，否则报错
         // 5. ParameterList<Args>.invoke(method);
 
