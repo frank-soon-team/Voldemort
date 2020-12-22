@@ -1,8 +1,8 @@
 package com.fs.voldemort.core.support;
 
+import com.fs.voldemort.action.Action1;
+import com.fs.voldemort.action.Action2;
 import com.fs.voldemort.func.Func;
-import com.fs.voldemort.func.action.Action1;
-import com.fs.voldemort.func.action.Action2;
 
 public class CallerNode {
 

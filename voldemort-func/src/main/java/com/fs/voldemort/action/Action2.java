@@ -1,4 +1,4 @@
-package com.fs.voldemort.func.action;
+package com.fs.voldemort.action;
 
 @FunctionalInterface
 public interface Action2<T1, T2> {

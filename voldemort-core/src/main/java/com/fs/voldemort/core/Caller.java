@@ -2,8 +2,8 @@ package com.fs.voldemort.core;
 
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
-import com.fs.voldemort.func.Act;
 import com.fs.voldemort.func.Func;
+import com.fs.voldemort.func.Func0;
 
 import java.util.function.Consumer;
 
@@ -22,10 +22,10 @@ public class Caller {
         funcList = funcLinkedList;
     }
 
-    public static Caller create(Act<Object> rootAct) {
+    public static Caller create(Func0<Object> rootAct) {
         Caller caller = create();
         if(rootAct != null) {
-            caller.funcList.add(p -> rootAct.act());
+            caller.funcList.add(p -> rootAct.call());
         }
         return caller;
     }
