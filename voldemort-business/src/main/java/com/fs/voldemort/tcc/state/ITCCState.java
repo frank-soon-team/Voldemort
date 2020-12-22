@@ -2,13 +2,18 @@ package com.fs.voldemort.tcc.state;
 
 import java.util.List;
 
+import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.node.TCCNode;
 
 public interface ITCCState {
 
-    void collectExceptional(RuntimeException e);
+    String identify();
 
-    List<RuntimeException> getExceptionalCollection();
+    void collectExceptional(ExecuteCallerNodeException e);
+
+    ExecuteCallerNodeException getCallerNodeException();
+
+    List<ExecuteCallerNodeException> getExceptionalCollection();
 
     void addTriedNode(TCCNode node);
 
@@ -17,5 +22,7 @@ public interface ITCCState {
     boolean isEnd();
 
     boolean isRollback();
+
+    int getStatus();
     
 }
