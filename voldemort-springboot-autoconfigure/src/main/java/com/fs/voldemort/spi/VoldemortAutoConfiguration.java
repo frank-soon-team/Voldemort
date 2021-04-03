@@ -12,7 +12,9 @@ public class VoldemortAutoConfiguration {
 
     @Bean
     public BusinessFuncRegistry businessFuncRegistry(ApplicationContext context) {
-        return new BusinessFuncRegistry(context::getBeansWithAnnotation);
+        // TODO @Frank 修复构造函数
+        return null;
+        //return new BusinessFuncRegistry(context::getBeansWithAnnotation);
     }
 
 }

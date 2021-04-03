@@ -25,6 +25,8 @@ public class FuncLinkedList {
     }
 
     protected void add(CallerNode node) {
+        _size++;
+
         if(firstNode == null) {
             firstNode = node;
             return;
@@ -38,23 +40,20 @@ public class FuncLinkedList {
 
         lastNode.setNextNode(node);
         lastNode = node;
-
-        _size++;
     }
 
     public CallerParameter execute(CallerParameter parameter) {
+        if(checkOverflow()) {
+            throw new CrucioException("overflow");
+        }
+
         CallerParameter currentParameter = ensureCallerParameter(parameter);
         CallerNode currentNode = firstNode;
-
-        int count = 0;
+        
         while(currentNode != null) {
-            if(count > OVERFLOW_COUNT) {
-                throw new CrucioException("overflow");
-            }
             try {
                 currentParameter = createCallParameter(currentParameter, currentNode.doAction(currentParameter));
                 currentNode = currentNode.getNextNode();
-                count++;
             } catch(Throwable e) {
                 throw new ImperioException("caller excute error.", e);
             }
@@ -89,6 +88,10 @@ public class FuncLinkedList {
     protected CallerParameter createCallParameter(CallerParameter oldParameter, Object result) {
         CallerParameter newParameter = new CallerParameter(result, oldParameter.context());
         return newParameter;
+    }
+
+    protected boolean checkOverflow() {
+        return this.size() > OVERFLOW_COUNT;
     }
     
 }
