@@ -25,13 +25,13 @@ public class CallerTest {
                 Caller
                     .create()
                     .call(p -> {
-                    BigDecimal num = (BigDecimal) p.context().get("c_num_key");
-                    System.out.println("c_num_key: " + num);
-                    return null;
+                        BigDecimal num = (BigDecimal) p.context().get("c_num_key");
+                        System.out.println("c_num_key: " + num);
+                        return null;
                     })
                     .call(p -> {
-                    p.context().update("c_num_key", new BigDecimal("3"));
-                    return null;
+                        p.context().update("c_num_key", new BigDecimal("3"));
+                        return null;
                     })
                     .call(p -> "Hello")
                     .call(p -> p.result + " World !")

@@ -23,6 +23,16 @@ public class ParallelTaskResult {
         return getValue(index);
     }
 
+    public void forEach(Action1<Object> actionFn) {
+        if(actionFn == null) {
+            throw new IllegalArgumentException("the actionFn is required.");
+        }
+
+        for(int i = 0; i < resultValues.length; i++) {
+            actionFn.apply(getValue(i));
+        }
+    }
+
     public Action1<ResultModel> getValueSetter(final int index) {
         return result -> {
             resultValues[index] = result;

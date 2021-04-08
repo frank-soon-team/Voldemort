@@ -1,8 +1,11 @@
 package com.fs.voldemort.core;
 
+import java.math.BigDecimal;
+
 import com.fs.voldemort.Wand;
 import com.fs.voldemort.parallel.ParallelTaskResult;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ParallelCallerTest {
@@ -24,12 +27,47 @@ public class ParallelCallerTest {
                     return 3;
                 })
                 .exec();
-        System.out.println(System.currentTimeMillis() - time);
+
+        long expendTime = System.currentTimeMillis() - time;
+        Assert.assertTrue(expendTime < 6000L);
 
         ParallelTaskResult parallelTaskResult = (ParallelTaskResult) result;
-        System.out.println(parallelTaskResult.getResult());
-        System.out.println(parallelTaskResult.getResult());
-        System.out.println(parallelTaskResult.getResult());
+        Assert.assertTrue(Integer.valueOf(1).equals(parallelTaskResult.getResult()));
+        Assert.assertTrue(Integer.valueOf(2).equals(parallelTaskResult.getResult()));
+        Assert.assertTrue(Integer.valueOf(3).equals(parallelTaskResult.getResult()));
+    }
+
+    @Test
+    public void test_CallerWithParallel() {
+        Object result = Wand.caller()
+            .call(p -> 1)
+            .call(p -> new BigDecimal("3").add(new BigDecimal(p.result.toString())))
+            .call(
+                Wand.parallelCaller()
+                    .call(p -> p.result)
+                    .call(p -> {
+                        sleep(3000L);
+                        return 2;
+                    })
+                    .call(p -> {
+                        sleep(3000L);
+                        return 2;
+                    })
+                    .call(p -> {
+                        sleep(3000L);
+                        return 2;
+                    })
+            )
+            .call(p -> {
+                ParallelTaskResult parallelTaskResult = (ParallelTaskResult) p.result;
+                return new BigDecimal(parallelTaskResult.getResult().toString())
+                    .add(new BigDecimal(parallelTaskResult.getResult().toString()))
+                    .add(new BigDecimal(parallelTaskResult.getResult().toString()))
+                    .add(new BigDecimal(parallelTaskResult.getResult().toString()));
+            })
+            .exec();
+
+        Assert.assertTrue(((BigDecimal)result).equals(new BigDecimal("10")));
     }
 
     public static void sleep(long time) {
