@@ -61,7 +61,8 @@ public class Caller {
         return (R) exec((CallerParameter) null);
     }
     
-    protected Object exec(CallerParameter parameter) {
+    // TODO 不好的设计
+    public Object exec(CallerParameter parameter) {
         CallerParameter resultParam = funcList.execute(parameter);
         return resultParam.result;
     }

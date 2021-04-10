@@ -2,6 +2,8 @@ package com.fs.voldemort.core;
 
 import java.math.BigDecimal;
 
+import com.fs.voldemort.Wand;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,6 +47,15 @@ public class CallerTest {
             .exec();
 
         Assert.assertTrue(result.equals("success"));
+    }
+
+    @Test
+    public void test_dynamicCaller() {
+        Wand.caller()
+            .call(p -> 1)
+            .call(p -> ((Integer) p.result) + 1)
+            .call(p -> Wand.caller().call(p2 -> ((Integer) p2.result) + 2))
+            .exec(r -> Assert.assertTrue(Integer.valueOf(4).equals(r)));
     }
 
     public void test_BusinessCaller() {
