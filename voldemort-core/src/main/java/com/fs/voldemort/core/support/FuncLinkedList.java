@@ -55,7 +55,7 @@ public class FuncLinkedList {
                 int index = 1;
                 while(result instanceof Caller) {
                     checkOverflow(index);
-                    result = ((Caller) result).exec(currentParameter);
+                    result = ((Caller) result).exec();
                     index++;
                 }
                 currentParameter = createCallParameter(currentParameter, result);

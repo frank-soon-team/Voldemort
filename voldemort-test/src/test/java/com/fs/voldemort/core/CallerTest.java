@@ -54,7 +54,7 @@ public class CallerTest {
         Wand.caller()
             .call(p -> 1)
             .call(p -> ((Integer) p.result) + 1)
-            .call(p -> Wand.caller().call(p2 -> ((Integer) p2.result) + 2))
+            .call(p -> Wand.caller(p).call(p2 -> ((Integer) p2.result) + 2))
             .exec(r -> Assert.assertTrue(Integer.valueOf(4).equals(r)));
     }
 

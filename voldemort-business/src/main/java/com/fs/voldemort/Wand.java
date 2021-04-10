@@ -2,6 +2,7 @@ package com.fs.voldemort;
 
 import com.fs.voldemort.business.BusinessCaller;
 import com.fs.voldemort.core.Caller;
+import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelCaller;
 import com.fs.voldemort.tcc.TCCCaller;
 
@@ -11,6 +12,10 @@ public abstract class Wand {
 
     public static Caller caller() {
         return Caller.create();
+    }
+
+    public static Caller caller(CallerParameter initParameter) {
+        return new Caller(initParameter);
     }
 
     //#endregion
