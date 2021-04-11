@@ -21,7 +21,7 @@ public interface BusinessFuncCallable {
                         .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
                 .collect(Collectors.toList());
 
-        if(funcMethodList.size()>1) {
+        if(funcMethodList.size() > 1) {
             throw new CallerException("Settle function can only have one func method!");
         }else if(funcMethodList.isEmpty()) {
             return new HashSet<>();
@@ -41,11 +41,13 @@ public interface BusinessFuncCallable {
         Object result = p.result;
         if(null != result) {
             //Check result is fundamental type
-            final Class resultClazz = result.getClass();
+            final Class<?> resultClazz = result.getClass();
             if(!isAssignableFromMulti(resultClazz,Number.class,CharSequence.class,Collection.class,Map.class)) {
                 final Field[] resultFields = result.getClass().getDeclaredFields();
-                resultFieldMap.putAll(Arrays.stream(resultFields)
-                        .collect(Collectors.toMap(Field::getName,field -> {
+                resultFieldMap
+                    .putAll(Arrays.stream(resultFields)
+                    .collect(
+                        Collectors.toMap(Field::getName, field -> {
                             boolean isAccessible = field.isAccessible();
                             if(!isAccessible) {
                                 field.setAccessible(true);
@@ -54,31 +56,33 @@ public interface BusinessFuncCallable {
                                 return field.get(result);
                             } catch (IllegalAccessException e) {
                                 throw new CallerException("SettleFuncCallable paramFit error:"+e.getMessage());
-                            }finally {
+                            } finally {
                                 field.setAccessible(isAccessible);
                             }
-                        }
-                        )
-                        )
+                        })
+                    )
                 );
             }
         }
 
         //Get args from context
-        return argsSet.stream().peek(arg-> {
-                Object value = resultFieldMap.get(arg.name);
-                if(value!=null) {
-                    arg.value = value;
-                }else {
-                    arg.value = p.context().get(arg.name);
-                }
-            }).filter(arg-> arg.value != null)
-            .collect(Collectors.toSet());
+        return 
+            argsSet.stream()
+                .peek(arg-> {
+                    Object value = resultFieldMap.get(arg.name);
+                    if(value != null) {
+                        arg.value = value;
+                    } else {
+                        arg.value = p.context().get(arg.name);
+                    }
+                })
+                .filter(arg -> arg.value != null)
+                .collect(Collectors.toSet());
     }
 
-    static boolean isAssignableFromMulti(Class testClazz, Class... clazzes) {
+    static boolean isAssignableFromMulti(Class<?> testClazz, Class<?>... clazzes) {
         if(clazzes.length > 0){
-            for(Class clazz : clazzes) {
+            for(Class<?> clazz : clazzes) {
                 if(testClazz.isAssignableFrom(clazz)) {
                     return true;
                 }
