@@ -2,6 +2,8 @@ package com.fs.voldemort.business.support;
 
 import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.support.CallerParameter;
+import com.fs.voldemort.func.Func;
+
 import lombok.NonNull;
 
 import java.lang.reflect.Field;
@@ -16,64 +18,132 @@ public interface BusinessFuncCallable {
 
     default Set<Args> paramFit(@NonNull final CallerParameter p) {
 
+        PARAM_FIT_FUNC.call(p);
+
+        // final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
+        //         .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
+        //                 .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
+        //         .collect(Collectors.toList());
+
+        // if(funcMethodList.size()>1) {
+        //     throw new CallerException("Settle function can only have one func method!");
+        // }else if(funcMethodList.isEmpty()) {
+        //     return new HashSet<>();
+        // }
+
+        // Set<Args> argsSet = new HashSet<>();
+
+        // final Method funcMethod = funcMethodList.get(0);
+        // Arrays.stream(funcMethod.getParameters()).forEach(param->{
+        //     final String paramName = param.getName();
+        //     argsSet.add(new Args(paramName));
+        // });
+
+        // final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
+
+        // //Get args from param.result fields
+        // Object result = p.result;
+        // if(null != result) {
+        //     //Check result is fundamental type
+        //     final Class resultClazz = result.getClass();
+        //     if(!isAssignableFromMulti(resultClazz,Number.class,CharSequence.class,Collection.class,Map.class)) {
+        //         final Field[] resultFields = result.getClass().getDeclaredFields();
+        //         resultFieldMap.putAll(Arrays.stream(resultFields)
+        //                 .collect(Collectors.toMap(Field::getName,field -> {
+        //                     boolean isAccessible = field.isAccessible();
+        //                     if(!isAccessible) {
+        //                         field.setAccessible(true);
+        //                     }
+        //                     try {
+        //                         return field.get(result);
+        //                     } catch (IllegalAccessException e) {
+        //                         throw new CallerException("SettleFuncCallable paramFit error:"+e.getMessage());
+        //                     }finally {
+        //                         field.setAccessible(isAccessible);
+        //                     }
+        //                 }
+        //                 )
+        //                 )
+        //         );
+        //     }
+        // }
+
+        // //Get args from context
+        // return argsSet.stream().peek(arg-> {
+        //         Object value = resultFieldMap.get(arg.name);
+        //         if(value!=null) {
+        //             arg.value = value;
+        //         }else {
+        //             arg.value = p.context().get(arg.name);
+        //         }
+        //     }).filter(arg-> arg.value != null)
+        //     .collect(Collectors.toSet());
+    }
+
+    public static Func<CallerParameter,Set<Args>> PARAM_FIT_FUNC = (p)->{
+        
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
-                .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
-                        .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
-                .collect(Collectors.toList());
+        .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
+                .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
+        .collect(Collectors.toList());
 
-        if(funcMethodList.size()>1) {
-            throw new CallerException("Settle function can only have one func method!");
-        }else if(funcMethodList.isEmpty()) {
-            return new HashSet<>();
-        }
+if(funcMethodList.size()>1) {
+    throw new CallerException("Settle function can only have one func method!");
+}else if(funcMethodList.isEmpty()) {
+    return new HashSet<>();
+}
 
-        Set<Args> argsSet = new HashSet<>();
+Set<Args> argsSet = new HashSet<>();
 
-        final Method funcMethod = funcMethodList.get(0);
-        Arrays.stream(funcMethod.getParameters()).forEach(param->{
-            final String paramName = param.getName();
-            argsSet.add(new Args(paramName));
-        });
+final Method funcMethod = funcMethodList.get(0);
+Arrays.stream(funcMethod.getParameters()).forEach(param->{
+    final String paramName = param.getName();
+    argsSet.add(new Args(paramName));
+});
 
-        final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
+final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
 
-        //Get args from param.result fields
-        Object result = p.result;
-        if(null != result) {
-            //Check result is fundamental type
-            final Class resultClazz = result.getClass();
-            if(!isAssignableFromMulti(resultClazz,Number.class,CharSequence.class,Collection.class,Map.class)) {
-                final Field[] resultFields = result.getClass().getDeclaredFields();
-                resultFieldMap.putAll(Arrays.stream(resultFields)
-                        .collect(Collectors.toMap(Field::getName,field -> {
-                            boolean isAccessible = field.isAccessible();
-                            if(!isAccessible) {
-                                field.setAccessible(true);
-                            }
-                            try {
-                                return field.get(result);
-                            } catch (IllegalAccessException e) {
-                                throw new CallerException("SettleFuncCallable paramFit error:"+e.getMessage());
-                            }finally {
-                                field.setAccessible(isAccessible);
-                            }
-                        }
-                        )
-                        )
-                );
-            }
-        }
-
-        //Get args from context
-        return argsSet.stream().peek(arg-> {
-                Object value = resultFieldMap.get(arg.name);
-                if(value!=null) {
-                    arg.value = value;
-                }else {
-                    arg.value = p.context().get(arg.name);
+//Get args from param.result fields
+Object result = p.result;
+if(null != result) {
+    //Check result is fundamental type
+    final Class resultClazz = result.getClass();
+    if(!isAssignableFromMulti(resultClazz,Number.class,CharSequence.class,Collection.class,Map.class)) {
+        final Field[] resultFields = result.getClass().getDeclaredFields();
+        resultFieldMap.putAll(Arrays.stream(resultFields)
+                .collect(Collectors.toMap(Field::getName,field -> {
+                    boolean isAccessible = field.isAccessible();
+                    if(!isAccessible) {
+                        field.setAccessible(true);
+                    }
+                    try {
+                        return field.get(result);
+                    } catch (IllegalAccessException e) {
+                        throw new CallerException("SettleFuncCallable paramFit error:"+e.getMessage());
+                    }finally {
+                        field.setAccessible(isAccessible);
+                    }
                 }
-            }).filter(arg-> arg.value != null)
-            .collect(Collectors.toSet());
+                )
+                )
+        );
+    }
+}
+
+//Get args from context
+return argsSet.stream().peek(arg-> {
+        Object value = resultFieldMap.get(arg.name);
+        if(value!=null) {
+            arg.value = value;
+        }else {
+            arg.value = p.context().get(arg.name);
+        }
+    }).filter(arg-> arg.value != null)
+    .collect(Collectors.toSet());
+
+
+
+
     }
 
     static boolean isAssignableFromMulti(Class testClazz, Class... clazzes) {

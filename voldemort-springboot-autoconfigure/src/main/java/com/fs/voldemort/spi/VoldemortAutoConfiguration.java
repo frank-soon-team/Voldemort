@@ -6,13 +6,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Slf4j
 @Configuration
 public class VoldemortAutoConfiguration {
 
     @Bean
     public BusinessFuncRegistry businessFuncRegistry(ApplicationContext context) {
-        return new BusinessFuncRegistry(context::getBeansWithAnnotation);
+        return new BusinessFuncRegistry(annotationType->context.getBeansWithAnnotation(annotationType));
     }
 
 }
