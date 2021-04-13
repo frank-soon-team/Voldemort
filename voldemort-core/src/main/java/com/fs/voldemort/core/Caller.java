@@ -10,16 +10,26 @@ import java.util.function.Consumer;
 public class Caller {
 
     protected final FuncLinkedList funcList;
+    private final CallerParameter initailizationParameter;
 
     public Caller() {
-        funcList  = new FuncLinkedList();
+        this(new FuncLinkedList(), null);
+    }
+
+    public Caller(CallerParameter iniParameter) {
+        this(new FuncLinkedList(), iniParameter);
     }
 
     protected Caller(FuncLinkedList funcLinkedList) {
+        this(funcLinkedList, null);
+    }
+
+    protected Caller(FuncLinkedList funcLinkedList, CallerParameter iniCallerParameter) {
         if(funcLinkedList == null) {
             throw new IllegalArgumentException("the parameter funcLinkedList is required.");
         }
         funcList = funcLinkedList;
+        initailizationParameter = iniCallerParameter;
     }
 
     public static Caller create(Func0<Object> rootAct) {
@@ -58,7 +68,7 @@ public class Caller {
 
     @SuppressWarnings("unchecked")
     public <R> R exec() {
-        return (R) exec((CallerParameter) null);
+        return (R) exec(initailizationParameter);
     }
     
     protected Object exec(CallerParameter parameter) {

@@ -22,17 +22,17 @@ import java.util.stream.Collectors;
  */
 public class BusinessFuncRegistry {
 
-    private Map<Class, BusinessFunc> funcContainer;
+    private Map<Class<?>, BusinessFunc> funcContainer;
 
-    private final Func<Class, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc;
+    private final Func<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc;
 
-    public BusinessFuncRegistry(Func<Class, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc){
+    public BusinessFuncRegistry(Func<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc){
         this.getBusinessFuncHorcruxesFunc = getBusinessFuncHorcruxesFunc;
         init();
         scanAndFill();
     }
 
-    private void init(){
+    private void init() {
         funcContainer = new ConcurrentHashMap<>();
         BusinessCaller.businessFuncRegistry = this;
     }
@@ -43,7 +43,8 @@ public class BusinessFuncRegistry {
             return;
         }
         final Map<Method, BusinessFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcContainer.size());
-        funcContainer.putAll(funcHorcruxesBeanMap.values().stream()
+        funcContainer.putAll(
+            funcHorcruxesBeanMap.values().stream()
                 .map(
                     funcHorcruxes -> {
                         return Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
@@ -74,20 +75,19 @@ public class BusinessFuncRegistry {
         );
     }
 
-    @SuppressWarnings("unchecked")
-    public BusinessFunc getFunc(final Class funcClazz) {
+    public BusinessFunc getFunc(final Class<?> funcClazz) {
         return funcContainer.get(funcClazz);
     }
 
     public class BusinessFunc {
 
-        public final Class funcClazz;
+        public final Class<?> funcClazz;
 
-        public final DynamicFunc func;
+        public final DynamicFunc<?> func;
 
         public final Func<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc;
 
-        public BusinessFunc(Class funClass, DynamicFunc func, 
+        public BusinessFunc(Class<?> funClass, DynamicFunc<?> func, 
             Func<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc) {
             this.funcClazz = funClass;
             this.func = func;

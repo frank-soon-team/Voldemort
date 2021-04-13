@@ -13,8 +13,8 @@ public class ExecuteCallerNodeException extends RuntimeException {
 
     private String name;
 
-    public ExecuteCallerNodeException(String message, Throwable e, CallerNode node, CallerParameter parameter) {
-        super(message, e);
+    public ExecuteCallerNodeException(Throwable e, CallerNode node, CallerParameter parameter) {
+        super(e);
         this.node = node;
         this.parameter = parameter;
     }

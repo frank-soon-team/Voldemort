@@ -2,6 +2,8 @@ package com.fs.voldemort.core;
 
 import java.math.BigDecimal;
 
+import com.fs.voldemort.Wand;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,41 +12,50 @@ public class CallerTest {
     @Test
     public void test_Caller() {
         String result = Caller
-           .create()
-           .call(p -> {
-               System.out.println("call1:" + String.valueOf(p.result));
-               p.context().set("c_key","c_value1");
-               return new BigDecimal("1");
-           })
-           .call(p -> {
-               System.out.println("call2: " + p.result);
-               p.context().set("c_num_key", new BigDecimal("2"));
-               return ((BigDecimal)p.result).add(new BigDecimal("1"));
-           })
-           .call(
-               Caller
-                .create()
-                .call(p -> {
-                    BigDecimal num = (BigDecimal) p.context().get("c_num_key");
-                    System.out.println("c_num_key: " + num);
-                    return null;
-                })
-                .call(p -> {
-                    p.context().update("c_num_key", new BigDecimal("3"));
-                    return null;
-                })
-                .call(p -> "Hello")
-                .call(p -> p.result + " World !")
-           )
-           .call(p -> {
-               System.out.println("call3: " + p.result);
-               System.out.println("p.context.c_key: " + p.context().get("c_key"));
-               System.out.println("p.context.c_num_key: " + p.context().get("c_num_key"));
-               return "success";
-           })
-           .exec();
+            .create()
+            .call(p -> {
+                System.out.println("call1:" + String.valueOf(p.result));
+                p.context().set("c_key","c_value1");
+                return new BigDecimal("1");
+            })
+            .call(p -> {
+                System.out.println("call2: " + p.result);
+                p.context().set("c_num_key", new BigDecimal("2"));
+                return ((BigDecimal)p.result).add(new BigDecimal("1"));
+            })
+            .call(
+                Caller
+                    .create()
+                    .call(p -> {
+                        BigDecimal num = (BigDecimal) p.context().get("c_num_key");
+                        System.out.println("c_num_key: " + num);
+                        return null;
+                    })
+                    .call(p -> {
+                        p.context().update("c_num_key", new BigDecimal("3"));
+                        return null;
+                    })
+                    .call(p -> "Hello")
+                    .call(p -> p.result + " World !")
+            )
+            .call(p -> {
+                System.out.println("call3: " + p.result);
+                System.out.println("p.context.c_key: " + p.context().get("c_key"));
+                System.out.println("p.context.c_num_key: " + p.context().get("c_num_key"));
+                return "success";
+            })
+            .exec();
 
         Assert.assertTrue(result.equals("success"));
+    }
+
+    @Test
+    public void test_dynamicCaller() {
+        Wand.caller()
+            .call(p -> 1)
+            .call(p -> ((Integer) p.result) + 1)
+            .call(p -> Wand.caller(p).call(p2 -> ((Integer) p2.result) + 2))
+            .exec(r -> Assert.assertTrue(Integer.valueOf(4).equals(r)));
     }
 
     public void test_BusinessCaller() {
@@ -55,14 +66,14 @@ public class CallerTest {
         /*
 
             // Lambda调用链
-            Voldemort.caller().call().exec();
+            Wand.caller().call().exec();
             // 函数调用链
-            Voldemort.businessCaller().call().exec();
+            Wand.businessCaller().call().exec();
             // TCC事务链
-            Voldemort.tccCaller().call().exec();
+            Wand.tccCaller().call().exec();
 
             // 多事务链
-            Voldemort.caller()
+            Wand.caller()
                 .call(
                     Voldmort.tccCaller().call(ITCCNode.class)
                 )

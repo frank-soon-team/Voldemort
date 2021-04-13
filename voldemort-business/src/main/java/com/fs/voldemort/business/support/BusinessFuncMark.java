@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD,ElementType.FIELD})
 public @interface BusinessFuncMark {
 
-    Class value();
+    Class<?> value();
 
 }

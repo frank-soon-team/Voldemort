@@ -22,24 +22,29 @@ public class BusinessCaller extends Caller
 public class TCCCaller extends BusinessCaller
 ```
 
+## ParallelCaller
+```
+public class ParallelCaller extends Caller
+```
+
 ## AsyncCaller
 ```
 public class AsyncCaller extends Caller
 ```
 
-## Voldemort
+## Wand
 ```
 // Lambda调用链
-Voldemort.caller().call().exec();
+Wand.caller().call().exec();
 
 // 函数调用链
-Voldemort.businessCaller().call().exec();
+Wand.businessCaller().call().exec();
 
 // TCC事务链
-Voldemort.tccCaller().call().exec();
+Wand.tccCaller().call().exec();
 
 // 多事务链
-Voldemort.caller()
+Wand.caller()
     .call(
         Voldmort.tccCaller().call(ITCCNode.class)
     )

@@ -1,5 +1,6 @@
 package com.fs.voldemort.core.support;
 
+import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.exception.ImperioException;
 import com.fs.voldemort.func.Func;
@@ -25,6 +26,8 @@ public class FuncLinkedList {
     }
 
     protected void add(CallerNode node) {
+        _size++;
+
         if(firstNode == null) {
             firstNode = node;
             return;
@@ -38,23 +41,25 @@ public class FuncLinkedList {
 
         lastNode.setNextNode(node);
         lastNode = node;
-
-        _size++;
     }
 
     public CallerParameter execute(CallerParameter parameter) {
+        checkOverflow(this.size());
+
         CallerParameter currentParameter = ensureCallerParameter(parameter);
         CallerNode currentNode = firstNode;
-
-        int count = 0;
+        
         while(currentNode != null) {
-            if(count > OVERFLOW_COUNT) {
-                throw new CrucioException("overflow");
-            }
             try {
-                currentParameter = createCallParameter(currentParameter, currentNode.doAction(currentParameter));
+                Object result = currentNode.doAction(currentParameter);
+                int index = 1;
+                while(result instanceof Caller) {
+                    checkOverflow(index);
+                    result = ((Caller) result).exec();
+                    index++;
+                }
+                currentParameter = createCallParameter(currentParameter, result);
                 currentNode = currentNode.getNextNode();
-                count++;
             } catch(Throwable e) {
                 throw new ImperioException("caller excute error.", e);
             }
@@ -89,6 +94,12 @@ public class FuncLinkedList {
     protected CallerParameter createCallParameter(CallerParameter oldParameter, Object result) {
         CallerParameter newParameter = new CallerParameter(result, oldParameter.context());
         return newParameter;
+    }
+
+    protected void checkOverflow(int index) {
+        if(index > OVERFLOW_COUNT) {
+            throw new CrucioException("overflow");
+        }
     }
     
 }
