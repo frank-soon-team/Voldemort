@@ -14,17 +14,13 @@ public class BusinessCaller extends Caller {
 
     public static BusinessFuncRegistry businessFuncRegistry;
 
-    public static BusinessCaller create(){
-        return new BusinessCaller();
-    }
-
     private BusinessCaller() {
         super();
     }
 
     public BusinessCaller call(Class<BusinessFuncCallable> funcClazz) {
         final BusinessFunc bFunc = businessFuncRegistry.getFunc(funcClazz);
-        this.call(p->{
+        this.call(p -> {
             return bFunc.func.call(bFunc.paramFitFunc.call(p).toArray());
         });
         return this;
@@ -34,6 +30,10 @@ public class BusinessCaller extends Caller {
     public BusinessCaller call(Func<CallerParameter, Object> func) {
         super.call(func);
         return this;
+    }
+
+    public static BusinessCaller create() {
+        return new BusinessCaller();
     }
 
 }

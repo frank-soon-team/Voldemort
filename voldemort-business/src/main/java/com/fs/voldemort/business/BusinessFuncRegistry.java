@@ -32,7 +32,7 @@ public class BusinessFuncRegistry {
         scanAndFill();
     }
 
-    private void init(){
+    private void init() {
         funcContainer = new ConcurrentHashMap<>();
         BusinessCaller.businessFuncRegistry = this;
     }
