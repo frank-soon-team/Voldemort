@@ -16,20 +16,20 @@ public class Caller {
         this(new FuncLinkedList(), null);
     }
 
-    public Caller(CallerParameter iniParameter) {
-        this(new FuncLinkedList(), iniParameter);
+    public Caller(CallerParameter initParameter) {
+        this(new FuncLinkedList(), initParameter);
     }
 
     protected Caller(FuncLinkedList funcLinkedList) {
         this(funcLinkedList, null);
     }
 
-    protected Caller(FuncLinkedList funcLinkedList, CallerParameter iniCallerParameter) {
+    protected Caller(FuncLinkedList funcLinkedList, CallerParameter initCallerParameter) {
         if(funcLinkedList == null) {
-            throw new IllegalArgumentException("the parameter funcLinkedList is required.");
+            throw new IllegalArgumentException("the parameter funcLinkedList of constructor is required.");
         }
         funcList = funcLinkedList;
-        initailizationParameter = iniCallerParameter;
+        initailizationParameter = initCallerParameter;
     }
 
     public static Caller create(Func0<Object> rootAct) {

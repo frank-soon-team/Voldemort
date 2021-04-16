@@ -2,7 +2,6 @@ package com.fs.voldemort.tcc;
 
 import java.util.List;
 
-import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
@@ -39,13 +38,37 @@ import com.fs.voldemort.tcc.strategy.IConfirmCompensateStrategy;
  * </p>
  * 
  */
-public class TCCManager extends FuncLinkedList {
+public abstract class TCCManager extends FuncLinkedList {
 
     private final static String TCC_EXECUTE_STATE = "TCC_EXECUTE_STATE";
 
     private IStateManager stateManager;
     private IConfirmCompensateStrategy confirmCompensateStrategy;
     private ICancelCompensateStrategy cancelCompensateStrategy;
+
+    public IStateManager getStateManager() {
+        return stateManager;
+    }
+
+    public void setStateManager(IStateManager stateManager) {
+        this.stateManager = stateManager;
+    }
+
+    public IConfirmCompensateStrategy getConfirmCompensateStrategy() {
+        return confirmCompensateStrategy;
+    }
+
+    public void setConfirmCompensateStrategy(IConfirmCompensateStrategy confirmCompensateStrategy) {
+        this.confirmCompensateStrategy = confirmCompensateStrategy;
+    }
+
+    public ICancelCompensateStrategy getCancelCompensateStrategy() {
+        return cancelCompensateStrategy;
+    }
+
+    public void setCancelCompensateStrategy(ICancelCompensateStrategy cancelCompensateStrategy) {
+        this.cancelCompensateStrategy = cancelCompensateStrategy;
+    }
 
     public void add(ITCCHandler tccHandler) {
         if(tccHandler == null) {
@@ -96,15 +119,12 @@ public class TCCManager extends FuncLinkedList {
     //#region TCC Transactional
 
     protected CallerParameter prepare(CallerParameter parameter, CallerNode startNode) {
+        checkOverflow(this.size());
+
         CallerParameter currentParameter = parameter;
         CallerNode currentNode = startNode;
 
-        int count = 0;
         while(currentNode != null) {
-            if(count > OVERFLOW_COUNT) {
-                throw new CrucioException("overflow");
-            }
-
             Object result = null;
             if(currentNode instanceof TCCNode) {
                 result = executeTCCNode((TCCNode)currentNode, currentParameter);
@@ -112,7 +132,8 @@ public class TCCManager extends FuncLinkedList {
                 result = executeNormalNode(currentNode, currentParameter);
             }
 
-            count++;
+            result = tryCallSubCaller(result);
+
             currentParameter = createCallParameter(currentParameter, result);
             currentNode = currentNode.getNextNode();
         }

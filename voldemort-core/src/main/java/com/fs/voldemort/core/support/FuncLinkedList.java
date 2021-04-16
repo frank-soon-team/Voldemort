@@ -52,12 +52,7 @@ public class FuncLinkedList {
         while(currentNode != null) {
             try {
                 Object result = currentNode.doAction(currentParameter);
-                int index = 1;
-                while(result instanceof Caller) {
-                    checkOverflow(index);
-                    result = ((Caller) result).exec();
-                    index++;
-                }
+                result = tryCallSubCaller(result);
                 currentParameter = createCallParameter(currentParameter, result);
                 currentNode = currentNode.getNextNode();
             } catch(Throwable e) {
@@ -100,6 +95,19 @@ public class FuncLinkedList {
         if(index > OVERFLOW_COUNT) {
             throw new CrucioException("overflow");
         }
+    }
+
+    protected Object tryCallSubCaller(final Object result) {
+        Object resultValue = result;
+
+        int index = 1;
+        while(result instanceof Caller) {
+            checkOverflow(index);
+            resultValue = ((Caller) result).exec();
+            index++;
+        }
+
+        return resultValue;
     }
     
 }
