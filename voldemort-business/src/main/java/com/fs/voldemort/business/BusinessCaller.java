@@ -1,6 +1,5 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
 /**
@@ -8,9 +7,7 @@ import com.fs.voldemort.core.support.CallerParameter;
  *
  * @author frank
  */
-public class BusinessCaller extends Caller {
-
-    public static BusinessFuncContainer businessFuncContainer;
+public class BusinessCaller extends BusinessFuncAvailableCaller {
 
     private BusinessCaller() {
         super();
