@@ -38,7 +38,7 @@
     <modules>
         <module>voldemort-core</module>
         <module>voldemort-business</module>
-        <module>voldemort-func</module>
+        <module>voldemort-business-tcc-support</module>
         <module>voldemort-springboot-starter</module>
         <module>voldemort-springboot-autoconfigure</module>
         <module>voldemort-test</module>

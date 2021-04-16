@@ -3,7 +3,7 @@ package com.fs.voldemort.core.support;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.exception.ImperioException;
-import com.fs.voldemort.func.Func;
+import com.fs.voldemort.core.functional.func.Func1;
 
 public class FuncLinkedList {
 
@@ -16,7 +16,7 @@ public class FuncLinkedList {
     public FuncLinkedList() {
     }
 
-    public void add(Func<CallerParameter, Object> func) {
+    public void add(Func1<CallerParameter, Object> func) {
         if(func == null) {
             throw new IllegalArgumentException("the parameter func is required.");
         }

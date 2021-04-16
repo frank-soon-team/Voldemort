@@ -1,7 +1,7 @@
 package com.fs.voldemort.parallel;
 
-import com.fs.voldemort.action.Action1;
 import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.functional.action.Action1;
 
 public class ParallelTaskResult {
 

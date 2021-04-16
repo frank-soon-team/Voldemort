@@ -7,10 +7,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 
 import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.functional.func.Func1;
+import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
-import com.fs.voldemort.func.Func;
-import com.fs.voldemort.func.Func2;
 
 public class ParallelTaskList extends FuncLinkedList {
 
@@ -34,7 +34,7 @@ public class ParallelTaskList extends FuncLinkedList {
     }
 
     @Override
-    public void add(Func<CallerParameter, Object> func) {
+    public void add(Func1<CallerParameter, Object> func) {
         if(func == null) {
             throw new IllegalArgumentException("the parameter func is required.");
         }

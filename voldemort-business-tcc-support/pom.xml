@@ -9,9 +9,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>voldemort-func</artifactId>
-    <name>voldemort-func</name>
+    <artifactId>voldemort-business-tcc-support</artifactId>
+    <name>voldemort-business-tcc-support</name>
 
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fs</groupId>
+            <artifactId>voldemort-business</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
