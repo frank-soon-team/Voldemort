@@ -41,7 +41,7 @@ public class ParallelTaskResult {
 
     private Object getValue(int index) {
         if(index >= resultValues.length) {
-            throw new IndexOutOfBoundsException(index);
+            // throw new IndexOutOfBoundsException(index);
         }
 
         ResultModel result = resultValues[index];
