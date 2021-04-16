@@ -18,7 +18,7 @@ public class BusinessCaller extends Caller {
         super();
     }
 
-    public BusinessCaller call(Class<BusinessFuncCallable> funcClazz) {
+    public BusinessCaller call(Class<?> funcClazz) {
         final BusinessFunc bFunc = businessFuncRegistry.getFunc(funcClazz);
         this.call(p -> {
             return bFunc.func.call(bFunc.paramFitFunc.call(p).toArray());
