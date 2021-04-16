@@ -1,4 +1,4 @@
-package com.fs.voldemort.func;
+package com.fs.voldemort.core.functional.func;
 
 @FunctionalInterface
 public interface Func7<T1, T2, T3, T4, T5, T6, T7, R> {

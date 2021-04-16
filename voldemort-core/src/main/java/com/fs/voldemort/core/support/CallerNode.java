@@ -1,14 +1,14 @@
 package com.fs.voldemort.core.support;
 
-import com.fs.voldemort.action.Action1;
-import com.fs.voldemort.action.Action2;
-import com.fs.voldemort.func.Func;
+import com.fs.voldemort.core.functional.action.Action1;
+import com.fs.voldemort.core.functional.action.Action2;
+import com.fs.voldemort.core.functional.func.Func1;
 
 public class CallerNode {
 
     private Action1<CallerParameter> beforeAction;
     
-    private Func<CallerParameter, Object> actionFunc;
+    private Func1<CallerParameter, Object> actionFunc;
 
     private Action2<CallerParameter, Object> afterAction;
 
@@ -16,7 +16,7 @@ public class CallerNode {
 
     private CallerNode nextNode;
 
-    public CallerNode(Func<CallerParameter, Object> actionFunc) {
+    public CallerNode(Func1<CallerParameter, Object> actionFunc) {
         setActionFunc(actionFunc);
     }
 
@@ -38,14 +38,14 @@ public class CallerNode {
         this.nextNode = nextNode;
     }
 
-    public void setActionFunc(Func<CallerParameter, Object> actionFunc) {
+    public void setActionFunc(Func1<CallerParameter, Object> actionFunc) {
         if(actionFunc == null) {
             throw new IllegalArgumentException("the parameter actionFunc is required.");
         }
         this.actionFunc = actionFunc;
     }
 
-    public Func<CallerParameter, Object> getActionFunc() {
+    public Func1<CallerParameter, Object> getActionFunc() {
         return this.actionFunc;
     }
 

@@ -1,9 +1,9 @@
 package com.fs.voldemort.core;
 
+import com.fs.voldemort.core.functional.func.Func0;
+import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
-import com.fs.voldemort.func.Func;
-import com.fs.voldemort.func.Func0;
 
 import java.util.function.Consumer;
 
@@ -44,7 +44,7 @@ public class Caller {
         return new Caller();
     }
 
-    public Caller call(Func<CallerParameter, Object> func) {
+    public Caller call(Func1<CallerParameter, Object> func) {
         funcList.add(func);
         return this;
     }

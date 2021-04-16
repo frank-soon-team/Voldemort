@@ -2,11 +2,11 @@ package com.fs.voldemort.parallel;
 
 import java.util.concurrent.CountDownLatch;
 
-import com.fs.voldemort.action.Action1;
 import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.functional.action.Action1;
+import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.func.Func;
 
 public class ParallelTaskNode extends CallerNode implements Runnable {
 
@@ -14,7 +14,7 @@ public class ParallelTaskNode extends CallerNode implements Runnable {
     private CallerParameter currentCallerParameter;
     private Action1<ParallelTaskResult.ResultModel> currentResultSetter;
 
-    public ParallelTaskNode(Func<CallerParameter, Object> actionFunc) {
+    public ParallelTaskNode(Func1<CallerParameter, Object> actionFunc) {
         super(actionFunc);
     }
 

@@ -3,8 +3,8 @@ package com.fs.voldemort.business;
 import com.fs.voldemort.business.BusinessFuncRegistry.BusinessFunc;
 import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.core.Caller;
+import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.func.Func;
 /**
  * Polymerize caller
  *
@@ -27,7 +27,7 @@ public class BusinessCaller extends Caller {
     }
 
     @Override
-    public BusinessCaller call(Func<CallerParameter, Object> func) {
+    public BusinessCaller call(Func1<CallerParameter, Object> func) {
         super.call(func);
         return this;
     }

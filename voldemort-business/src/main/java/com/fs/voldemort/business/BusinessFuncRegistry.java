@@ -4,9 +4,9 @@ import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.business.support.BusinessFuncHorcruxes;
 import com.fs.voldemort.business.support.BusinessFuncMark;
 import com.fs.voldemort.core.exception.CallerException;
+import com.fs.voldemort.core.functional.func.DynamicFunc;
+import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.func.DynamicFunc;
-import com.fs.voldemort.func.Func;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -24,9 +24,9 @@ public class BusinessFuncRegistry {
 
     private Map<Class<?>, BusinessFunc> funcContainer;
 
-    private final Func<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc;
+    private final Func1<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc;
 
-    public BusinessFuncRegistry(Func<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc){
+    public BusinessFuncRegistry(Func1<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc){
         this.getBusinessFuncHorcruxesFunc = getBusinessFuncHorcruxesFunc;
         init();
         scanAndFill();
@@ -85,10 +85,10 @@ public class BusinessFuncRegistry {
 
         public final DynamicFunc<?> func;
 
-        public final Func<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc;
+        public final Func1<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc;
 
         public BusinessFunc(Class<?> funClass, DynamicFunc<?> func, 
-            Func<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc) {
+            Func1<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc) {
             this.funcClazz = funClass;
             this.func = func;
             this.paramFitFunc = paramFitFunc;

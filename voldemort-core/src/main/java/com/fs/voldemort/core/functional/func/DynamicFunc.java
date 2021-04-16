@@ -1,4 +1,4 @@
-package com.fs.voldemort.func;
+package com.fs.voldemort.core.functional.func;
 
 /**
  * @author frank
