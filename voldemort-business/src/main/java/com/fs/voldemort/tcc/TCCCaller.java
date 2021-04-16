@@ -5,8 +5,8 @@ import com.fs.voldemort.tcc.node.ITCCHandler;
 
 public class TCCCaller extends Caller {
 
-    public TCCCaller() {
-        super(new TCCManager());
+    public TCCCaller(TCCManager tccManager) {
+        super(tccManager);
     }
 
     public Caller call(ITCCHandler tccHandler) {
@@ -18,8 +18,11 @@ public class TCCCaller extends Caller {
         return (TCCManager) this.funcList;
     }
 
-    public static TCCCaller create() {
-        return new TCCCaller();
+    public static TCCCaller create(TCCManager tccManager) {
+        if(tccManager == null) {
+            throw new IllegalArgumentException("the parameter tccManager is required. ");
+        }
+        return new TCCCaller(tccManager);
     }
     
 }

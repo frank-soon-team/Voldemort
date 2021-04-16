@@ -5,6 +5,7 @@ import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelCaller;
 import com.fs.voldemort.tcc.TCCCaller;
+import com.fs.voldemort.tcc.TCCManager;
 
 public abstract class Wand {
 
@@ -30,8 +31,8 @@ public abstract class Wand {
 
     //#region TCCCaller
 
-    public static TCCCaller tccCaller() {
-        return TCCCaller.create();
+    public static TCCCaller tccCaller(TCCManager tccManager) {
+        return TCCCaller.create(tccManager);
     }
 
     //#endregion
