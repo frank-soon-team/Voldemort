@@ -1,7 +1,5 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.business.BusinessFuncRegistry.BusinessFunc;
-import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.func.Func;
@@ -12,14 +10,14 @@ import com.fs.voldemort.func.Func;
  */
 public class BusinessCaller extends Caller {
 
-    public static BusinessFuncRegistry businessFuncRegistry;
+    public static BusinessFuncContainer businessFuncContainer;
 
     private BusinessCaller() {
         super();
     }
 
     public BusinessCaller call(Class<?> funcClazz) {
-        final BusinessFunc bFunc = businessFuncRegistry.getFunc(funcClazz);
+        final BusinessFunc bFunc = businessFuncContainer.getFunc(funcClazz);
         this.call(p -> {
             return bFunc.func.call(bFunc.paramFitFunc.call(p).toArray());
         });
