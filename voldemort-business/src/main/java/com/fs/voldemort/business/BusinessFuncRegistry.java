@@ -4,17 +4,13 @@ import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.business.support.BusinessFuncHorcruxes;
 import com.fs.voldemort.business.support.BusinessFuncMark;
 import com.fs.voldemort.core.exception.CallerException;
-import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.func.DynamicFunc;
-import com.fs.voldemort.func.Func;
+import com.fs.voldemort.core.functional.func.Func1;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class BusinessFuncRegistry {
 
-    public static Func<Func<Class<?>, Map<String, BusinessFuncCallable>>,Map<Class<?>, BusinessFunc>> scanFunc = (getBusinessFuncHorcruxesFunc) -> {
+    public static Func1<Func1<Class<?>, Map<String, BusinessFuncCallable>>,Map<Class<?>, BusinessFunc>> scanFunc = (getBusinessFuncHorcruxesFunc) -> {
         final Map<String, BusinessFuncCallable> funcHorcruxesBeanMap = getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class);
         if (funcHorcruxesBeanMap.isEmpty()) {
             return null;
