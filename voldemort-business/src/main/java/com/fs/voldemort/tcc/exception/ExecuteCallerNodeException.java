@@ -5,8 +5,6 @@ import com.fs.voldemort.core.support.CallerParameter;
 
 public class ExecuteCallerNodeException extends IllegalStateException {
 
-    private static final long serialVersionUID = 8874801524460382873L;
-
     private CallerParameter parameter;
 
     private CallerNode node;

@@ -94,6 +94,7 @@ public abstract class TCCManager extends FuncLinkedList {
         stateManager.begin(state);
         try {
             currentParameter = prepare(currentParameter, startNode);
+            state.setStatus(TCCStatus.TrySuccess);
         } catch(ExecuteCallerNodeException e) {
             state.collectExceptional(e);
         }
@@ -101,12 +102,12 @@ public abstract class TCCManager extends FuncLinkedList {
         // 保存try阶段的数据
         stateManager.update(state);
 
-        // isRollback和isEnd互斥，只能满足其中一个
-        if(state.isRollback()) {
-            rollback(state);
-        }
-        if(state.isEnd()) {
+        System.out.println("status: " + state.getStatus());
+        
+        if(state.isConfirm()) {
             commit(state);
+        } else {
+            rollback(state);
         }
         // 更新TCC执行结果
         stateManager.end(state);
@@ -124,6 +125,8 @@ public abstract class TCCManager extends FuncLinkedList {
         CallerParameter currentParameter = parameter;
         CallerNode currentNode = startNode;
 
+        TCCExecuteState tccState = getTCCState(currentParameter);
+
         while(currentNode != null) {
             Object result = null;
             if(currentNode instanceof TCCNode) {
@@ -132,15 +135,16 @@ public abstract class TCCManager extends FuncLinkedList {
                 result = executeNormalNode(currentNode, currentParameter);
             }
 
-            result = tryCallSubCaller(result);
+            try {
+                result = tryCallSubCaller(result);
+            } catch(RuntimeException e) {
+                tccState.setStatus(TCCStatus.TryFaild);
+                throw new ExecuteCallerNodeException(e, currentNode, currentParameter);
+            }
 
             currentParameter = createCallParameter(currentParameter, result);
             currentNode = currentNode.getNextNode();
         }
-
-        TCCExecuteState state = getTCCState(currentParameter);
-        state.setRollback(false);
-        state.setEnd(true);
 
         return currentParameter;
     }
@@ -158,12 +162,7 @@ public abstract class TCCManager extends FuncLinkedList {
             }
             tccState.setStatus(TCCStatus.ConfirmSuccess);
         } catch(RuntimeException e) {
-            if(e instanceof TCCTimeoutException) {
-                tccState.setStatus(TCCStatus.ConfirmTimeout);
-            } else {
-                tccState.setStatus(TCCStatus.ConfirmFailed);
-            }
-
+            tccState.setStatus(e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
             confirmCompensateStrategy.retry(state);
         }
     }
@@ -177,18 +176,13 @@ public abstract class TCCManager extends FuncLinkedList {
         TCCExecuteState tccState = (TCCExecuteState) state;
         try {
             int count = triedNodeList.size();
-            for(int i = count - 1; i >= 0; i++) {
+            for(int i = count - 1; i >= 0; i--) {
                 TCCNode tccNode = triedNodeList.get(i);
                 tccNode.doCancel();
             }
             tccState.setStatus(TCCStatus.CancelSuccess);
         } catch(RuntimeException e) {
-            if(e instanceof TCCTimeoutException) {
-                tccState.setStatus(TCCStatus.CancelTimeout);
-            } else {
-                tccState.setStatus(TCCStatus.CancelFailed);
-            }
-
+            tccState.setStatus(e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
             cancelCompensateStrategy.retry(state);
         }
     }
@@ -207,7 +201,7 @@ public abstract class TCCManager extends FuncLinkedList {
             node.setNodeParameter(parameter);
             return node.doAction(parameter);
         } catch(RuntimeException e) {
-            state.setRollback(true);
+            state.setStatus(e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
             throw new ExecuteCallerNodeException(e, node, parameter);
         } finally {
             state.addTriedNode(node);
@@ -225,7 +219,7 @@ public abstract class TCCManager extends FuncLinkedList {
             return node.doAction(parameter);
         } catch(RuntimeException e) {
             TCCExecuteState state = (TCCExecuteState) getTCCState(parameter);
-            state.setRollback(true);
+            state.setStatus(TCCStatus.TryFaild);
             throw new ExecuteCallerNodeException(e, node, parameter);
         }
     }
@@ -235,7 +229,6 @@ public abstract class TCCManager extends FuncLinkedList {
         if(exception != null) {
             throw exception;
         }
-
     }
 
     private TCCExecuteState getTCCState(CallerParameter parameter) {

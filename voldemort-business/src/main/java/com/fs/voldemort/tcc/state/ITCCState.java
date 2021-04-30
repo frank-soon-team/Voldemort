@@ -3,6 +3,7 @@ package com.fs.voldemort.tcc.state;
 import java.util.List;
 
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
+import com.fs.voldemort.tcc.exception.TCCStateException;
 import com.fs.voldemort.tcc.node.TCCNode;
 
 public interface ITCCState {
@@ -10,6 +11,10 @@ public interface ITCCState {
     String identify();
 
     void collectExceptional(ExecuteCallerNodeException e);
+
+    void setStateException(TCCStateException e);
+
+    TCCStateException getStateException();
 
     ExecuteCallerNodeException getCallerNodeException();
 
@@ -19,9 +24,11 @@ public interface ITCCState {
 
     List<TCCNode> getTriedNodeList();
 
-    boolean isEnd();
+    boolean isConfirm();
 
-    boolean isRollback();
+    boolean isSuccess();
+
+    boolean isEnd();
 
     int getStatus();
     

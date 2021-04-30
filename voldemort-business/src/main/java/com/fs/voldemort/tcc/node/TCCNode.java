@@ -5,7 +5,7 @@ import com.fs.voldemort.core.support.CallerParameter;
 
 public class TCCNode extends CallerNode {
 
-    private ITCCHandler tccHandler;
+    private final ITCCHandler tccHandler;
     private CallerParameter nodeParameter;
 
     public TCCNode(ITCCHandler tccHandler) {
@@ -38,5 +38,9 @@ public class TCCNode extends CallerNode {
     
     public CallerParameter getNodeParameter() {
         return this.nodeParameter;
+    }
+
+    public ITCCHandler getTCCHandler() {
+        return tccHandler;
     }
 }

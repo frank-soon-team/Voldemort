@@ -27,4 +27,8 @@ public interface IConverter<K> {
 
     Date getDateValue(K key);
 
+    Date getDateValue(K key, String dateFormatter);
+
+    <T> T getValue(K key);
+
 }

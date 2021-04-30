@@ -9,7 +9,7 @@ public class TCCCaller extends Caller {
         super(tccManager);
     }
 
-    public Caller call(ITCCHandler tccHandler) {
+    public TCCCaller call(ITCCHandler tccHandler) {
         getTCCManager().add(tccHandler);
         return this;
     }
