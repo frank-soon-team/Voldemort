@@ -4,6 +4,6 @@ import com.fs.voldemort.business.BusinessFunc;
 
 public interface BusinessFuncAddable {
 
-    void add(Class<?> funcClazz, BusinessFunc func);
+    void addFunc(Class<?> funcClazz, BusinessFunc func);
 
 }

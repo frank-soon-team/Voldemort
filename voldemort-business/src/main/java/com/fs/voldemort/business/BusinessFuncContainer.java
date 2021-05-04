@@ -1,18 +1,16 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.business.support.BusinessFuncAddable;
-import com.fs.voldemort.business.support.BusinessFuncAvailable;
-import com.fs.voldemort.business.support.BusinessFuncCallable;
-import com.fs.voldemort.business.support.BusinessFuncInitializable;
+import com.fs.voldemort.business.support.*;
 import com.fs.voldemort.core.functional.func.Func1;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Frank
  */
-public class BusinessFuncContainer implements BusinessFuncAddable, BusinessFuncInitializable, BusinessFuncAvailable {
+public class BusinessFuncContainer implements BusinessFuncOperational, BusinessFuncInitializable {
 
     private final Map<Class<?>, BusinessFunc> funcContainer;
 
@@ -20,7 +18,7 @@ public class BusinessFuncContainer implements BusinessFuncAddable, BusinessFuncI
         funcContainer = new ConcurrentHashMap<>();
     }
 
-    public void fill(Func1<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc) {
+    public void fill(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
         funcContainer.putAll(BusinessFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc));
     }
 
@@ -30,12 +28,13 @@ public class BusinessFuncContainer implements BusinessFuncAddable, BusinessFuncI
     }
 
     @Override
-    public void add(Class<?> funcClazz, BusinessFunc func) {
+    public void addFunc(Class<?> funcClazz, BusinessFunc func) {
         funcContainer.put(funcClazz,func);
     }
 
     @Override
-    public void init(Func1<Class<?>, Map<String, BusinessFuncCallable>> getBusinessFuncHorcruxesFunc) {
+    public BusinessFuncOperational init(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
         fill(getBusinessFuncHorcruxesFunc);
+        return this;
     }
 }

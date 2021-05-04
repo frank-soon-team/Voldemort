@@ -6,6 +6,7 @@ import com.fs.voldemort.business.support.BusinessFuncMark;
 import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.functional.func.Func1;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,39 +19,43 @@ import java.util.stream.Collectors;
  */
 public class BusinessFuncRegistry {
 
-    public static Func1<Func1<Class<?>, Map<String, BusinessFuncCallable>>,Map<Class<?>, BusinessFunc>> scanFunc =
-            (getBusinessFuncHorcruxesFunc) -> {
-        final Map<String, BusinessFuncCallable> funcHorcruxesBeanMap = getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class);
-        if (funcHorcruxesBeanMap.isEmpty()) {
-            return null;
-        }
+    private BusinessFuncRegistry(){}
 
-        final Integer funcHorcruxesInstanceSize = funcHorcruxesBeanMap.size();
+    public static final Func1<Func1<Class<? extends Annotation>, Map<String, Object>>,Map<Class<?>, BusinessFunc>> scanFunc =
+        getBusinessFuncHorcruxesFunc -> {
+            final Map<String, Object> funcHorcruxesBeanMap = getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class);
+            if (funcHorcruxesBeanMap.isEmpty()) {
+                return null;
+            }
 
-        final Map<Method, BusinessFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
-        return
-            funcHorcruxesBeanMap.values().stream()
-                .map(
-                    funcHorcruxes -> Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
-                        .filter(method -> method.isAnnotationPresent(BusinessFuncMark.class))
-                        .peek(method -> assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes))
-                        .collect(Collectors.toList())
-                )
-                .flatMap(Collection::stream)
-                .collect(
-                    Collectors.toMap(Method::getClass,
-                        method -> new BusinessFunc(
-                            assistFuncHorcruxesInstanceMap.get(method).getClass(),
-                            args -> {
-                                try {
-                                    return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
-                                } catch (Exception e) {
-                                    throw new CallerException(e.getMessage(),e);
-                                }
-                            },
-                            p -> assistFuncHorcruxesInstanceMap.get(method).paramFit(p)
-                        )
+            final Integer funcHorcruxesInstanceSize = funcHorcruxesBeanMap.size();
+
+            final Map<Method, BusinessFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
+            return
+                funcHorcruxesBeanMap.values().stream()
+                    .filter(BusinessFuncCallable.class::isInstance)
+                    .map(BusinessFuncCallable.class::cast)
+                    .map(
+                        funcHorcruxes -> Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
+                            .filter(method -> method.isAnnotationPresent(BusinessFuncMark.class))
+                            .peek(method -> assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes))
+                            .collect(Collectors.toList())
                     )
-                );
-    };
+                    .flatMap(Collection::stream)
+                    .collect(
+                        Collectors.toMap(Method::getClass,
+                            method -> new BusinessFunc(
+                                assistFuncHorcruxesInstanceMap.get(method).getClass(),
+                                args -> {
+                                    try {
+                                        return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
+                                    } catch (Exception e) {
+                                        throw new CallerException(e.getMessage(),e);
+                                    }
+                                },
+                                p -> assistFuncHorcruxesInstanceMap.get(method).paramFit(p)
+                            )
+                        )
+                    );
+        };
 }

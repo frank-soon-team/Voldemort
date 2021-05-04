@@ -1,5 +1,6 @@
 package com.fs.voldemort.spi;
 
+import com.fs.voldemort.business.BusinessFuncInitializationCaller;
 import com.fs.voldemort.business.BusinessFuncRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -12,9 +13,8 @@ public class VoldemortAutoConfiguration {
 
     @Bean
     public BusinessFuncRegistry businessFuncRegistry(ApplicationContext context) {
-        // TODO @Frank 修复构造函数
+        BusinessFuncInitializationCaller.init(context::getBeansWithAnnotation);
         return null;
-        //return new BusinessFuncRegistry(context::getBeansWithAnnotation);
     }
 
 }
