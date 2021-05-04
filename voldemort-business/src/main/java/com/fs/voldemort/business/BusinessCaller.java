@@ -1,5 +1,6 @@
 package com.fs.voldemort.business;
 
+import com.fs.voldemort.business.exception.BusinessFuncInitializationException;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
 /**
@@ -14,10 +15,17 @@ public class BusinessCaller extends BusinessFuncAvailableCaller {
     }
 
     public BusinessCaller call(Class<?> funcClazz) {
-        final BusinessFunc bFunc = businessFuncContainer.getFunc(funcClazz);
-        this.call(p -> {
-            return bFunc.func.call(bFunc.paramFitFunc.call(p).toArray());
-        });
+        if(getFunc == null) {
+            throw new BusinessFuncInitializationException("The businessFuncAvailableCaller initialize error, " +
+                    "please check component config!");
+        }
+
+        final BusinessFunc bFunc = getFunc.call(funcClazz);
+        if(bFunc == null) {
+            throw new BusinessFuncInitializationException("Can not find func, please ensure funcClazz:"+
+                    funcClazz.getName() + "has been config Correctly...");
+        }
+        this.call(p -> bFunc.func.call(bFunc.paramFitFunc.call(p).toArray()));
         return this;
     }
 

@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
  */
 public class BusinessFuncRegistry {
 
-    public static Func1<Func1<Class<?>, Map<String, BusinessFuncCallable>>,Map<Class<?>, BusinessFunc>> scanFunc = (getBusinessFuncHorcruxesFunc) -> {
+    public static Func1<Func1<Class<?>, Map<String, BusinessFuncCallable>>,Map<Class<?>, BusinessFunc>> scanFunc =
+            (getBusinessFuncHorcruxesFunc) -> {
         final Map<String, BusinessFuncCallable> funcHorcruxesBeanMap = getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class);
         if (funcHorcruxesBeanMap.isEmpty()) {
             return null;
@@ -44,7 +45,7 @@ public class BusinessFuncRegistry {
                                 try {
                                     return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
                                 } catch (Exception e) {
-                                    throw new CallerException(e.getMessage());
+                                    throw new CallerException(e.getMessage(),e);
                                 }
                             },
                             p -> assistFuncHorcruxesInstanceMap.get(method).paramFit(p)
