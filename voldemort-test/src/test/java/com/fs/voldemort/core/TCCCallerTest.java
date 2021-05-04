@@ -6,9 +6,8 @@ import com.fs.voldemort.core.functional.action.Action0;
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
-import com.fs.voldemort.tcc.simple.SimpleTccManager;
+import com.fs.voldemort.tcc.simple.SimpleTCCManager;
 
-import com.fs.voldemort.tcc.simple.SimpleTccManager;
 import org.junit.Test;
 
 public class TCCCallerTest {
@@ -16,7 +15,7 @@ public class TCCCallerTest {
     @Test
     public void test_TCCCaller() {
 
-        Wand.tccCaller(new SimpleTccManager())
+        Wand.tccCaller(new SimpleTCCManager())
             .call(
                 createHandler(
                     "Coupon", 
