@@ -10,4 +10,8 @@ public class CallerException extends ImperioException {
     public CallerException(String message) {
         super(message);
     }
+
+    public CallerException(String message,Throwable throwable) {
+        super(message, throwable);
+    }
 }
