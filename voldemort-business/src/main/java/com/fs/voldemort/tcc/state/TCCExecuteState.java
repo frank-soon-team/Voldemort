@@ -3,6 +3,7 @@ package com.fs.voldemort.tcc.state;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
@@ -16,7 +17,7 @@ public class TCCExecuteState implements ITCCState {
     // 当前执行状态
     private TCCStatus status = TCCStatus.Initail;
     // 待提交、待回滚列表
-    private final List<TCCNode> triedTCCNodeList;
+    private final List<TCCNode> tccNodeList;
     // 异常列表
     private final List<ExecuteCallerNodeException> errorCollection;
     // TCC状态异常
@@ -35,7 +36,7 @@ public class TCCExecuteState implements ITCCState {
         if(this.tccTransactionId == null || this.tccTransactionId.length() == 0) {
             throw new IllegalArgumentException("the parameter tccTransactionId is required.");
         }
-        triedTCCNodeList = new ArrayList<>(size);
+        tccNodeList = new ArrayList<>(size);
         errorCollection = new ArrayList<>(size);
     }
 
@@ -68,8 +69,8 @@ public class TCCExecuteState implements ITCCState {
     }
 
     @Override
-    public int getStatus() {
-        return status.getValue();
+    public TCCStatus getStatus() {
+        return status;
     }
     
 
@@ -90,14 +91,35 @@ public class TCCExecuteState implements ITCCState {
     }
 
     @Override
-    public void addTriedNode(TCCNode node) {
-        triedTCCNodeList.add(node);
+    public void addTCCNode(TCCNode node) {
+        tccNodeList.add(node);
 
     }
 
     @Override
+    public List<TCCNode> getTCCNodeList() {
+        return tccNodeList.stream().collect(Collectors.toList());
+    }
+
+    @Override
     public List<TCCNode> getTriedNodeList() {
-        return triedTCCNodeList;
+        return tccNodeList.stream()
+                    .filter(n -> n.getStatus() != TCCStatus.Initail)
+                    .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TCCNode> getRollbackFailedList() {
+        return tccNodeList.stream()
+                    .filter(n -> n.getStatus() == TCCStatus.CancelFailed || n.getStatus() == TCCStatus.CancelTimeout)
+                    .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TCCNode> getConfirmFailedList() {
+        return tccNodeList.stream()
+                    .filter(n -> n.getStatus() == TCCStatus.ConfirmFailed || n.getStatus() == TCCStatus.ConfirmTimeout)
+                    .collect(Collectors.toList());
     }
 
     @Override

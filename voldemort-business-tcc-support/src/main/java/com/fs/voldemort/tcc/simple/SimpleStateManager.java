@@ -8,7 +8,7 @@ public class SimpleStateManager implements IStateManager {
 
     @Override
     public void begin(ITCCState state) {
-        if(state.getStatus() != TCCStatus.Initail.getValue()) {
+        if(state.getStatus() != TCCStatus.Initail) {
             throw new IllegalStateException("can not begin, status: " + state.getStatus());
         }
         System.out.println("TCC: " + state.identify() + ", begin.");
@@ -16,7 +16,7 @@ public class SimpleStateManager implements IStateManager {
 
     @Override
     public void update(ITCCState state) {
-        TCCStatus status = TCCStatus.valueOf(state.getStatus());
+        TCCStatus status = state.getStatus();
         if(status != TCCStatus.TrySuccess && status != TCCStatus.TryFaild && status != TCCStatus.TryTimeout) {
             throw new IllegalStateException("can not begin, status: " + state.getStatus());
         }

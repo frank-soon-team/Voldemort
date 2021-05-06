@@ -3,6 +3,7 @@ package com.fs.voldemort.tcc;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
@@ -10,6 +11,7 @@ import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.exception.TCCTimeoutException;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNode;
+import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.state.IStateManager;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.state.TCCExecuteState;
@@ -40,8 +42,6 @@ import com.fs.voldemort.tcc.strategy.IConfirmCompensateStrategy;
  * 
  */
 public abstract class TCCManager extends FuncLinkedList {
-
-    private final static String TCC_EXECUTE_STATE = "TCC_EXECUTE_STATE";
 
     private IStateManager stateManager;
     private IConfirmCompensateStrategy confirmCompensateStrategy;
@@ -88,27 +88,26 @@ public abstract class TCCManager extends FuncLinkedList {
             return createCallParameter(currentParameter, null);
         }
 
-        TCCExecuteState state = new TCCExecuteState(this.size());
-        currentParameter.context().set(TCC_EXECUTE_STATE, state);
+        ITCCState state = createTCCState(startNode);
+        setTCCState(currentParameter, state);
 
         // 新建一条TCC状态记录
         stateManager.begin(state);
-        try {
-            currentParameter = prepare(currentParameter, startNode);
-            state.setStatus(TCCStatus.TrySuccess);
-        } catch(ExecuteCallerNodeException e) {
-            state.collectExceptional(e);
-        }
+        
+        // * try 阶段 （一阶段）
+        currentParameter = prepare(currentParameter, startNode);
 
-        // 保存try阶段的数据
+        // 更新try阶段TCC状态记录
         stateManager.update(state);
         
+        // * 确认阶段 （二阶段）
         if(state.isConfirm()) {
             commit(state);
         } else {
             rollback(state);
         }
-        // 更新TCC执行结果
+
+        // 更新确认阶段TCC执行结果
         stateManager.end(state);
 
         throwIfExceptional(state);
@@ -126,23 +125,31 @@ public abstract class TCCManager extends FuncLinkedList {
 
         TCCExecuteState tccState = getTCCState(currentParameter);
 
-        while(currentNode != null) {
-            Object result = null;
-            if(currentNode instanceof TCCNode) {
-                result = executeTCCNode((TCCNode)currentNode, currentParameter);
-            } else {
-                result = executeNormalNode(currentNode, currentParameter);
-            }
-
-            try {
+        try {
+            while(currentNode != null) {
+                Object result = null;
+                if(currentNode instanceof TCCNode) {
+                    TCCNode tccNode = (TCCNode) currentNode;
+                    tccNode.setNodeParameter((TCCNodeParameter) currentParameter);
+                    result = tccNode.doAction(currentParameter);
+                    tccNode.setStatus(TCCStatus.TrySuccess);
+                } else {
+                    result = currentNode.doAction(currentParameter);
+                }
+                // 执行子Caller
                 result = tryCallSubCaller(result);
-            } catch(RuntimeException e) {
-                tccState.setStatus(TCCStatus.TryFaild);
-                throw new ExecuteCallerNodeException(e, currentNode, currentParameter);
+    
+                currentParameter = createCallParameter(currentParameter, result);
+                currentNode = currentNode.getNextNode();
             }
-
-            currentParameter = createCallParameter(currentParameter, result);
-            currentNode = currentNode.getNextNode();
+            tccState.setStatus(TCCStatus.TrySuccess);
+        } catch(RuntimeException e) {
+            if(currentNode instanceof TCCNode) {
+                ((TCCNode)currentNode).setStatus(
+                    e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
+            }
+            tccState.setStatus(TCCStatus.TryFaild);
+            tccState.collectExceptional(new ExecuteCallerNodeException(e, currentNode, currentParameter));
         }
 
         return currentParameter;
@@ -160,6 +167,7 @@ public abstract class TCCManager extends FuncLinkedList {
         for (TCCNode tccNode : triedNodeList) {
             try {
                 tccNode.doConfirm();
+                tccNode.setStatus(TCCStatus.ConfirmSuccess);
             } catch(RuntimeException e) {
                 tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
                 commitFailedList.add(tccNode);
@@ -188,6 +196,7 @@ public abstract class TCCManager extends FuncLinkedList {
             TCCNode tccNode = triedNodeList.get(i);
             try {
                 tccNode.doCancel();
+                tccNode.setStatus(TCCStatus.CancelSuccess);
             } catch(RuntimeException e) {
                 tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
                 rollbackFailedList.add(tccNode);
@@ -203,42 +212,34 @@ public abstract class TCCManager extends FuncLinkedList {
     }
 
     //#endregion
-
-    /**
-     * 执行TCC节点
-     * @param node TCC业务节点
-     * @param parameter 参数
-     * @return 返回执行结果
-     */
-    protected Object executeTCCNode(TCCNode node, CallerParameter parameter) {
-        TCCExecuteState state = (TCCExecuteState) getTCCState(parameter);
-        try {
-            node.setNodeParameter(parameter);
-            return node.doAction(parameter);
-        } catch(RuntimeException e) {
-            state.setStatus(e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
-            throw new ExecuteCallerNodeException(e, node, parameter);
-        } finally {
-            state.addTriedNode(node);
-        }
-    }
-
-    /**
-     * 执行普通节点
-     * @param node 业务节点
-     * @param parameter 参数
-     * @return 返回执行结果
-     */
-    protected Object executeNormalNode(CallerNode node, CallerParameter parameter) {
-        try {
-            return node.doAction(parameter);
-        } catch(RuntimeException e) {
-            TCCExecuteState state = (TCCExecuteState) getTCCState(parameter);
-            state.setStatus(TCCStatus.TryFaild);
-            throw new ExecuteCallerNodeException(e, node, parameter);
-        }
-    }
     
+    @Override
+    protected CallerParameter ensureCallerParameter(CallerParameter parameter) {
+        if(parameter == null) {
+            return new TCCNodeParameter(null, new CallerContext());
+        }
+        return new TCCNodeParameter(parameter.result, parameter.context());
+    }
+
+    @Override
+    protected CallerParameter createCallParameter(CallerParameter oldParameter, Object result) {
+        return new TCCNodeParameter(result, oldParameter.context());
+    }
+
+    protected ITCCState createTCCState(CallerNode startNode) {
+        TCCExecuteState state = new TCCExecuteState(this.size());
+        // 提取TCCNode节点
+        CallerNode currentNode = startNode;
+        while(currentNode != null) {
+            if(currentNode instanceof TCCNode) {
+                state.addTCCNode((TCCNode)currentNode);
+            }
+            currentNode = currentNode.getNextNode();
+        }
+
+        return state;
+    }
+
     protected void throwIfExceptional(ITCCState state) {
         ExecuteCallerNodeException exception = state.getCallerNodeException();
         if(exception != null) {
@@ -246,8 +247,12 @@ public abstract class TCCManager extends FuncLinkedList {
         }
     }
 
+    private void setTCCState(CallerParameter parameter, ITCCState tccState) {
+        ((TCCNodeParameter) parameter).setTCCState(tccState);
+    }
+
     private TCCExecuteState getTCCState(CallerParameter parameter) {
-        return (TCCExecuteState) parameter.context().get(TCC_EXECUTE_STATE);
+        return (TCCExecuteState) ((TCCNodeParameter) parameter).getTCCState();
     }
     
 }

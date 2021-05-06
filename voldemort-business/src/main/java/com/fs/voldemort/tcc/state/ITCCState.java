@@ -20,9 +20,15 @@ public interface ITCCState {
 
     List<ExecuteCallerNodeException> getExceptionalCollection();
 
-    void addTriedNode(TCCNode node);
+    void addTCCNode(TCCNode node);
+
+    List<TCCNode> getTCCNodeList();
 
     List<TCCNode> getTriedNodeList();
+
+    List<TCCNode> getRollbackFailedList();
+
+    List<TCCNode> getConfirmFailedList();
 
     boolean isConfirm();
 
@@ -30,6 +36,6 @@ public interface ITCCState {
 
     boolean isEnd();
 
-    int getStatus();
+    TCCStatus getStatus();
     
 }

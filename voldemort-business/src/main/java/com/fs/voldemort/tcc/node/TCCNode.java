@@ -1,13 +1,12 @@
 package com.fs.voldemort.tcc.node;
 
 import com.fs.voldemort.core.support.CallerNode;
-import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.state.TCCStatus;
 
 public class TCCNode extends CallerNode {
 
     private final ITCCHandler tccHandler;
-    private CallerParameter nodeParameter;
+    private TCCNodeParameter nodeParameter;
     private TCCStatus status;
 
     public TCCNode(ITCCHandler tccHandler) {
@@ -24,25 +23,21 @@ public class TCCNode extends CallerNode {
         if(nodeParameter == null) {
             throw new IllegalStateException("the nodeParameter is null.");
         }
-        
-        // TODO caller parameter 参数对接
-        tccHandler.confirm();
+        tccHandler.confirm(nodeParameter.getTCCState());
     }
 
     public void doCancel() {
         if(nodeParameter == null) {
             throw new IllegalStateException("the nodeParameter is null.");
         }
-        
-        // TODO caller parameter 参数对接
-        tccHandler.cancel();
+        tccHandler.cancel(nodeParameter.getTCCState());
     }
     
-    public void setNodeParameter(CallerParameter parameter) {
+    public void setNodeParameter(TCCNodeParameter parameter) {
         this.nodeParameter = parameter;
     }
     
-    public CallerParameter getNodeParameter() {
+    public TCCNodeParameter getNodeParameter() {
         return this.nodeParameter;
     }
 
