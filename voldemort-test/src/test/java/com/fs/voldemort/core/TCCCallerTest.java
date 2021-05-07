@@ -5,11 +5,15 @@ import com.fs.voldemort.Wand;
 import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
+import com.fs.voldemort.tcc.TCCCaller;
+import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
+import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
 import com.fs.voldemort.tcc.state.ITCCState;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TCCCallerTest {
@@ -42,18 +46,135 @@ public class TCCCallerTest {
 
     }
 
-    // public void test_TCC_Rollback() {
-    //     int[] value = new int[] { 0 };
-    //     Wand.tccCaller(new SimpleTCCManager())
-    //         .call(
-    //             createHandler(
-    //                 "Step1", 
-    //                 p -> p, 
-    //                 () -> null, 
-    //                 () -> null)
-    //         )
-    //         .exec();
-    // }
+    @Test
+    public void test_TCC_Success() {
+        int[] value = new int[] { 0 };
+        TCCCaller tccCaller = Wand.tccCaller(new SimpleTCCManager(), value);
+        tccCaller
+            .call(
+                createHandler(
+                    "Step1", 
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        result[0] += 1;
+                        return null;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] += 1;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        if(result[0] > 0) {
+                            result[0] -= 1;
+                        }
+                    })
+            )
+            .call(
+                createHandler(
+                    "Step2", 
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        result[0] += 1;
+                        return null;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] += 1;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] -= 1;
+                    })
+            )
+            .call(
+                createHandler(
+                    "Step3", 
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        result[0] += 1;
+                        return null;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] += 1;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] -= 1;
+                    })
+            );
+
+        tccCaller.exec();
+
+         Assert.assertTrue(value[0] == 6);
+    }
+
+    @Test
+    public void test_TCC_Rollback() {
+        int[] value = new int[] { 0 };
+        TCCCaller tccCaller = Wand.tccCaller(new SimpleTCCManager(), value);
+        tccCaller
+            .call(
+                createHandler(
+                    "Step1", 
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        result[0] += 1;
+                        return result;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] += 1;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        if(result[0] > 0) {
+                            result[0] -= 1;
+                        }
+                    })
+            )
+            .call(
+                createHandler(
+                    "Step2", 
+                    p -> {
+                        int[] result = (int[]) p.result;
+                        result[0] += 1;
+                        return result;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] += 1;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] -= 1;
+                    })
+            )
+            .call(
+                createHandler(
+                    "Step3", 
+                    p -> {
+                        throw new IllegalStateException("throw");
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] += 1;
+                    }, 
+                    s -> {
+                        int[] result = (int[]) s.getParam();
+                        result[0] -= 1;
+                    })
+            );
+
+        try {
+            tccCaller.exec();
+        } catch(ExecuteCallerNodeException e) {
+            System.out.println("Rollback > " + e.getMessage());
+        }
+
+         Assert.assertTrue(value[0] == 0);
+    }
 
     public ITCCHandler createHandler(String name, Func1<CallerParameter, Object> goTry, Action1<ITCCState> confirm, Action1<ITCCState> cancel) {
         return new BaseTCCHandler(name) {

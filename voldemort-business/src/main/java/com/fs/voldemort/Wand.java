@@ -6,6 +6,7 @@ import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelCaller;
 import com.fs.voldemort.tcc.TCCCaller;
 import com.fs.voldemort.tcc.TCCManager;
+import com.fs.voldemort.tcc.node.TCCNodeParameter;
 
 public abstract class Wand {
 
@@ -33,6 +34,14 @@ public abstract class Wand {
 
     public static TCCCaller tccCaller(TCCManager tccManager) {
         return TCCCaller.create(tccManager);
+    }
+
+    public static TCCCaller tccCaller(TCCManager tccManager, Object param) {
+        TCCCaller tccCaller = TCCCaller.create(tccManager);
+        return (TCCCaller) tccCaller.call(p -> {
+            ((TCCNodeParameter) p).getTCCState().setParam(param);
+            return null;
+        });
     }
 
     //#endregion

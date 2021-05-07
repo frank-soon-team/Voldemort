@@ -37,5 +37,9 @@ public interface ITCCState {
     boolean isEnd();
 
     TCCStatus getStatus();
+
+    void setParam(Object param);
+
+    Object getParam();
     
 }

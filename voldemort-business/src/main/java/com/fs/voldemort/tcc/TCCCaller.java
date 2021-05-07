@@ -1,12 +1,17 @@
 package com.fs.voldemort.tcc;
 
 import com.fs.voldemort.core.Caller;
+import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 
 public class TCCCaller extends Caller {
 
     public TCCCaller(TCCManager tccManager) {
         super(tccManager);
+    }
+
+    public TCCCaller(TCCManager tccManager, CallerParameter parameter) {
+        super(tccManager, parameter);
     }
 
     public TCCCaller call(ITCCHandler tccHandler) {

@@ -22,6 +22,8 @@ public class TCCExecuteState implements ITCCState {
     private final List<ExecuteCallerNodeException> errorCollection;
     // TCC状态异常
     private TCCStateException stateException;
+    // TCC参数
+    private Object param;
 
     public TCCExecuteState(int size) {
         this(UUID.randomUUID().toString(), size);
@@ -130,5 +132,15 @@ public class TCCExecuteState implements ITCCState {
     @Override
     public TCCStateException getStateException() {
         return stateException;
+    }
+
+    @Override
+    public void setParam(Object param) {
+        this.param = param;
+    }
+
+    @Override
+    public Object getParam() {
+        return param;
     }
 }
