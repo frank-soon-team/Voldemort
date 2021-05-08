@@ -12,6 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This is a business func initializer which used to fill BuinessFunc{@link com.fs.voldemort.business.BusinessFunc} for BusinessCaller{@link com.fs.voldemort.business.BusinessCaller}
+ */
 public abstract class BusinessFuncInitializationCaller extends Caller {
 
     private static List<Action1<Func1<Class<?>,BusinessFunc>>> initializeGetFuncHookList = new LinkedList<>();
