@@ -1,7 +1,6 @@
 package com.fs.voldemort.business;
 
 import com.fs.voldemort.business.support.BusinessFuncInitializable;
-import com.fs.voldemort.business.support.BusinessFuncOperational;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.action.Action2;
@@ -13,19 +12,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This is a business func initializer which used to fill BuinessFunc{@link com.fs.voldemort.business.BusinessFunc} for BusinessCaller{@link com.fs.voldemort.business.BusinessCaller}
+ * This is a business func initializer which used to fill {@link com.fs.voldemort.business.BusinessFunc}
+ * for {@link com.fs.voldemort.business.BusinessCaller}
  */
 public abstract class BusinessFuncInitializationCaller extends Caller {
 
-    private static List<Action1<Func1<Class<?>,BusinessFunc>>> initializeGetFuncHookList = new LinkedList<>();
+    private static final List<Action1<Func1<Class<?>,BusinessFunc>>> initializeGetFuncHookList = new LinkedList<>();
 
-    private static List<Action1<Action2<Class<?>,BusinessFunc>>> initializeAddFuncHookList = new LinkedList<>();
+    private static final List<Action1<Action2<Class<?>,BusinessFunc>>> initializeAddFuncHookList = new LinkedList<>();
 
     public static void init(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
         final BusinessFuncInitializable businessFuncInitializable = new BusinessFuncContainer();
-        final BusinessFuncOperational businessFuncOperational = businessFuncInitializable.init(getBusinessFuncHorcruxesFunc);
-        initializeGetFuncHookList.stream().forEach(hook->hook.apply(businessFuncOperational.getFunc()));
-        initializeAddFuncHookList.stream().forEach(hook->hook.apply(businessFuncOperational.addFunc()));
+        final var businessFuncOperational = businessFuncInitializable.init(getBusinessFuncHorcruxesFunc);
+        initializeGetFuncHookList.forEach(hook->hook.apply(businessFuncOperational.getFunc()));
+        initializeAddFuncHookList.forEach(hook->hook.apply(businessFuncOperational.addFunc()));
     }
 
     protected static void initializeGetFuncHook(Action1<Func1<Class<?>,BusinessFunc>> hookFunc) {

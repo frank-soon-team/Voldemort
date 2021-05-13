@@ -37,8 +37,13 @@ public class BusinessFuncRegistry {
                     .map(BusinessFuncCallable.class::cast)
                     .map(
                         funcHorcruxes -> Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
-                            .filter(method -> method.isAnnotationPresent(BusinessFuncMark.class))
-                            .peek(method -> assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes))
+                            .filter(method -> {
+                                if(method.isAnnotationPresent(BusinessFuncMark.class)){
+                                    assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes);
+                                    return true;
+                                }
+                                return false;
+                            })
                             .collect(Collectors.toList())
                     )
                     .flatMap(Collection::stream)

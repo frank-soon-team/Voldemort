@@ -7,7 +7,7 @@ import com.fs.voldemort.core.functional.func.Func1;
  */
 public abstract class BusinessFuncAvailableCaller extends BusinessFuncInitializationCaller{
 
-    public static Func1<Class<?>,BusinessFunc> getFunc;
+    protected static Func1<Class<?>,BusinessFunc> getFunc;
 
     static {
         BusinessFuncInitializationCaller.initializeGetFuncHook(func -> getFunc = func);
