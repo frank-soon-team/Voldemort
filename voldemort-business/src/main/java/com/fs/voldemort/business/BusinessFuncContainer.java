@@ -18,10 +18,6 @@ public class BusinessFuncContainer implements BusinessFuncOperational, BusinessF
         funcContainer = new ConcurrentHashMap<>();
     }
 
-    public void fill(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
-        funcContainer.putAll(BusinessFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc));
-    }
-
     @Override
     public BusinessFunc getFunc(final Class<?> funcClazz) {
         return funcContainer.get(funcClazz);
@@ -34,7 +30,13 @@ public class BusinessFuncContainer implements BusinessFuncOperational, BusinessF
 
     @Override
     public BusinessFuncOperational init(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
-        fill(getBusinessFuncHorcruxesFunc);
+        funcContainer.putAll(BusinessFuncRegistry.scanFuncByAnnotation.call(getBusinessFuncHorcruxesFunc));
+        return this;
+    }
+
+    @Override
+    public BusinessFuncOperational init(Map<String, Object> businessFuncHorcruxesFuncMap) {
+        funcContainer.putAll(BusinessFuncRegistry.scanFunc.call(businessFuncHorcruxesFuncMap));
         return this;
     }
 }

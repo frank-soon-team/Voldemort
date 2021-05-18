@@ -29,7 +29,7 @@ public interface BusinessFuncCallable {
 
         Set<Args> argsSet = new HashSet<>();
 
-        final Method funcMethod = funcMethodList.get(0);
+        final var funcMethod = funcMethodList.get(0);
         Arrays.stream(funcMethod.getParameters()).forEach(param->{
             final String paramName = param.getName();
             argsSet.add(new Args(paramName));
@@ -48,7 +48,7 @@ public interface BusinessFuncCallable {
                     .putAll(Arrays.stream(resultFields)
                     .collect(
                         Collectors.toMap(Field::getName, field -> {
-                            boolean isAccessible = field.isAccessible();
+                            boolean isAccessible = field.canAccess(result);
                             if(!isAccessible) {
                                 field.setAccessible(true);
                             }
@@ -68,15 +68,15 @@ public interface BusinessFuncCallable {
         //Get args from context
         return 
             argsSet.stream()
-                .peek(arg-> {
+                .filter(arg -> {
                     Object value = resultFieldMap.get(arg.name);
                     if(value != null) {
                         arg.value = value;
                     } else {
                         arg.value = p.context().get(arg.name);
                     }
+                    return arg.value != null;
                 })
-                .filter(arg -> arg.value != null)
                 .collect(Collectors.toSet());
     }
 
@@ -107,7 +107,7 @@ public interface BusinessFuncCallable {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Args args = (Args) o;
+            var args = (Args) o;
             return name.equals(args.name);
         }
 

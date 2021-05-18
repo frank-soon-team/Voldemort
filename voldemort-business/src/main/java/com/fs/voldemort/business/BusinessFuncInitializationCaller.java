@@ -21,9 +21,16 @@ public abstract class BusinessFuncInitializationCaller extends Caller {
 
     private static final List<Action1<Action2<Class<?>,BusinessFunc>>> initializeAddFuncHookList = new LinkedList<>();
 
-    public static void init(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
+    public static void initByAnnotation(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
         final BusinessFuncInitializable businessFuncInitializable = new BusinessFuncContainer();
         final var businessFuncOperational = businessFuncInitializable.init(getBusinessFuncHorcruxesFunc);
+        initializeGetFuncHookList.forEach(hook->hook.apply(businessFuncOperational.getFunc()));
+        initializeAddFuncHookList.forEach(hook->hook.apply(businessFuncOperational.addFunc()));
+    }
+
+    public static void init(Map<String, Object> businessFuncHorcruxesFuncMap) {
+        final BusinessFuncInitializable businessFuncInitializable = new BusinessFuncContainer();
+        final var businessFuncOperational = businessFuncInitializable.init(businessFuncHorcruxesFuncMap);
         initializeGetFuncHookList.forEach(hook->hook.apply(businessFuncOperational.getFunc()));
         initializeAddFuncHookList.forEach(hook->hook.apply(businessFuncOperational.addFunc()));
     }

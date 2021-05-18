@@ -9,4 +9,6 @@ public interface BusinessFuncInitializable {
 
     BusinessFuncOperational init(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc);
 
+    BusinessFuncOperational init(Map<String, Object> businessFuncHorcruxesFuncMap);
+
 }

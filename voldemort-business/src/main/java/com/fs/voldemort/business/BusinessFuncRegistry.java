@@ -21,9 +21,11 @@ public class BusinessFuncRegistry {
 
     private BusinessFuncRegistry(){}
 
-    public static final Func1<Func1<Class<? extends Annotation>, Map<String, Object>>,Map<Class<?>, BusinessFunc>> scanFunc =
-        getBusinessFuncHorcruxesFunc -> {
-            final Map<String, Object> funcHorcruxesBeanMap = getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class);
+    public static final Func1<Func1<Class<? extends Annotation>, Map<String, Object>>,Map<Class<?>, BusinessFunc>> scanFuncByAnnotation =
+        getBusinessFuncHorcruxesFunc -> BusinessFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class));
+
+    public static final Func1<Map<String, Object>, Map<Class<?>, BusinessFunc>> scanFunc =
+        funcHorcruxesBeanMap -> {
             if (funcHorcruxesBeanMap.isEmpty()) {
                 return null;
             }
@@ -40,7 +42,7 @@ public class BusinessFuncRegistry {
                             .filter(method -> {
                                 if(method.isAnnotationPresent(BusinessFuncMark.class)){
                                     assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes);
-                                    return true;
+                                        return true;
                                 }
                                 return false;
                             })
