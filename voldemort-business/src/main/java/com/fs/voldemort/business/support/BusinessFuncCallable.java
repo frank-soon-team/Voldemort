@@ -3,7 +3,6 @@ package com.fs.voldemort.business.support;
 import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.support.CallerParameter;
 import lombok.NonNull;
-import org.reflections.Reflections;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -90,15 +89,6 @@ public interface BusinessFuncCallable {
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-
-        Reflections reflections = new Reflections(String.class);
-        reflections.getAllTypes()
-
-
-        System.out.println(BusinessFuncCallable.isAssignableFromMulti(String.class,CharSequence.class));
     }
 
     class Args{
