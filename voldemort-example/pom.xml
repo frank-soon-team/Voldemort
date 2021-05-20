@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>com.fs</groupId>
+        <artifactId>voldemort-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>voldemort-example</artifactId>
+    <name>voldemort-example</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <uranus-version>1.0.0</uranus-version>
+        <spring-boot-version>2.3.6.RELEASE</spring-boot-version>
+        <spring-version>5.2.11.RELEASE</spring-version>
+        <spring-security-version>5.3.5.RELEASE</spring-security-version>
+        <jackson-version>2.11.2</jackson-version>
+        <logback-version>1.2.3</logback-version>
+        <apache-commons-lang-version>3.11</apache-commons-lang-version>
+    </properties>
+
+    <modules>
+        <module>voldemort-example.uranus</module>
+        <module>voldemort-example.service</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring-Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-parent</artifactId>
+                <version>${spring-boot-version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        
+        <!-- JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-version}</version>
+        </dependency>
+
+        <!-- Log -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache-commons-lang-version}</version>
+        </dependency>
+
+    </dependencies>
+
+
+</project>

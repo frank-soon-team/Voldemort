@@ -7,7 +7,7 @@
     <groupId>com.fs</groupId>
     <artifactId>voldemort-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
 
     <name>voldemort-parent</name>
 
@@ -42,6 +42,7 @@
         <module>voldemort-springboot-starter</module>
         <module>voldemort-springboot-autoconfigure</module>
         <module>voldemort-test</module>
+        <module>voldemort-example</module>
     </modules>
 
     <dependencyManagement>
@@ -61,7 +62,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>5.3.1</version>
+                <version>5.2.11.RELEASE</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/junit/junit -->
