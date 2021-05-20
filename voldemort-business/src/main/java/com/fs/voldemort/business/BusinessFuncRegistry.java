@@ -52,7 +52,9 @@ public class BusinessFuncRegistry {
                                 assistFuncHorcruxesInstanceMap.get(method).getClass(),
                                 args -> {
                                     try {
-                                        return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
+                                        System.out.println(args.length);
+                                        String arg = String.valueOf(args[0]);
+                                        return method.invoke(assistFuncHorcruxesInstanceMap.get(method),arg);
                                     } catch (Exception e) {
                                         throw new CallerException(e.getMessage(),e);
                                     }
