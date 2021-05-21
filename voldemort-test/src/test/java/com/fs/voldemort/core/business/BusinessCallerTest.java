@@ -6,6 +6,8 @@ import com.fs.voldemort.core.business.horcruxes.MarvoroGunterRing;
 import com.fs.voldemort.core.business.horcruxes.Nagini;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,6 +32,12 @@ public class BusinessCallerTest {
         System.out.println(result);
     }
 
-
+//    public static void main(String[] args) {
+//        Method method = HutchpatchGoldenCup.class.getMethods()[0];
+//        System.out.println(method);
+//        Parameter[] parameter = method.getParameters();
+//        System.out.println(parameter[0]);
+//        System.out.println(parameter[0].isNamePresent());
+//    }
 
 }

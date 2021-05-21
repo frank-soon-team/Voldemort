@@ -40,6 +40,14 @@ public interface BusinessFuncCallable {
         final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
 
         //Get args from param.result fields
+
+//        if() {
+//
+//        }
+
+//        Set<BusinessFuncCallable.Args> result
+
+
         Object result = p.result;
         if(null != result) {
             //Check result is fundamental type
@@ -69,18 +77,24 @@ public interface BusinessFuncCallable {
         }
 
         //Get args from context
-        return 
-            argsSet.stream()
-                .filter(arg -> {
-                    Object value = resultFieldMap.get(arg.name);
-                    if(value != null) {
-                        arg.value = value;
-                    } else {
-                        arg.value = p.context().get(arg.name);
-                    }
-                    return arg.value != null;
-                })
-                .collect(Collectors.toSet());
+        if(argsSet.size()>1){
+            return argsSet.stream()
+                    .filter(arg -> {
+                        Object value = resultFieldMap.get(arg.name);
+                        if(value != null) {
+                            arg.value = value;
+                        } else {
+                            arg.value = p.context().get(arg.name);
+                        }
+                        return arg.value != null;
+                    })
+                    .collect(Collectors.toSet());
+        }else if(argsSet.size() == 1){
+            argsSet.stream().findFirst().get().value = resultFieldMap.get(DEFAULT_RESULT);
+            return argsSet;
+        }else{
+            return null;
+        }
     }
 
     static boolean isAssignableFromMulti(@NonNull final Object target,@NonNull final Class<?>... clazzes) {
