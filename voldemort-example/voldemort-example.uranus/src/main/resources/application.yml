@@ -22,6 +22,7 @@ logging:
   config: classpath:config/logback.xml
 uranus:
   security:
+    resource-path: /style/**,/content/**,/script/**,/favicon.ico,/error
     membership:
       default-password: 1
       salt: 
