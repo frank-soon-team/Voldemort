@@ -1,6 +1,6 @@
 package com.fs.voldemort.spi;
 
-import com.fs.voldemort.business.BusinessFuncInitializationCaller;
+import com.fs.voldemort.business.BusinessFuncAvailableCaller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -13,7 +13,7 @@ public class VoldemortAutoConfiguration implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        BusinessFuncInitializationCaller.initByAnnotation(applicationContext::getBeansWithAnnotation);
+        BusinessFuncAvailableCaller.initByAnnotation(aClass -> applicationContext.getBeansWithAnnotation(aClass).values());
     }
 
 }

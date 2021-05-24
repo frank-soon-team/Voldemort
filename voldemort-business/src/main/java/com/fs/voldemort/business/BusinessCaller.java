@@ -1,8 +1,12 @@
 package com.fs.voldemort.business;
 
 import com.fs.voldemort.business.exception.BusinessFuncInitializationException;
+import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
+
+import java.util.Set;
+
 /**
  * Polymerize caller
  *
@@ -25,7 +29,11 @@ public class BusinessCaller extends BusinessFuncAvailableCaller {
             throw new BusinessFuncInitializationException("Can not find func, please ensure funcClazz:"+
                     funcClazz.getName() + "has been config Correctly...");
         }
-        this.call(p -> bFunc.func.call(bFunc.paramFitFunc.call(p).toArray()));
+
+        this.call(p -> {
+            Set<BusinessFuncCallable.Args> result = bFunc.paramFitFunc.call(p);
+            return bFunc.func.call(result.toArray());
+        });
         return this;
     }
 

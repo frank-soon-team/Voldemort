@@ -15,9 +15,9 @@ public class BusinessFunc {
 
     public final Func1<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc;
 
-    public BusinessFunc(Class<?> funClass, DynamicFunc<?> func,
+    public BusinessFunc(Class<?> funcClass, DynamicFunc<?> func,
         Func1<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc) {
-        this.funcClazz = funClass;
+        this.funcClazz = funcClass;
         this.func = func;
         this.paramFitFunc = paramFitFunc;
     }

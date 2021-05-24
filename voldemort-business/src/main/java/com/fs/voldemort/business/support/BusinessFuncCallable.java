@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
  */
 public interface BusinessFuncCallable {
 
+    String DEFAULT_RESULT = "DEF";
+
     default Set<Args> paramFit(@NonNull final CallerParameter p) {
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
@@ -38,11 +40,18 @@ public interface BusinessFuncCallable {
         final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
 
         //Get args from param.result fields
+
+//        if() {
+//
+//        }
+
+//        Set<BusinessFuncCallable.Args> result
+
+
         Object result = p.result;
         if(null != result) {
             //Check result is fundamental type
-            final Class<?> resultClazz = result.getClass();
-            if(!isAssignableFromMulti(resultClazz,Number.class,CharSequence.class,Collection.class,Map.class)) {
+            if(!isAssignableFromMulti(result,Number.class,CharSequence.class,Collection.class,Map.class)) {
                 final Field[] resultFields = result.getClass().getDeclaredFields();
                 resultFieldMap
                     .putAll(Arrays.stream(resultFields)
@@ -62,33 +71,34 @@ public interface BusinessFuncCallable {
                         })
                     )
                 );
+            }else {
+                resultFieldMap.put(DEFAULT_RESULT, result);
             }
         }
 
         //Get args from context
-        return 
-            argsSet.stream()
-                .filter(arg -> {
-                    Object value = resultFieldMap.get(arg.name);
-                    if(value != null) {
-                        arg.value = value;
-                    } else {
-                        arg.value = p.context().get(arg.name);
-                    }
-                    return arg.value != null;
-                })
-                .collect(Collectors.toSet());
+        if(argsSet.size()>1){
+            return argsSet.stream()
+                    .filter(arg -> {
+                        Object value = resultFieldMap.get(arg.name);
+                        if(value != null) {
+                            arg.value = value;
+                        } else {
+                            arg.value = p.context().get(arg.name);
+                        }
+                        return arg.value != null;
+                    })
+                    .collect(Collectors.toSet());
+        }else if(argsSet.size() == 1){
+            argsSet.stream().findFirst().get().value = resultFieldMap.get(DEFAULT_RESULT);
+            return argsSet;
+        }else{
+            return null;
+        }
     }
 
-    static boolean isAssignableFromMulti(Class<?> testClazz, Class<?>... clazzes) {
-        if(clazzes.length > 0){
-            for(Class<?> clazz : clazzes) {
-                if(testClazz.isAssignableFrom(clazz)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    static boolean isAssignableFromMulti(@NonNull final Object target,@NonNull final Class<?>... clazzes) {
+        return clazzes.length > 0 && Arrays.stream(clazzes).anyMatch(clazz -> clazz.isInstance(target));
     }
 
     class Args{

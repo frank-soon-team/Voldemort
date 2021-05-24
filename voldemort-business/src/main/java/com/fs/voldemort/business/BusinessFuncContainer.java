@@ -4,6 +4,7 @@ import com.fs.voldemort.business.support.*;
 import com.fs.voldemort.core.functional.func.Func1;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,14 +30,14 @@ public class BusinessFuncContainer implements BusinessFuncOperational, BusinessF
     }
 
     @Override
-    public BusinessFuncOperational init(Func1<Class<? extends Annotation>, Map<String, Object>> getBusinessFuncHorcruxesFunc) {
+    public BusinessFuncOperational init(Func1<Class<? extends Annotation>, Collection<Object>> getBusinessFuncHorcruxesFunc) {
         funcContainer.putAll(BusinessFuncRegistry.scanFuncByAnnotation.call(getBusinessFuncHorcruxesFunc));
         return this;
     }
 
     @Override
-    public BusinessFuncOperational init(Map<String, Object> businessFuncHorcruxesFuncMap) {
-        funcContainer.putAll(BusinessFuncRegistry.scanFunc.call(businessFuncHorcruxesFuncMap));
+    public BusinessFuncOperational init(Collection<Object> businessFuncHorcruxes) {
+        funcContainer.putAll(BusinessFuncRegistry.scanFunc.call(businessFuncHorcruxes));
         return this;
     }
 }

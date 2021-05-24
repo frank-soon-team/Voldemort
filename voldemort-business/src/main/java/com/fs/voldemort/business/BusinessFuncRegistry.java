@@ -8,10 +8,7 @@ import com.fs.voldemort.core.functional.func.Func1;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,20 +18,20 @@ public class BusinessFuncRegistry {
 
     private BusinessFuncRegistry(){}
 
-    public static final Func1<Func1<Class<? extends Annotation>, Map<String, Object>>,Map<Class<?>, BusinessFunc>> scanFuncByAnnotation =
+    public static final Func1<Func1<Class<? extends Annotation>, Collection<Object>>,Map<Class<?>, BusinessFunc>> scanFuncByAnnotation =
         getBusinessFuncHorcruxesFunc -> BusinessFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class));
 
-    public static final Func1<Map<String, Object>, Map<Class<?>, BusinessFunc>> scanFunc =
-        funcHorcruxesBeanMap -> {
-            if (funcHorcruxesBeanMap.isEmpty()) {
+    public static final Func1<Collection<Object>, Map<Class<?>, BusinessFunc>> scanFunc =
+        funcHorcruxesList -> {
+            if (funcHorcruxesList.isEmpty()) {
                 return null;
             }
 
-            final Integer funcHorcruxesInstanceSize = funcHorcruxesBeanMap.size();
+            final Integer funcHorcruxesInstanceSize = funcHorcruxesList.size();
 
             final Map<Method, BusinessFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
             return
-                funcHorcruxesBeanMap.values().stream()
+                funcHorcruxesList.stream()
                     .filter(BusinessFuncCallable.class::isInstance)
                     .map(BusinessFuncCallable.class::cast)
                     .map(
@@ -50,12 +47,14 @@ public class BusinessFuncRegistry {
                     )
                     .flatMap(Collection::stream)
                     .collect(
-                        Collectors.toMap(Method::getClass,
+                        Collectors.toMap(Method::getDeclaringClass,
                             method -> new BusinessFunc(
                                 assistFuncHorcruxesInstanceMap.get(method).getClass(),
                                 args -> {
                                     try {
-                                        return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
+                                        System.out.println(args.length);
+                                        String arg = String.valueOf(args[0]);
+                                        return method.invoke(assistFuncHorcruxesInstanceMap.get(method),arg);
                                     } catch (Exception e) {
                                         throw new CallerException(e.getMessage(),e);
                                     }
