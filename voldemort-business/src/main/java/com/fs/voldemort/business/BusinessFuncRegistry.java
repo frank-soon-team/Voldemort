@@ -52,8 +52,10 @@ public class BusinessFuncRegistry {
                                 assistFuncHorcruxesInstanceMap.get(method).getClass(),
                                 args -> {
                                     try {
-                                        System.out.println(args.length);
-                                        String arg = String.valueOf(args[0]);
+                                        BusinessFuncCallable.Arg result = args;
+
+
+
                                         return method.invoke(assistFuncHorcruxesInstanceMap.get(method),arg);
                                     } catch (Exception e) {
                                         throw new CallerException(e.getMessage(),e);

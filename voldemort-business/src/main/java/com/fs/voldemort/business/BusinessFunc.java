@@ -13,10 +13,10 @@ public class BusinessFunc {
 
     public final DynamicFunc<?> func;
 
-    public final Func1<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc;
+    public final Func1<CallerParameter,Set<BusinessFuncCallable.Arg>> paramFitFunc;
 
     public BusinessFunc(Class<?> funcClass, DynamicFunc<?> func,
-        Func1<CallerParameter,Set<BusinessFuncCallable.Args>> paramFitFunc) {
+        Func1<CallerParameter,Set<BusinessFuncCallable.Arg>> paramFitFunc) {
         this.funcClazz = funcClass;
         this.func = func;
         this.paramFitFunc = paramFitFunc;

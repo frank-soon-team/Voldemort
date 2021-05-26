@@ -4,7 +4,6 @@ import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.support.CallerParameter;
 import lombok.NonNull;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,14 +13,31 @@ import java.util.stream.Collectors;
  */
 public interface BusinessFuncCallable {
 
-    String DEFAULT_RESULT = "DEF";
+    String RESULT = "RES";
 
-    default Set<Args> paramFit(@NonNull final CallerParameter p) {
+    /**
+     * Get arg info of target function method, and adapt result that has been executed by last function,
+     *
+     * # Role 1
+     *     Last func        call    Current func
+     *     R func1()        --->    func2(R arg)
+     * # Role 2
+     *     Last func        call    Current func
+     *     R func1()        --->    func2(R arg, C1 arg1, C2 arg2, C2 arg3)
+     *  ## Parameter description
+     *     R arg                    -> The result of last function
+     *     C1 arg1  context param   -> The arg of context param
+     *                                 Context param class is C1.class
+     *                                 Context param key is     'arg1'
+     *     C2 arg2                  -> Class: C1.class      key:'arg2'
+     *     C2 arg3                  -> Class: C2.class      key:'arg3'
+     */
+    default Set<Arg> paramFit(@NonNull final CallerParameter p) {
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
-                .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
-                        .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
-                .collect(Collectors.toList());
+            .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
+                    .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
+            .collect(Collectors.toList());
 
         if(funcMethodList.size() > 1) {
             throw new CallerException("Settle function can only have one func method!");
@@ -29,83 +45,41 @@ public interface BusinessFuncCallable {
             return new HashSet<>();
         }
 
-        Set<Args> argsSet = new HashSet<>();
+        final Method funcMethod = funcMethodList.get(0);
 
-        final var funcMethod = funcMethodList.get(0);
-        Arrays.stream(funcMethod.getParameters()).forEach(param->{
-            final String paramName = param.getName();
-            argsSet.add(new Args(paramName));
-        });
+        final Set<Arg> argSet = Arrays.stream(funcMethod.getParameters()).map(param-> new Arg(param.getName())).collect(Collectors.toSet());
 
-        final Map<String,Object> resultFieldMap = new HashMap<>(argsSet.size());
-
-        //Get args from param.result fields
-
-//        if() {
+//        //Get args from context
+//        if(argSet.size()>1){
 //
-//        }
-
-//        Set<BusinessFuncCallable.Args> result
-
-
-        Object result = p.result;
-        if(null != result) {
-            //Check result is fundamental type
-            if(!isAssignableFromMulti(result,Number.class,CharSequence.class,Collection.class,Map.class)) {
-                final Field[] resultFields = result.getClass().getDeclaredFields();
-                resultFieldMap
-                    .putAll(Arrays.stream(resultFields)
-                    .collect(
-                        Collectors.toMap(Field::getName, field -> {
-                            boolean isAccessible = field.canAccess(result);
-                            if(!isAccessible) {
-                                field.setAccessible(true);
-                            }
-                            try {
-                                return field.get(result);
-                            } catch (IllegalAccessException e) {
-                                throw new CallerException("SettleFuncCallable paramFit error:"+e.getMessage());
-                            } finally {
-                                field.setAccessible(isAccessible);
-                            }
-                        })
-                    )
-                );
-            }else {
-                resultFieldMap.put(DEFAULT_RESULT, result);
-            }
-        }
-
-        //Get args from context
-        if(argsSet.size()>1){
-            return argsSet.stream()
-                    .filter(arg -> {
-                        Object value = resultFieldMap.get(arg.name);
-                        if(value != null) {
-                            arg.value = value;
-                        } else {
-                            arg.value = p.context().get(arg.name);
-                        }
-                        return arg.value != null;
-                    })
-                    .collect(Collectors.toSet());
-        }else if(argsSet.size() == 1){
-            argsSet.stream().findFirst().get().value = resultFieldMap.get(DEFAULT_RESULT);
-            return argsSet;
-        }else{
+//            return argSet.forEach()
+//                    .filter(arg -> {
+//                        Object value = resultFieldMap.get(arg.name);
+//                        if(value != null) {
+//                            arg.value = value;
+//                        } else {
+//                            arg.value = p.context().get(arg.name);
+//                        }
+//                        return arg.value != null;
+//                    })
+//                    .collect(Collectors.toSet());
+//        }else if(argSet.size() == 1){
+//            argSet.stream().findFirst().get().value = resultFieldMap.get(RESULT);
+//            return argSet;
+//        }else{
             return null;
-        }
+//        }
     }
 
     static boolean isAssignableFromMulti(@NonNull final Object target,@NonNull final Class<?>... clazzes) {
         return clazzes.length > 0 && Arrays.stream(clazzes).anyMatch(clazz -> clazz.isInstance(target));
     }
 
-    class Args{
+    class Arg {
         public final String name;
         public Object value;
 
-        public Args(String name) {
+        public Arg(String name) {
             this.name = name;
         }
 
@@ -117,7 +91,7 @@ public interface BusinessFuncCallable {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            var args = (Args) o;
+            var args = (Arg) o;
             return name.equals(args.name);
         }
 
