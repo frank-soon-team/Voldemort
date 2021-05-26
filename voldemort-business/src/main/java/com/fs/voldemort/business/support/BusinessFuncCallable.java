@@ -32,7 +32,7 @@ public interface BusinessFuncCallable {
      *     C2 arg2                  -> Class: C1.class      key:'arg2'
      *     C2 arg3                  -> Class: C2.class      key:'arg3'
      */
-    default Set<Arg> paramFit(@NonNull final CallerParameter p) {
+    default Object[] paramFit(@NonNull final CallerParameter p) {
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
             .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
@@ -42,7 +42,7 @@ public interface BusinessFuncCallable {
         if(funcMethodList.size() > 1) {
             throw new CallerException("Settle function can only have one func method!");
         }else if(funcMethodList.isEmpty()) {
-            return new HashSet<>();
+            return new Object[0];
         }
 
         final Method funcMethod = funcMethodList.get(0);
@@ -52,37 +52,15 @@ public interface BusinessFuncCallable {
         if(!argSet.isEmpty()) {
             //Deal result
             final Arg resultArg = argSet.iterator().next();
-//            argSet.stream().findFirst().get().value = ;
+            resultArg.value = p.result;
 
             //Deal context arg
             if(argSet.size()>1) {
-
-
-
+                argSet.stream().skip(1).forEach(arg->arg.value = p.context().get(arg.name));
             }
-
+            return argSet.stream().map(arg->arg.value).toArray();
         }
-
-//        //Get args from context
-//        if(argSet.size()>1){
-//
-//            return argSet.forEach()
-//                    .filter(arg -> {
-//                        Object value = resultFieldMap.get(arg.name);
-//                        if(value != null) {
-//                            arg.value = value;
-//                        } else {
-//                            arg.value = p.context().get(arg.name);
-//                        }
-//                        return arg.value != null;
-//                    })
-//                    .collect(Collectors.toSet());
-//        }else if(argSet.size() == 1){
-//            argSet.stream().findFirst().get().value = resultFieldMap.get(RESULT);
-//            return argSet;
-//        }else{
-            return null;
-//        }
+        return new Object[0];
     }
 
     static boolean isAssignableFromMulti(@NonNull final Object target,@NonNull final Class<?>... clazzes) {

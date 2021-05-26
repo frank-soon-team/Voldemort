@@ -52,7 +52,6 @@ public class BusinessFuncRegistry {
                                 assistFuncHorcruxesInstanceMap.get(method).getClass(),
                                 args -> {
                                     try {
-                                        //TODO 需适配
                                         return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
                                     } catch (Exception e) {
                                         throw new CallerException(e.getMessage(),e);

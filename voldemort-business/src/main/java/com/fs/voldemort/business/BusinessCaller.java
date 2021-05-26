@@ -31,8 +31,8 @@ public class BusinessCaller extends BusinessFuncAvailableCaller {
         }
 
         this.call(p -> {
-            Set<BusinessFuncCallable.Arg> result = bFunc.paramFitFunc.call(p);
-            return bFunc.func.call(result.toArray());
+            Object[] result = bFunc.paramFitFunc.call(p);
+            return bFunc.func.call(result);
         });
         return this;
     }
