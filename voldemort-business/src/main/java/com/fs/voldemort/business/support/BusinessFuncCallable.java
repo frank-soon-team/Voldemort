@@ -49,6 +49,20 @@ public interface BusinessFuncCallable {
 
         final Set<Arg> argSet = Arrays.stream(funcMethod.getParameters()).map(param-> new Arg(param.getName())).collect(Collectors.toSet());
 
+        if(!argSet.isEmpty()) {
+            //Deal result
+            final Arg resultArg = argSet.iterator().next();
+//            argSet.stream().findFirst().get().value = ;
+
+            //Deal context arg
+            if(argSet.size()>1) {
+
+
+
+            }
+
+        }
+
 //        //Get args from context
 //        if(argSet.size()>1){
 //
