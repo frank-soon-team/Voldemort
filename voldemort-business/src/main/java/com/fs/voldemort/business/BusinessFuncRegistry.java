@@ -2,7 +2,7 @@ package com.fs.voldemort.business;
 
 import com.fs.voldemort.business.support.BusinessFuncCallable;
 import com.fs.voldemort.business.support.BusinessFuncHorcruxes;
-import com.fs.voldemort.business.support.BusinessFuncMark;
+import com.fs.voldemort.business.support.BusinessFunc;
 import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.functional.func.Func1;
 
@@ -18,10 +18,10 @@ public class BusinessFuncRegistry {
 
     private BusinessFuncRegistry(){}
 
-    public static final Func1<Func1<Class<? extends Annotation>, Collection<Object>>,Map<Class<?>, BusinessFunc>> scanFuncByAnnotation =
+    public static final Func1<Func1<Class<? extends Annotation>, Collection<Object>>,Map<Class<?>, com.fs.voldemort.business.BusinessFunc>> scanFuncByAnnotation =
         getBusinessFuncHorcruxesFunc -> BusinessFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class));
 
-    public static final Func1<Collection<Object>, Map<Class<?>, BusinessFunc>> scanFunc =
+    public static final Func1<Collection<Object>, Map<Class<?>, com.fs.voldemort.business.BusinessFunc>> scanFunc =
         funcHorcruxesList -> {
             if (funcHorcruxesList.isEmpty()) {
                 return null;
@@ -37,7 +37,7 @@ public class BusinessFuncRegistry {
                     .map(
                         funcHorcruxes -> Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
                             .filter(method -> {
-                                if(method.isAnnotationPresent(BusinessFuncMark.class)){
+                                if(method.isAnnotationPresent(BusinessFunc.class)){
                                     assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes);
                                         return true;
                                 }
@@ -48,7 +48,7 @@ public class BusinessFuncRegistry {
                     .flatMap(Collection::stream)
                     .collect(
                         Collectors.toMap(Method::getDeclaringClass,
-                            method -> new BusinessFunc(
+                            method -> new com.fs.voldemort.business.BusinessFunc(
                                 assistFuncHorcruxesInstanceMap.get(method).getClass(),
                                 args -> {
                                     try {

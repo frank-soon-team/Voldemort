@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
  */
 public interface BusinessFuncCallable {
 
-    String RESULT = "RES";
-
     /**
      * Get arg info of target function method, and adapt result that has been executed by last function,
      *
@@ -36,7 +34,7 @@ public interface BusinessFuncCallable {
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
             .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
-                    .anyMatch(annotation -> annotation.annotationType().equals(BusinessFuncMark.class)))
+                    .anyMatch(annotation -> annotation.annotationType().equals(BusinessFunc.class)))
             .collect(Collectors.toList());
 
         if(funcMethodList.size() > 1) {
@@ -61,10 +59,6 @@ public interface BusinessFuncCallable {
             return argSet.stream().map(arg->arg.value).toArray();
         }
         return new Object[0];
-    }
-
-    static boolean isAssignableFromMulti(@NonNull final Object target,@NonNull final Class<?>... clazzes) {
-        return clazzes.length > 0 && Arrays.stream(clazzes).anyMatch(clazz -> clazz.isInstance(target));
     }
 
     class Arg {
