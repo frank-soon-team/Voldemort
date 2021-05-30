@@ -32,12 +32,4 @@ public class BusinessCallerTest {
         System.out.println(result);
     }
 
-//    public static void main(String[] args) {
-//        Method method = HutchpatchGoldenCup.class.getMethods()[0];
-//        System.out.println(method);
-//        Parameter[] parameter = method.getParameters();
-//        System.out.println(parameter[0]);
-//        System.out.println(parameter[0].isNamePresent());
-//    }
-
 }
