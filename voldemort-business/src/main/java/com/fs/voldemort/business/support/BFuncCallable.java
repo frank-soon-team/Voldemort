@@ -43,7 +43,7 @@ public interface BFuncCallable {
      * but there is still such a scene, developer need to manipulate context parameters in the function, that`s
      * why BFunc provides the entry of the operation function in the formal parameter;
      * For example base on above # role 2 current function:
-     *  func2(R arg,  C1 arg1, C2 arg2, C2 arg3, {@link BFuncContext} Func2<String,Object,Boolean> f_setC)
+     *  func2(R arg,  C1 arg1, C2 arg2, C2 arg3, {@link BFuncOperate} Func2<String,Object,Boolean> f_setC)
      *
      */
     default Object[] paramFit(@NonNull final CallerParameter p) {
@@ -64,8 +64,8 @@ public interface BFuncCallable {
         final Set<Object> arg = new HashSet<>();
         final Set<CArg> cArgSet = new HashSet<>();
         final Set<PArg> pArgSet = Arrays.stream(funcMethod.getParameters()).filter(param->{
-            if(param.isAnnotationPresent(BFuncContext.class)){
-                cArgSet.add(new CArg(param.getAnnotation(BFuncContext.class).value(),p.context()));
+            if(param.isAnnotationPresent(BFuncOperate.class)){
+                cArgSet.add(new CArg(param.getAnnotation(BFuncOperate.class).value(),p.context()));
                 return false;
             }
             return true;
@@ -126,10 +126,10 @@ public interface BFuncCallable {
      * Func arg for context
      */
     class CArg {
-        public final BFuncContext.OPER oper;
+        public final BFuncOperate.Oper oper;
         public final CallerContext context;
 
-        public CArg(@NonNull BFuncContext.OPER oper, @NonNull CallerContext context) {
+        public CArg(@NonNull BFuncOperate.Oper oper, @NonNull CallerContext context) {
             this.oper = oper;
             this.context = context;
         }

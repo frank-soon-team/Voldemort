@@ -24,6 +24,10 @@ public class BFuncCallerTest {
                 .call(p-> "Begin!")
                 .call(HutchpatchGoldenCup.class)
                 .call(Nagini.class)
+                .call(p->{
+                    p.context().set("c3","C3!!!");
+                    return "Result 666";
+                })
                 .call(MarvoroGunterRing.class)
                 .exec();
 
