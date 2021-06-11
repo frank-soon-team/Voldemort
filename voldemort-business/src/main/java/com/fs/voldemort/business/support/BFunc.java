@@ -7,15 +7,6 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER})
-public @interface FuncContext {
-
-    OPER value();
-
-    enum OPER{
-        SET,
-        GET,
-        DELETE
-    }
-
+@Target({ElementType.METHOD,ElementType.FIELD})
+public @interface BFunc {
 }

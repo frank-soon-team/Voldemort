@@ -1,6 +1,6 @@
 package com.fs.voldemort;
 
-import com.fs.voldemort.business.BusinessCaller;
+import com.fs.voldemort.business.BFuncCaller;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelCaller;
@@ -24,8 +24,8 @@ public abstract class Wand {
 
     //#region BusinessCaller
 
-    public static BusinessCaller businessCaller() {
-        return BusinessCaller.create();
+    public static BFuncCaller businessCaller() {
+        return BFuncCaller.create();
     }
 
     //#endregion

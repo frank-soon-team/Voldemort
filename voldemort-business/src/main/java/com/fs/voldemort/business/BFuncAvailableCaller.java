@@ -9,16 +9,16 @@ import java.util.Collection;
 /**
  * @author frank
  */
-public class BusinessFuncAvailableCaller extends Caller {
+public class BFuncAvailableCaller extends Caller {
 
-    protected static Func1<Class<?>,BusinessFunc> getFunc;
+    protected static Func1<Class<?>, BFunc> getFunc;
 
     public static void initByAnnotation(Func1<Class<? extends Annotation>, Collection<Object>> getBusinessFuncHorcruxesFunc) {
-        getFunc = new BusinessFuncContainer().init(getBusinessFuncHorcruxesFunc).getFunc();
+        getFunc = new BFuncContainer().init(getBusinessFuncHorcruxesFunc).getFunc();
     }
 
     public static void init(Collection<Object> businessFuncHorcruxesFuncs) {
-        getFunc = new BusinessFuncContainer().init(businessFuncHorcruxesFuncs).getFunc();
+        getFunc = new BFuncContainer().init(businessFuncHorcruxesFuncs).getFunc();
     }
 
 }

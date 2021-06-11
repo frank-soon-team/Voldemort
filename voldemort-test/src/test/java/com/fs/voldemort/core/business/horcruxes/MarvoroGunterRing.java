@@ -1,13 +1,13 @@
 package com.fs.voldemort.core.business.horcruxes;
 
-import com.fs.voldemort.business.support.BusinessFuncCallable;
-import com.fs.voldemort.business.support.BusinessFuncHorcruxes;
-import com.fs.voldemort.business.support.BusinessFunc;
+import com.fs.voldemort.business.support.BFuncCallable;
+import com.fs.voldemort.business.support.BFuncHorcruxes;
+import com.fs.voldemort.business.support.BFunc;
 
-@BusinessFuncHorcruxes
-public class MarvoroGunterRing implements BusinessFuncCallable {
+@BFuncHorcruxes
+public class MarvoroGunterRing implements BFuncCallable {
 
-    @BusinessFunc
+    @BFunc
     public String func(String result, String c3){
         return "This is Marvoro Gunter Ring! Result is " + result + "c3:" + c3;
     }

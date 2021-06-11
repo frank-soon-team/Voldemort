@@ -1,8 +1,8 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.business.support.BusinessFuncCallable;
-import com.fs.voldemort.business.support.BusinessFuncHorcruxes;
-import com.fs.voldemort.business.support.BusinessFunc;
+import com.fs.voldemort.business.support.BFuncCallable;
+import com.fs.voldemort.business.support.BFuncHorcruxes;
+import com.fs.voldemort.business.support.BFunc;
 import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.functional.func.Func1;
 
@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 /**
  * @author frank
  */
-public class BusinessFuncRegistry {
+public class BFuncRegistry {
 
-    private BusinessFuncRegistry(){}
+    private BFuncRegistry(){}
 
-    public static final Func1<Func1<Class<? extends Annotation>, Collection<Object>>,Map<Class<?>, com.fs.voldemort.business.BusinessFunc>> scanFuncByAnnotation =
-        getBusinessFuncHorcruxesFunc -> BusinessFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc.call(BusinessFuncHorcruxes.class));
+    public static final Func1<Func1<Class<? extends Annotation>, Collection<Object>>,Map<Class<?>, com.fs.voldemort.business.BFunc>> scanFuncByAnnotation =
+        getBusinessFuncHorcruxesFunc -> BFuncRegistry.scanFunc.call(getBusinessFuncHorcruxesFunc.call(BFuncHorcruxes.class));
 
-    public static final Func1<Collection<Object>, Map<Class<?>, com.fs.voldemort.business.BusinessFunc>> scanFunc =
+    public static final Func1<Collection<Object>, Map<Class<?>, com.fs.voldemort.business.BFunc>> scanFunc =
         funcHorcruxesList -> {
             if (funcHorcruxesList.isEmpty()) {
                 return null;
@@ -29,15 +29,15 @@ public class BusinessFuncRegistry {
 
             final Integer funcHorcruxesInstanceSize = funcHorcruxesList.size();
 
-            final Map<Method, BusinessFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
+            final Map<Method, BFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
             return
                 funcHorcruxesList.stream()
-                    .filter(BusinessFuncCallable.class::isInstance)
-                    .map(BusinessFuncCallable.class::cast)
+                    .filter(BFuncCallable.class::isInstance)
+                    .map(BFuncCallable.class::cast)
                     .map(
                         funcHorcruxes -> Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
                             .filter(method -> {
-                                if(method.isAnnotationPresent(BusinessFunc.class)){
+                                if(method.isAnnotationPresent(BFunc.class)){
                                     assistFuncHorcruxesInstanceMap.put(method, funcHorcruxes);
                                         return true;
                                 }
@@ -48,7 +48,7 @@ public class BusinessFuncRegistry {
                     .flatMap(Collection::stream)
                     .collect(
                         Collectors.toMap(Method::getDeclaringClass,
-                            method -> new com.fs.voldemort.business.BusinessFunc(
+                            method -> new com.fs.voldemort.business.BFunc(
                                 assistFuncHorcruxesInstanceMap.get(method).getClass(),
                                 args -> {
                                     try {
