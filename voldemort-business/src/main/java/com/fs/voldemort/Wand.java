@@ -1,5 +1,6 @@
 package com.fs.voldemort;
 
+import com.fs.voldemort.business.BFuncCaller;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import com.fs.voldemort.business.BusinessCaller;
@@ -27,8 +28,8 @@ public abstract class Wand {
 
     //#region BusinessCaller
 
-    public static BusinessCaller businessCaller() {
-        return BusinessCaller.create();
+    public static BFuncCaller businessCaller() {
+        return BFuncCaller.create();
     }
 
     //#endregion
