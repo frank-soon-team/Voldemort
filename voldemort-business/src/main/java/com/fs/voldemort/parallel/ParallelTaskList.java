@@ -28,6 +28,10 @@ public class ParallelTaskList extends FuncLinkedList {
         this(capacity, null);
     }
 
+    public ParallelTaskList(Func2<Integer, Integer, ThreadPoolExecutor> executorFactoryFunc) {
+        this(-1, executorFactoryFunc);
+    }
+
     public ParallelTaskList(final int capacity, Func2<Integer, Integer, ThreadPoolExecutor> executorFactoryFunc) {
         this.capacity = capacity;
         this.executorFactoryFunc = executorFactoryFunc != null ? executorFactoryFunc : createExecutorFactoryFunc();

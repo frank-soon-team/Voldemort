@@ -1,7 +1,10 @@
 package com.fs.voldemort;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 import com.fs.voldemort.business.BusinessCaller;
 import com.fs.voldemort.core.Caller;
+import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelCaller;
 import com.fs.voldemort.tcc.TCCCaller;
@@ -50,6 +53,10 @@ public abstract class Wand {
 
     public static ParallelCaller parallelCaller() {
         return ParallelCaller.create();
+    }
+
+    public static ParallelCaller parallelCaller(final Func0<ThreadPoolExecutor> executorFactoryFunc) {
+        return ParallelCaller.createWithExecutor(executorFactoryFunc);
     }
 
     //#endregion
