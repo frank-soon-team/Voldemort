@@ -3,7 +3,6 @@ package com.fs.voldemort;
 import com.fs.voldemort.business.BFuncCaller;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import com.fs.voldemort.business.BusinessCaller;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.support.CallerParameter;

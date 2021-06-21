@@ -91,8 +91,6 @@ public interface BFuncCallable {
         return arg.toArray();
     }
 
-    default void setC(String k ,Object v){}
-
     /**
      * Param arg
      */
