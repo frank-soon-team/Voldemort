@@ -11,6 +11,11 @@ import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
+import com.fs.voldemort.tcc.simple.service.biz.SImpleTCCCancelRetryBiz;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCBeginBiz;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCConfirmRetryBiz;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCEndBiz;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCUpdateBiz;
 import com.fs.voldemort.tcc.state.ITCCState;
 
 import org.junit.Assert;
@@ -20,7 +25,7 @@ public class TCCCallerTest {
     
     @Test
     public void test_TCCCaller() {
-        Wand.tccCaller(new SimpleTCCManager())
+        Wand.tccCaller(buildMananger())
             .call(
                 createHandler(
                     "Coupon", 
@@ -49,7 +54,7 @@ public class TCCCallerTest {
     @Test
     public void test_TCC_Success() {
         int[] value = new int[] { 0 };
-        TCCCaller tccCaller = Wand.tccCaller(new SimpleTCCManager(), value);
+        TCCCaller tccCaller = Wand.tccCaller(buildMananger(), value);
         tccCaller
             .call(
                 createHandler(
@@ -107,13 +112,13 @@ public class TCCCallerTest {
 
         tccCaller.exec();
 
-         Assert.assertTrue(value[0] == 6);
+        Assert.assertTrue(value[0] == 6);
     }
 
     @Test
     public void test_TCC_Rollback() {
         int[] value = new int[] { 0 };
-        TCCCaller tccCaller = Wand.tccCaller(new SimpleTCCManager(), value);
+        TCCCaller tccCaller = Wand.tccCaller(buildMananger(), value);
         tccCaller
             .call(
                 createHandler(
@@ -173,7 +178,7 @@ public class TCCCallerTest {
             System.out.println("Rollback > " + e.getMessage());
         }
 
-         Assert.assertTrue(value[0] == 0);
+        Assert.assertTrue(value[0] == 0);
     }
 
     public ITCCHandler createHandler(String name, Func1<CallerParameter, Object> goTry, Action1<ITCCState> confirm, Action1<ITCCState> cancel) {
@@ -195,6 +200,16 @@ public class TCCCallerTest {
             }
             
         };
+    }
+
+    public SimpleTCCManager buildMananger() {
+        return SimpleTCCManager.builder()
+            .setTCCBeginBiz(new SimpleTCCBeginBiz())
+            .setTCCUpdateBiz(new SimpleTCCUpdateBiz())
+            .setTCCEndBiz(new SimpleTCCEndBiz())
+            .setTCCConfirmRetryBiz(new SimpleTCCConfirmRetryBiz())
+            .setTCCCancelRetryBiz(new SImpleTCCCancelRetryBiz())
+            .build();
     }
 
 }

@@ -41,11 +41,25 @@ import com.fs.voldemort.tcc.strategy.IConfirmCompensateStrategy;
  * </p>
  * 
  */
-public abstract class TCCManager extends FuncLinkedList {
+public class TCCManager extends FuncLinkedList {
 
     private IStateManager stateManager;
     private IConfirmCompensateStrategy confirmCompensateStrategy;
     private ICancelCompensateStrategy cancelCompensateStrategy;
+
+    protected TCCManager() {
+
+    }
+
+    public TCCManager(ITCCManagerAdapter adapter) {
+        if(adapter == null) {
+            throw new IllegalArgumentException("the parameter [adapter] of constructor is required.");
+        }
+
+        setStateManager(adapter.getStateManager());
+        setConfirmCompensateStrategy(adapter.getConfirmCompensateStrategy());
+        setCancelCompensateStrategy(adapter.getCancelCompensateStrategy());
+    }
 
     public IStateManager getStateManager() {
         return stateManager;

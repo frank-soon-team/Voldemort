@@ -1,13 +1,15 @@
-package com.fs.voldemort.tcc.simple;
+package com.fs.voldemort.tcc.simple.service.biz;
 
+import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.state.ITCCState;
-import com.fs.voldemort.tcc.strategy.ICancelCompensateStrategy;
 
-public class SimpleCancelCompensateStrategy implements ICancelCompensateStrategy {
+public class SImpleTCCCancelRetryBiz implements Action1<ITCCState> {
 
     @Override
-    public void retry(ITCCState state) {
+    public void apply(ITCCState state) {
+        // TODO TCC 取消阶段 重试
+
         System.out.println("TCC: " + state.identify() + ", retry start...");
 
         state.getTriedNodeList().forEach(n -> {
@@ -16,6 +18,7 @@ public class SimpleCancelCompensateStrategy implements ICancelCompensateStrategy
         });
         
         System.out.println("TCC: " + state.identify() + ", retry end...");
+        
     }
     
 }

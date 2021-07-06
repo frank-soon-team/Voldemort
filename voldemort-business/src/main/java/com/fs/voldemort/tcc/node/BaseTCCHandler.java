@@ -19,6 +19,10 @@ public abstract class BaseTCCHandler implements ITCCHandler {
         return name;
     }
 
+    protected String getDefaultName() {
+        return this.getClass().getName();
+    }
+
     // public String serialize() {
     //     // 序列化
     // }
