@@ -1,12 +1,23 @@
 package com.fs.voldemort.core.support;
 
+import com.fs.voldemort.core.functional.func.DynamicFunc;
+import com.fs.voldemort.core.functional.func.Func0;
+import com.fs.voldemort.core.functional.func.Func1;
+import com.fs.voldemort.core.functional.func.Func2;
+import com.fs.voldemort.core.functional.func.Func3;
+import com.fs.voldemort.core.functional.func.Func4;
+import com.fs.voldemort.core.functional.func.Func5;
+import com.fs.voldemort.core.functional.func.Func6;
+import com.fs.voldemort.core.functional.func.Func7;
+
 public class CallerContext {
     
     private ValueBag valueBag = new ValueBag();
+    private FunctionBag functionBag = null;
     private CallerContext parentContext;
 
     public CallerContext() {
-
+        functionBag = new FunctionBag();
     }
 
     public CallerContext(CallerContext parentContext) {
@@ -51,5 +62,64 @@ public class CallerContext {
 
         return false;
     }
+
+    public <R> void declareFunction(String functionName, Func0<R> func) {
+        putFunction(functionName, args -> func.call());
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T, R> void declareFunction(String functionName, Func1<T, R> func) {
+        putFunction(functionName, args -> func.call((T) args[0]));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T1, T2, R> void declareFunction(String functionName, Func2<T1, T2, R> func) {
+        putFunction(functionName, args -> func.call((T1) args[0], (T2) args[1]));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T1, T2, T3, R> void declareFunction(String functionName, Func3<T1, T2, T3, R> func) {
+        putFunction(functionName, args -> func.call((T1) args[0], (T2) args[1], (T3) args[2]));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T1, T2, T3, T4, R> void declareFunction(String functionName, Func4<T1, T2, T3, T4, R> func) {
+        putFunction(functionName, args -> func.call((T1) args[0], (T2) args[1], (T3) args[2], (T4) args[3]));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T1, T2, T3, T4, T5, R> void declareFunction(String functionName, Func5<T1, T2, T3, T4, T5, R> func) {
+        putFunction(functionName, args -> func.call((T1) args[0], (T2) args[1], (T3) args[2], (T4) args[3], (T5) args[4]));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T1, T2, T3, T4, T5, T6, R> void declareFunction(String functionName, Func6<T1, T2, T3, T4, T5, T6, R> func) {
+        putFunction(functionName, args -> func.call((T1) args[0], (T2) args[1], (T3) args[2], (T4) args[3], (T5) args[4], (T6) args[5]));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T1, T2, T3, T4, T5, T6, T7, R> void declareFunction(String functionName, Func7<T1, T2, T3, T4, T5, T6, T7, R> func) {
+        putFunction(functionName, args -> func.call((T1) args[0], (T2) args[1], (T3) args[2], (T4) args[3], (T5) args[4], (T6) args[5], (T7) args[6]));
+    }
+
+    public void putFunction(String functionName, DynamicFunc<Object> func) {
+        if(parentContext != null) {
+            parentContext.putFunction(functionName, func);
+        } else {
+            functionBag.set(functionName, func);
+        }
+    }
     
+    public <R> R callFunction(String functionName, Object... args) {
+        return functionBag.call(functionName, args);
+    }
+
+    public <R> R callFunctionWithDefault(String functionName, Object... args) {
+        return functionBag.tryCall(functionName, args, null);
+    }
+
+    public <R> R callFunctionWithDefault(String functionName, R defaultResult, Object... args) {
+        return functionBag.tryCall(functionName, args, defaultResult);
+    }
+
 }
