@@ -3,6 +3,7 @@ package com.fs.voldemort.core;
 import java.math.BigDecimal;
 
 import com.fs.voldemort.Wand;
+import com.fs.voldemort.core.support.CallerContext;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,6 +59,43 @@ public class CallerTest {
             .exec(r -> Assert.assertTrue(Integer.valueOf(4).equals(r)));
     }
 
+    @Test
+    public void test_contextFunctional() {
+        Wand.caller()
+            .call(p -> 1)
+            .call(p -> {
+                CallerContext context = p.context();
+                context.declareFunction("add", (Integer a, Integer b) -> a + b);
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                context.declareFunction("subtract", (Integer a, Integer b) -> a - b);
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                context.declareFunction("multiple", (Integer a, Integer b) -> a * b);
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                context.declareFunction("divide", (Integer a, Integer b) -> a / b);
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                Integer value = (Integer) p.result;
+                value = context.callFunction("add", value, 100); // 101
+                value = context.callFunction("subtract", value, 1); // 100
+                value = context.callFunction("multiple", value, 2); // 200
+                value = context.callFunction("divide", value, 50); // 4
+
+                return value;
+            })
+            .exec(r -> Assert.assertEquals(r, 4));
+    }
+
     public void test_BusinessCaller() {
         // BusinessCaller.create().call();
 
@@ -88,29 +126,6 @@ public class CallerTest {
 
         // CallerFactory.tccCaller().call();
 
-    }
-
-    public void test_TCCCaller() {
-        /*
-
-        TccTransaction tcc = new TccTransaction();
-        tcc.begin(); // 创建数据库状态
-
-        try {
-            while(tcc.next()) {
-                TccNode node = tcc.current();
-                if(node.try()) {
-                    node.invoke();
-                }
-            }
-            tcc.commit();
-        } catch(Exception e) {
-            tcc.rollback(); // 调用每个节点的rollback方法
-        } finally {
-            tcc.end(); // 将数据库状态更新为完成
-        }
-
-        */
     }
     
 }

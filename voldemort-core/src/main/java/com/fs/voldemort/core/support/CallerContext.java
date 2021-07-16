@@ -13,7 +13,7 @@ import com.fs.voldemort.core.functional.func.Func7;
 public class CallerContext {
     
     private ValueBag valueBag = new ValueBag();
-    private FunctionBag functionBag = null;
+    private FunctionBag functionBag;
     private CallerContext parentContext;
 
     public CallerContext() {
@@ -111,14 +111,23 @@ public class CallerContext {
     }
     
     public <R> R callFunction(String functionName, Object... args) {
+        if(parentContext != null) {
+            return parentContext.callFunction(functionName, args);
+        }
         return functionBag.call(functionName, args);
     }
 
     public <R> R callFunctionWithDefault(String functionName, Object... args) {
+        if(parentContext != null) {
+            return parentContext.callFunctionWithDefault(functionName, args);
+        }
         return functionBag.tryCall(functionName, args, null);
     }
 
     public <R> R callFunctionWithDefault(String functionName, R defaultResult, Object... args) {
+        if(parentContext != null) {
+            return parentContext.callFunctionWithDefault(functionName, defaultResult, args);
+        }
         return functionBag.tryCall(functionName, args, defaultResult);
     }
 
