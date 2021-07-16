@@ -19,11 +19,19 @@ public class SimpleTCCManager extends TCCManager {
     public static SimpleTCCManagerBuilder builder() {
         return new SimpleTCCManagerBuilder();
     }
-    
+
+    public static SimpleTCCManagerExtendBuilder extendBuilder() {
+        return new SimpleTCCManagerExtendBuilder();
+    }
 
     public static class SimpleTCCManagerBuilder {
 
-        private SimpleTCCManagerBuilder() {
+    }
+    
+
+    public static class SimpleTCCManagerExtendBuilder extends SimpleTCCManagerBuilder {
+
+        private SimpleTCCManagerExtendBuilder() {
 
         }
 
@@ -37,27 +45,27 @@ public class SimpleTCCManager extends TCCManager {
 
         private SImpleTCCCancelRetryBiz tccCancelRetryBiz;
 
-        public SimpleTCCManagerBuilder setTCCBeginBiz(SimpleTCCBeginBiz beginBiz) {
+        public SimpleTCCManagerExtendBuilder setTCCBeginBiz(SimpleTCCBeginBiz beginBiz) {
             this.tccBeginBiz = beginBiz;
             return this;
         }
 
-        public SimpleTCCManagerBuilder setTCCUpdateBiz(SimpleTCCUpdateBiz updateBiz) {
+        public SimpleTCCManagerExtendBuilder setTCCUpdateBiz(SimpleTCCUpdateBiz updateBiz) {
             this.tccUpdateBiz = updateBiz;
             return this;
         }
 
-        public SimpleTCCManagerBuilder setTCCEndBiz(SimpleTCCEndBiz endBiz) {
+        public SimpleTCCManagerExtendBuilder setTCCEndBiz(SimpleTCCEndBiz endBiz) {
             this.tccEndBiz = endBiz;
             return this;
         }
 
-        public SimpleTCCManagerBuilder setTCCConfirmRetryBiz(SimpleTCCConfirmRetryBiz confirmRetryBiz) {
+        public SimpleTCCManagerExtendBuilder setTCCConfirmRetryBiz(SimpleTCCConfirmRetryBiz confirmRetryBiz) {
             this.tccConfirmRetryBiz = confirmRetryBiz;
             return this;
         }
 
-        public SimpleTCCManagerBuilder setTCCCancelRetryBiz(SImpleTCCCancelRetryBiz cancelRetryBiz) {
+        public SimpleTCCManagerExtendBuilder setTCCCancelRetryBiz(SImpleTCCCancelRetryBiz cancelRetryBiz) {
             this.tccCancelRetryBiz = cancelRetryBiz;
             return this;
         }

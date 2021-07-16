@@ -203,7 +203,7 @@ public class TCCCallerTest {
     }
 
     public SimpleTCCManager buildMananger() {
-        return SimpleTCCManager.builder()
+        return SimpleTCCManager.extendBuilder()
             .setTCCBeginBiz(new SimpleTCCBeginBiz())
             .setTCCUpdateBiz(new SimpleTCCUpdateBiz())
             .setTCCEndBiz(new SimpleTCCEndBiz())

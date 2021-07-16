@@ -1,5 +1,8 @@
 package com.fs.voldemort.core.support;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import com.fs.voldemort.core.functional.func.DynamicFunc;
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.functional.func.Func1;
@@ -24,17 +27,66 @@ public class CallerContext {
         this.parentContext = parentContext;
     }
 
-    /**
-     * 获取值
-     * 优先从当前上下文中获取，如果没有则尝试去parentContext中获取
-     * @param key
-     */
+    //#region Value
+
     public Object get(String key) {
-        Object value = valueBag.get(key);
-        if(value == null && parentContext != null) {
-            value = parentContext.get(key);
-        }
-        return value;
+        return get(
+            key, valueBag::get, parentContext != null ? parentContext::get : null);
+    }
+
+    public Byte getByte(String key) {
+        return get(
+            key, valueBag::getByteValue, parentContext != null ? parentContext::getByte : null);
+    }
+
+    public Character getChar(String key) {
+        return get(
+            key, valueBag::getCharValue, parentContext != null ? parentContext::getChar : null);
+    }
+
+    public String getString(String key) {
+        return get(
+            key, valueBag::getStringValue, parentContext != null ? parentContext::getString : null);
+    }
+
+    public Boolean getBoolean(String key) {
+        return get(
+            key, valueBag::getBooleanValue, parentContext != null ? parentContext::getBoolean : null);
+    }
+
+    public Short getShort(String key) {
+        return get(
+            key, valueBag::getShortValue, parentContext != null ? parentContext::getShort : null);
+    }
+
+    public Integer getInteger(String key) {
+        return get(
+            key, valueBag::getIntegerValue, parentContext != null ? parentContext::getInteger : null);
+    }
+
+    public Long getLong(String key) {
+        return get(
+            key, valueBag::getLongValue, parentContext != null ? parentContext::getLong : null);
+    }
+
+    public Float getFloat(String key) {
+        return get(
+            key, valueBag::getFloatValue, parentContext != null ? parentContext::getFloat : null);
+    }
+
+    public Double getDouble(String key) {
+        return get(
+            key, valueBag::getDoubleValue, parentContext != null ? parentContext::getDouble : null);
+    }
+
+    public BigDecimal getBigDecimal(String key) {
+        return get(
+            key, valueBag::getBigDecimalValue, parentContext != null ? parentContext::getBigDecimal : null);
+    }
+
+    public Date getDate(String key) {
+        return get(
+            key, valueBag::getDateValue, parentContext != null ? parentContext::getDate : null);
     }
 
     /**
@@ -62,6 +114,23 @@ public class CallerContext {
 
         return false;
     }
+
+    /**
+     * 获取值
+     * 优先从当前上下文中获取，如果没有则尝试去parentContext中获取
+     * @param key
+     */
+    protected <T1, R> R get(T1 key, Func1<T1, R> selfFunc, Func1<T1, R> parentFunc) {
+        R value = selfFunc.call(key);
+        if(value == null && parentFunc != null) {
+            value = parentFunc.call(key);
+        }
+        return value;
+    }
+
+    //#endregion
+
+    //#region Function
 
     public <R> void declareFunction(String functionName, Func0<R> func) {
         putFunction(functionName, args -> func.call());
@@ -130,5 +199,7 @@ public class CallerContext {
         }
         return functionBag.tryCall(functionName, args, defaultResult);
     }
+
+    //#endregion
 
 }

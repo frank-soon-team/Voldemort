@@ -96,6 +96,47 @@ public class CallerTest {
             .exec(r -> Assert.assertEquals(r, 4));
     }
 
+    @Test
+    public void test_contextFunctionalWithValue() {
+        Wand.caller()
+            .call(p -> 1)
+            .call(p -> {
+                CallerContext context = p.context();
+                context.set("addValue", 100);
+                context.declareFunction("add", (Integer a) -> a + context.getInteger("addValue"));
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                context.set("subtractValue", 1);
+                context.declareFunction("subtract", (Integer a) -> a - context.getInteger("subtractValue"));
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                context.set("multipleValue", 2);
+                context.declareFunction("multiple", (Integer a) -> a * context.getInteger("multipleValue"));
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                context.set("divideValue", 50);
+                context.declareFunction("divide", (Integer a) -> a / context.getInteger("divideValue"));
+                return p.result;
+            })
+            .call(p -> {
+                CallerContext context = p.context();
+                Integer value = (Integer) p.result;
+                value = context.callFunction("add", value); // 101
+                value = context.callFunction("subtract", value); // 100
+                value = context.callFunction("multiple", value); // 200
+                value = context.callFunction("divide", value); // 4
+
+                return value;
+            })
+            .exec(r -> Assert.assertEquals(r, 4));
+    }
+
     public void test_BusinessCaller() {
         // BusinessCaller.create().call();
 

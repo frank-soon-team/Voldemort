@@ -1,5 +1,11 @@
 package com.fs.voldemort.tcc.simple.service.gear;
 
-public class IRepositoryGear {
+import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
+
+public interface IRepositoryGear {
+
+    boolean create(TCCTaskModel taskModel);
+
+    boolean update(TCCTaskModel taskModel);
     
 }
