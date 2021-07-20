@@ -1,6 +1,8 @@
 package com.fs.voldemort.tcc.simple.service.model;
 
-public class TCCTaskNode {
+import java.io.Serializable;
+
+public class TCCTaskNode implements Serializable {
 
     private String nodeName;
 

@@ -11,11 +11,9 @@ import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
-import com.fs.voldemort.tcc.simple.service.biz.SImpleTCCCancelRetryBiz;
-import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCBeginBiz;
-import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCConfirmRetryBiz;
-import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCEndBiz;
-import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCUpdateBiz;
+import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
+import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
+import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
 import com.fs.voldemort.tcc.state.ITCCState;
 
 import org.junit.Assert;
@@ -203,13 +201,46 @@ public class TCCCallerTest {
     }
 
     public SimpleTCCManager buildMananger() {
-        return SimpleTCCManager.extendBuilder()
-            .setTCCBeginBiz(new SimpleTCCBeginBiz())
-            .setTCCUpdateBiz(new SimpleTCCUpdateBiz())
-            .setTCCEndBiz(new SimpleTCCEndBiz())
-            .setTCCConfirmRetryBiz(new SimpleTCCConfirmRetryBiz())
-            .setTCCCancelRetryBiz(new SImpleTCCCancelRetryBiz())
-            .build();
+
+        return SimpleTCCManager.builder()
+                .setRepositoryGear(new IRepositoryGear() {
+
+                    @Override
+                    public boolean create(TCCTaskModel taskModel) {
+                        System.out.println("create TCCTaskModel");
+                        return true;
+                    }
+
+                    @Override
+                    public boolean update(TCCTaskModel taskModel) {
+                        System.out.println("update TCCTaskModel");
+                        return true;
+                    }
+                    
+                })
+                .setSerializeGear(new ISerializeGear(){
+                    @Override
+                    public String serialize(Object obj) {
+                        return null;
+                    }
+
+                    @Override
+                    public <T> T deserialize(String serializeStr) {
+                        return null;
+                    }
+                    
+                })
+                .setBusinessSupportGear(null)
+                .build();
+
+
+        // return SimpleTCCManager.extendBuilder()
+        //     .setTCCBeginBiz(new SimpleTCCBeginBiz())
+        //     .setTCCUpdateBiz(new SimpleTCCUpdateBiz())
+        //     .setTCCEndBiz(new SimpleTCCEndBiz())
+        //     .setTCCConfirmRetryBiz(new SimpleTCCConfirmRetryBiz())
+        //     .setTCCCancelRetryBiz(new SimpleTCCCancelRetryBiz())
+        //     .build();
     }
 
 }

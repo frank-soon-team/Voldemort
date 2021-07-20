@@ -1,9 +1,10 @@
 package com.fs.voldemort.tcc.simple.service.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TCCTaskModel {
+public class TCCTaskModel implements Serializable {
 
     private String transactionId;
 
@@ -14,6 +15,8 @@ public class TCCTaskModel {
     private String statusDescription;
 
     private int retryTimes;
+
+    private String traceId;
 
     private String bizCode;
 
@@ -57,6 +60,14 @@ public class TCCTaskModel {
 
     public void setRetryTimes(int retryTimes) {
         this.retryTimes = retryTimes;
+    }
+
+    public String getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
     }
 
     public String getBizCode() {

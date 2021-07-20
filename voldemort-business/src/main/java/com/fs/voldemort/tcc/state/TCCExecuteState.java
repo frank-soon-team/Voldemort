@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fs.voldemort.core.functional.func.Func0;
+import com.fs.voldemort.core.support.CallerContext;
+import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.exception.TCCStateException;
 import com.fs.voldemort.tcc.node.TCCNode;
@@ -142,5 +144,19 @@ public class TCCExecuteState implements ITCCState {
     @Override
     public Object getParam() {
         return param;
+    }
+
+    public CallerContext getContext() {
+        CallerContext context = null;
+
+        if(errorCollection != null && !errorCollection.isEmpty()) {
+            ExecuteCallerNodeException executeCallerNodeException = errorCollection.get(errorCollection.size() - 1);
+            CallerParameter callerParameter = executeCallerNodeException.getParameter();
+            if(callerParameter != null) {
+                context = callerParameter.context();
+            }
+        }
+
+        return context;
     }
 }

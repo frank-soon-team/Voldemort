@@ -159,8 +159,8 @@ public class TCCManager extends FuncLinkedList {
             tccState.setStatus(TCCStatus.TrySuccess);
         } catch(RuntimeException e) {
             if(currentNode instanceof TCCNode) {
-                ((TCCNode)currentNode).setStatus(
-                    e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
+                TCCNode tccNode = (TCCNode) currentNode;
+                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
             }
             tccState.setStatus(TCCStatus.TryFaild);
             tccState.collectExceptional(new ExecuteCallerNodeException(e, currentNode, currentParameter));

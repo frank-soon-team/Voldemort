@@ -12,6 +12,10 @@ public class ExecuteCallerNodeException extends IllegalStateException {
     private String name;
 
     public ExecuteCallerNodeException(Throwable e, CallerNode node, CallerParameter parameter) {
+        this(e, node, null, parameter);
+    }
+
+    public ExecuteCallerNodeException(Throwable e, CallerNode node, String name, CallerParameter parameter) {
         super(e);
         this.node = node;
         this.parameter = parameter;

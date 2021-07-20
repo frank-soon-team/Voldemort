@@ -53,5 +53,12 @@ public class TCCNode extends CallerNode {
         this.status = status;
     }
 
+    public String getName() {
+        if(tccHandler instanceof BaseTCCHandler) {
+            return ((BaseTCCHandler) tccHandler).getName();
+        }
+        return "";
+    }
+
     
 }
