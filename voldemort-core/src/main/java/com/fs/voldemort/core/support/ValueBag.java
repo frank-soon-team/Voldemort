@@ -5,8 +5,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fs.voldemort.core.common.IConverter;
 
@@ -33,6 +35,16 @@ public class ValueBag implements IBag<String, Object>, IConverter<String> {
     @Override
     public boolean contains(String key) {
         return contextStore.containsKey(key);
+    }
+
+    @Override
+    public Set<String> getKeys() {
+        return new HashSet<>(contextStore.keySet());
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return contextStore.isEmpty();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.fs.voldemort.core.support;
 
+import java.util.Set;
+
 public interface IBag<K, V> {
     
     V get(K key);
@@ -7,5 +9,9 @@ public interface IBag<K, V> {
     void set(K key, V value);
 
     boolean contains(K key);
+
+    Set<K> getKeys();
+
+    boolean isEmpty();
 
 }

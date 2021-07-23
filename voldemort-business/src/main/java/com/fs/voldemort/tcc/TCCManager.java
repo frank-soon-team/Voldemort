@@ -124,9 +124,32 @@ public class TCCManager extends FuncLinkedList {
         // 更新确认阶段TCC执行结果
         stateManager.end(state);
 
+        // 二阶段失败，补偿
+        if(!state.isSuccess()) {
+            compensate(state);
+        }
+
         throwIfExceptional(state);
 
         return currentParameter;
+    }
+
+    public void confirm(ITCCState tccState) {
+        if(tccState == null) {
+            throw new IllegalArgumentException("the parameter tccState is required.");
+        }
+
+        commit(tccState);
+        stateManager.end(tccState);
+    }
+
+    public void cancel(ITCCState tccState) {
+        if(tccState == null) {
+            throw new IllegalArgumentException("the parameter tccState is required.");
+        }
+
+        rollback(tccState);
+        stateManager.end(tccState);
     }
 
     //#region TCC Transactional
@@ -179,6 +202,9 @@ public class TCCManager extends FuncLinkedList {
         List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
 
         for (TCCNode tccNode : triedNodeList) {
+            if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
+                continue;
+            }
             try {
                 tccNode.doConfirm();
                 tccNode.setStatus(TCCStatus.ConfirmSuccess);
@@ -192,7 +218,6 @@ public class TCCManager extends FuncLinkedList {
             tccState.setStatus(TCCStatus.ConfirmSuccess);
         } else {
             tccState.setStatus(TCCStatus.ConfirmFailed);
-            confirmCompensateStrategy.retry(state);
         }
     }
 
@@ -208,6 +233,9 @@ public class TCCManager extends FuncLinkedList {
 
         for(int i = count - 1; i >= 0; i--) {
             TCCNode tccNode = triedNodeList.get(i);
+            if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
+                continue;
+            }
             try {
                 tccNode.doCancel();
                 tccNode.setStatus(TCCStatus.CancelSuccess);
@@ -221,7 +249,24 @@ public class TCCManager extends FuncLinkedList {
             tccState.setStatus(TCCStatus.CancelSuccess);
         } else {
             tccState.setStatus(TCCStatus.CancelFailed);
-            cancelCompensateStrategy.retry(state);
+        }
+    }
+
+    protected void compensate(ITCCState tccState) {
+        TCCStatus status = tccState.getStatus();
+        
+        if(status == TCCStatus.ConfirmFailed || status == TCCStatus.ConfirmTimeout) {
+            if(confirmCompensateStrategy != null) {
+                confirmCompensateStrategy.retry(tccState);
+            }
+            return;
+        }
+
+        if(status == TCCStatus.CancelFailed || status == TCCStatus.CancelTimeout) {
+            if(cancelCompensateStrategy != null) {
+                cancelCompensateStrategy.retry(tccState);
+            }
+            return;
         }
     }
 

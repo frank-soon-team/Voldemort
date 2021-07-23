@@ -1,7 +1,9 @@
 package com.fs.voldemort.core.support;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fs.voldemort.core.functional.func.DynamicFunc;
 
@@ -28,6 +30,16 @@ public class FunctionBag implements IBag<String, DynamicFunc<Object>> {
     @Override
     public boolean contains(String key) {
         return contextStore.containsKey(key);
+    }
+
+    @Override
+    public Set<String> getKeys() {
+        return new HashSet<>(contextStore.keySet());
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return contextStore.isEmpty();
     }
 
     public <R> R call(String key, Object[] args) {

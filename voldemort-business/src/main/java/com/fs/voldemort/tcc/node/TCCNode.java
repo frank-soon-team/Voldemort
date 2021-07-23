@@ -23,14 +23,14 @@ public class TCCNode extends CallerNode {
         if(nodeParameter == null) {
             throw new IllegalStateException("the nodeParameter is null.");
         }
-        tccHandler.confirm(nodeParameter.getTCCState());
+        tccHandler.confirm(nodeParameter);
     }
 
     public void doCancel() {
         if(nodeParameter == null) {
             throw new IllegalStateException("the nodeParameter is null.");
         }
-        tccHandler.cancel(nodeParameter.getTCCState());
+        tccHandler.cancel(nodeParameter);
     }
     
     public void setNodeParameter(TCCNodeParameter parameter) {

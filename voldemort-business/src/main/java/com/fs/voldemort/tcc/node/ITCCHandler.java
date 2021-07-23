@@ -1,7 +1,6 @@
 package com.fs.voldemort.tcc.node;
 
 import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.tcc.state.ITCCState;
 
 /**
  * TCC事务节点的接口
@@ -18,11 +17,11 @@ public interface ITCCHandler {
      * 提交操作，支持幂等，支持悬挂提交
      * @return
      */
-    void confirm(ITCCState tccState);
+    void confirm(CallerParameter parameter);
 
     /**
      * 回滚操作，支持幂等，支持悬挂提交
      */
-    void cancel(ITCCState tccState);
+    void cancel(CallerParameter parameter);
 
 }

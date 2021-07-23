@@ -2,6 +2,9 @@ package com.fs.voldemort.core.support;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.fs.voldemort.core.functional.func.DynamicFunc;
 import com.fs.voldemort.core.functional.func.Func0;
@@ -14,6 +17,8 @@ import com.fs.voldemort.core.functional.func.Func6;
 import com.fs.voldemort.core.functional.func.Func7;
 
 public class CallerContext {
+
+    private final static String PARENT_KEY = "_Parent_Context";
     
     private ValueBag valueBag = new ValueBag();
     private FunctionBag functionBag;
@@ -25,6 +30,10 @@ public class CallerContext {
 
     public CallerContext(CallerContext parentContext) {
         this.parentContext = parentContext;
+    }
+
+    public CallerContext(Map<String, Object> initailMap) {
+        parse(initailMap);
     }
 
     //#region Value
@@ -103,7 +112,7 @@ public class CallerContext {
      * @param key
      */
     public boolean update(String key, Object value) {
-        if(valueBag.contains(key)) {
+        if(valueBag != null && valueBag.contains(key)) {
             valueBag.set(key, value);
             return true;
         }
@@ -126,6 +135,10 @@ public class CallerContext {
             value = parentFunc.call(key);
         }
         return value;
+    }
+
+    protected void parse(Map<String, Object> initailMap) {
+
     }
 
     //#endregion
@@ -202,4 +215,35 @@ public class CallerContext {
 
     //#endregion
 
+    public Map<String, Object> getValueMap() {
+        Map<String, Object> parentValueMap = null;
+        if(parentContext != null) {
+            parentValueMap = parentContext.getValueMap();
+        }
+
+        if(valueBag == null) {
+            return parentValueMap;
+        }
+
+        Set<String> keySet = valueBag.getKeys();
+        if(keySet == null || keySet.isEmpty()) {
+            return parentValueMap;
+        }
+
+
+        Map<String, Object> valueMap = new HashMap<>();
+        valueMap.put(PARENT_KEY, parentValueMap);
+        for(String key : keySet) {
+            valueMap.put(key, valueBag.get(key));
+        }
+
+        return valueMap;
+    }
+
+    CallerContext get() {
+        if(valueBag.isEmpty()) {
+            return parentContext;
+        }
+        return this;
+    }
 }

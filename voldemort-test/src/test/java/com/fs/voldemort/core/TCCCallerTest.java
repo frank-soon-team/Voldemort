@@ -14,7 +14,6 @@ import com.fs.voldemort.tcc.simple.SimpleTCCManager;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
 import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
-import com.fs.voldemort.tcc.state.ITCCState;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,22 +27,22 @@ public class TCCCallerTest {
                 createHandler(
                     "Coupon", 
                     p -> { System.out.println("预留优惠券"); return true; },
-                    s -> { System.out.println("扣减优惠券"); },
-                    s -> System.out.println("返回优惠券"))
+                    p -> { System.out.println("扣减优惠券"); },
+                    p -> System.out.println("返回优惠券"))
             )
             .call(
                 createHandler(
                     "Point", 
                     p -> { System.out.println("计算奖励积分"); return true; },
-                    s -> { System.out.println("积分奖励生效"); },
-                    s -> System.out.println("积分奖励取消"))
+                    p -> { System.out.println("积分奖励生效"); },
+                    p -> System.out.println("积分奖励取消"))
             )
             .call(
                 createHandler(
                     "Gift", 
                     p -> { System.out.println("预留赠品"); return true; },
-                    s -> { System.out.println("赠品赠送"); },
-                    s -> System.out.println("赠品取消"))
+                    p -> { System.out.println("赠品赠送"); },
+                    p -> System.out.println("赠品取消"))
             )
             .exec();
 
@@ -62,12 +61,12 @@ public class TCCCallerTest {
                         result[0] += 1;
                         return null;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] += 1;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         if(result[0] > 0) {
                             result[0] -= 1;
                         }
@@ -81,12 +80,12 @@ public class TCCCallerTest {
                         result[0] += 1;
                         return null;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] += 1;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] -= 1;
                     })
             )
@@ -98,12 +97,12 @@ public class TCCCallerTest {
                         result[0] += 1;
                         return null;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] += 1;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] -= 1;
                     })
             );
@@ -126,12 +125,12 @@ public class TCCCallerTest {
                         result[0] += 1;
                         return result;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] += 1;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         if(result[0] > 0) {
                             result[0] -= 1;
                         }
@@ -145,12 +144,12 @@ public class TCCCallerTest {
                         result[0] += 1;
                         return result;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] += 1;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] -= 1;
                     })
             )
@@ -160,12 +159,12 @@ public class TCCCallerTest {
                     p -> {
                         throw new IllegalStateException("throw");
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] += 1;
                     }, 
-                    s -> {
-                        int[] result = (int[]) s.getParam();
+                    p -> {
+                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
                         result[0] -= 1;
                     })
             );
@@ -179,7 +178,7 @@ public class TCCCallerTest {
         Assert.assertTrue(value[0] == 0);
     }
 
-    public ITCCHandler createHandler(String name, Func1<CallerParameter, Object> goTry, Action1<ITCCState> confirm, Action1<ITCCState> cancel) {
+    public ITCCHandler createHandler(String name, Func1<CallerParameter, Object> goTry, Action1<CallerParameter> confirm, Action1<CallerParameter> cancel) {
         return new BaseTCCHandler(name) {
 
             @Override
@@ -188,13 +187,13 @@ public class TCCCallerTest {
             }
 
             @Override
-            public void confirm(ITCCState tccState) {
-                confirm.apply(tccState);
+            public void confirm(CallerParameter parameter) {
+                confirm.apply(parameter);
             }
 
             @Override
-            public void cancel(ITCCState tccState) {
-                cancel.apply(tccState);
+            public void cancel(CallerParameter parameter) {
+                cancel.apply(parameter);
             }
             
         };

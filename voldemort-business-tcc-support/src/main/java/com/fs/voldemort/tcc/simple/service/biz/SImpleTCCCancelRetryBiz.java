@@ -1,7 +1,9 @@
 package com.fs.voldemort.tcc.simple.service.biz;
 
+import java.util.List;
+
 import com.fs.voldemort.core.functional.action.Action1;
-import com.fs.voldemort.tcc.node.BaseTCCHandler;
+import com.fs.voldemort.tcc.node.TCCNode;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
@@ -26,17 +28,16 @@ public class SimpleTCCCancelRetryBiz extends BaseTCCBiz implements Action1<ITCCS
 
     @Override
     public void apply(ITCCState state) {
-        // TODO TCC 取消阶段 重试
+        if(!state.isSuccess()) {
+            return;
+        }
 
-        System.out.println("TCC: " + state.identify() + ", retry start...");
+        List<TCCNode> triedNodeList = state.getTriedNodeList();
+        if(triedNodeList == null || triedNodeList.isEmpty()) {
+            throw new IllegalStateException("the TCCNodeList is empty.");
+        }
 
-        state.getTriedNodeList().forEach(n -> {
-            BaseTCCHandler tccHandler = (BaseTCCHandler) n.getTCCHandler();
-            System.out.println(tccHandler.getName() + " cancel success.");
-        });
-        
-        System.out.println("TCC: " + state.identify() + ", retry end...");
-        
+        // TODO 处理回滚补偿流程
     }
     
 }

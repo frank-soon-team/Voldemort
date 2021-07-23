@@ -10,7 +10,7 @@ public class CallerParameter {
             throw new IllegalArgumentException("the parameter is required.");
         }
         this.result = parameter.result;
-        this.context = new CallerContext(parameter.context());
+        this.context = new CallerContext(parameter.context().get());
     }
 
     public CallerParameter(Object result, CallerContext context) {
