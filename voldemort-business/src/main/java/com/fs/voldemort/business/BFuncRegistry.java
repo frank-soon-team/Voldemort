@@ -1,5 +1,6 @@
 package com.fs.voldemort.business;
 
+import com.fs.voldemort.business.fit.FitMode;
 import com.fs.voldemort.business.support.BFuncCallable;
 import com.fs.voldemort.business.support.BFuncHorcruxes;
 import com.fs.voldemort.business.support.BFunc;
@@ -29,11 +30,9 @@ public class BFuncRegistry {
 
             final Integer funcHorcruxesInstanceSize = funcHorcruxesList.size();
 
-            final Map<Method, BFuncCallable> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
+            final Map<Method, Object> assistFuncHorcruxesInstanceMap = new HashMap<>(funcHorcruxesInstanceSize);
             return
                 funcHorcruxesList.stream()
-                    .filter(BFuncCallable.class::isInstance)
-                    .map(BFuncCallable.class::cast)
                     .map(
                         funcHorcruxes -> Arrays.stream(funcHorcruxes.getClass().getDeclaredMethods())
                             .filter(method -> {
@@ -57,7 +56,7 @@ public class BFuncRegistry {
                                         throw new CallerException(e.getMessage(),e);
                                     }
                                 },
-                                p -> assistFuncHorcruxesInstanceMap.get(method).paramFit(p)
+                                method.getAnnotation(BFunc.class).fit().getFitFunc()
                             )
                         )
                     );

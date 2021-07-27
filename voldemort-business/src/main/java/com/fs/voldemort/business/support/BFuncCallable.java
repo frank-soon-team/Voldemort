@@ -1,7 +1,8 @@
 package com.fs.voldemort.business.support;
 
+import com.fs.voldemort.business.fit.CArg;
+import com.fs.voldemort.business.fit.PArg;
 import com.fs.voldemort.core.exception.CallerException;
-import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
 import lombok.NonNull;
 
@@ -61,18 +62,21 @@ public interface BFuncCallable {
 
         final Method funcMethod = funcMethodList.get(0);
 
-        final Set<Object> arg = new HashSet<>();
-        final Set<CArg> cArgSet = new HashSet<>();
-        final Set<PArg> pArgSet = Arrays.stream(funcMethod.getParameters()).filter(param->{
+        //arg result set
+        final List<Object> arg = new LinkedList<>();
+        //Context arg temporary set
+        final List<CArg> cArgSet = new LinkedList<>();
+        //Param arg temporary set
+        final List<PArg> pArgSet = Arrays.stream(funcMethod.getParameters()).filter(param->{
             if(param.isAnnotationPresent(BFuncOperate.class)){
                 cArgSet.add(new CArg(param.getAnnotation(BFuncOperate.class).value(),p.context()));
                 return false;
             }
             return true;
-        }).map(param-> new PArg(param.getName())).collect(Collectors.toSet());
+        }).map(param-> new PArg(param.getName())).collect(Collectors.toList());
 
-        //Deal param arg
         if(!pArgSet.isEmpty()) {
+            //Deal result arg
             final PArg resultArg = pArgSet.iterator().next();
             resultArg.value = p.result;
 
@@ -80,78 +84,15 @@ public interface BFuncCallable {
             if(pArgSet.size()>1) {
                 pArgSet.stream().skip(1).forEach(pArg -> pArg.value = p.context().get(pArg.name));
             }
-            arg.addAll(pArgSet.stream().map(pArg -> pArg.value).collect(Collectors.toSet()));
+            arg.addAll(pArgSet.stream().map(pArg -> pArg.value).collect(Collectors.toList()));
         }
 
         //Deal context operator func arg
         if(!cArgSet.isEmpty()) {
-            arg.addAll(cArgSet.stream().map(CArg::getOperFunc).collect(Collectors.toSet()));
+            arg.addAll(cArgSet.stream().map(CArg::getOperFunc).collect(Collectors.toList()));
         }
 
         return arg.toArray();
-    }
-
-    /**
-     * Param arg
-     */
-    class PArg {
-        public final String name;
-        public Object value;
-
-        public PArg(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            var args = (PArg) o;
-            return name.equals(args.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name);
-        }
-    }
-
-    /**
-     * Func arg for context
-     */
-    class CArg {
-        public final BFuncOperate.Oper oper;
-        public final CallerContext context;
-
-        public CArg(@NonNull BFuncOperate.Oper oper, @NonNull CallerContext context) {
-            this.oper = oper;
-            this.context = context;
-        }
-
-        public Object getOperFunc() {
-            return oper.getFunc.call(context);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            var args = (CArg) o;
-            return oper.equals(args.oper);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(oper);
-        }
     }
 
 }

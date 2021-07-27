@@ -1,17 +1,17 @@
 package com.fs.voldemort.core.business.horcruxes;
 
-import com.fs.voldemort.business.support.BFuncCallable;
-import com.fs.voldemort.business.support.BFuncHorcruxes;
+import com.fs.voldemort.business.fit.FitMode;
 import com.fs.voldemort.business.support.BFunc;
+import com.fs.voldemort.business.support.BFuncHorcruxes;
 import com.fs.voldemort.business.support.BFuncOperate;
+import com.fs.voldemort.core.business.fit.CustomFit;
 import com.fs.voldemort.core.functional.action.Action2;
 
 @BFuncHorcruxes
-public class HutchpatchGoldenCup implements BFuncCallable {
+public class HutchpatchGoldenCup {
 
-    @BFunc
+    @BFunc(fit = FitMode.CUSTOM, iFit = CustomFit.class)
     public String func(String target,
-
         @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC){
         //Add param to call context
         f_setC.apply("c1","context 1 result");
@@ -21,19 +21,3 @@ public class HutchpatchGoldenCup implements BFuncCallable {
     }
 
 }
-//
-//public class HutchpatchGoldenCupWrapper extends HutchpatchGoldenCup {
-//
-//    private final HutchpatchGoldenCup instance;
-//
-//    private final Context context;
-//
-//    public HutchpatchGoldenCupWrapper(HutchpatchGoldenCup instance, Context context) {
-//
-//    }
-//
-//    public void setC(String k ,Object v) {
-//
-//    }
-//
-//}

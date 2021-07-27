@@ -2,6 +2,7 @@ package com.fs.voldemort.business;
 
 import com.fs.voldemort.core.functional.func.DynamicFunc;
 import com.fs.voldemort.core.functional.func.Func1;
+import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
 
 /**
@@ -13,10 +14,10 @@ public class BFunc {
 
     public final DynamicFunc<?> func;
 
-    public final Func1<CallerParameter,Object[]> paramFitFunc;
+    public final Func2<Class<?>,CallerParameter,Object[]> paramFitFunc;
 
     public BFunc(Class<?> funcClass, DynamicFunc<?> func,
-                 Func1<CallerParameter,Object[]> paramFitFunc) {
+                 Func2<Class<?>,CallerParameter,Object[]> paramFitFunc) {
         this.funcClazz = funcClass;
         this.func = func;
         this.paramFitFunc = paramFitFunc;

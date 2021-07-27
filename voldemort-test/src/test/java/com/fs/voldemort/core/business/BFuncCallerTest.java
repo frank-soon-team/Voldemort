@@ -25,6 +25,7 @@ public class BFuncCallerTest {
                 .call(HutchpatchGoldenCup.class)
                 .call(Nagini.class)
                 .call(p->{
+                    System.out.println(p);
                     p.context().set("c3","C3!!!");
                     return "Result 666";
                 })

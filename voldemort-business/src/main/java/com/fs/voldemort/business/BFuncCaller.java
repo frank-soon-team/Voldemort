@@ -28,7 +28,7 @@ public class BFuncCaller extends BFuncAvailableCaller {
         }
 
         this.call(p -> {
-            Object[] result = bFunc.paramFitFunc.call(p);
+            Object[] result = bFunc.paramFitFunc.call(funcClazz,p);
             return bFunc.func.call(result);
         });
         return this;
