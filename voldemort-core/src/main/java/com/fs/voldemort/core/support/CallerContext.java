@@ -137,10 +137,6 @@ public class CallerContext {
         return value;
     }
 
-    protected void parse(Map<String, Object> initailMap) {
-
-    }
-
     //#endregion
 
     //#region Function
@@ -238,6 +234,26 @@ public class CallerContext {
         }
 
         return valueMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void parse(Map<String, Object> initailMap) {
+        ValueBag valueBag = new ValueBag();
+
+        if(initailMap == null || initailMap.isEmpty()) {
+            return;
+        }
+        
+        for(Map.Entry<String, Object> entry : initailMap.entrySet()) {
+            String key = entry.getKey();
+            if(PARENT_KEY.equals(key)) {
+                Map<String, Object> parentInitailMap = (Map<String, Object>) entry.getValue();
+                CallerContext parentContext = new CallerContext(parentInitailMap).get();
+                this.parentContext = parentContext;
+            } else {
+                valueBag.set(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     CallerContext get() {
