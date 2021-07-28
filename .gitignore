@@ -16,3 +16,5 @@ gen
 
 voldemort-test/target
 logs
+target/nexus-staging
+*.asc

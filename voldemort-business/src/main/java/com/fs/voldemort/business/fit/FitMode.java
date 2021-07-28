@@ -7,7 +7,7 @@ import lombok.Getter;
 
 public enum FitMode {
 
-    /**
+    /*
      * # Definition
      *  R func(
      *      Part 1-> Result arg

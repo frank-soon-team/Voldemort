@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public interface BFuncCallable {
 
-    /**
+    /*
      * #Definition
      *  R func(
      *      Part 1-> Result arg

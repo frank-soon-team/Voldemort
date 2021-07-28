@@ -21,11 +21,11 @@ public @interface BFuncOperate {
      */
     enum Oper {
         /**
-         * Func2 -> (contextKey, contextValue)
+         * Func2: (contextKey, contextValue)
          */
         SET(c-> (Action2<String,Object>) c::set),
         /**
-         * Func1 -> (contextKey, contextValue)
+         * Func1: (contextKey, contextValue)
          */
         GET(c-> (Func1<String,Object>) c::get);
 
