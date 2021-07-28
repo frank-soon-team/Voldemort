@@ -4,6 +4,7 @@ import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
+import com.fs.voldemort.core.support.ShareContextCallerParameter;
 
 import java.util.function.Consumer;
 
@@ -18,6 +19,12 @@ public class Caller {
 
     public Caller(CallerParameter initParameter) {
         this(new FuncLinkedList(), initParameter);
+    }
+
+    public Caller(CallerParameter initParameter, boolean shareContext) {
+        this(shareContext 
+            ? new ShareContextCallerParameter(initParameter.result, initParameter.context()) 
+            : initParameter);
     }
 
     protected Caller(FuncLinkedList funcLinkedList) {

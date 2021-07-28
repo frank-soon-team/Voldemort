@@ -28,6 +28,14 @@ public class FunctionBag implements IBag<String, DynamicFunc<Object>> {
     }
 
     @Override
+    public boolean remove(String key) {
+        if(key == null || key.length() == 0) {
+            return false;
+        }
+        return contextStore.remove(key) != null;
+    }
+
+    @Override
     public boolean contains(String key) {
         return contextStore.containsKey(key);
     }

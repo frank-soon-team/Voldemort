@@ -80,7 +80,10 @@ public class FuncLinkedList {
         if(parameter == null) {
             result = new CallerParameter(null, new CallerContext());
         } else {
-            result = new CallerParameter(parameter);
+            result = 
+                parameter instanceof ShareContextCallerParameter 
+                    ? parameter 
+                    : new CallerParameter(parameter);
         }
 
         return result;
@@ -101,7 +104,7 @@ public class FuncLinkedList {
         Object resultValue = result;
 
         int index = 1;
-        while(result instanceof Caller) {
+        while(resultValue instanceof Caller) {
             checkOverflow(index);
             resultValue = ((Caller) result).exec();
             index++;

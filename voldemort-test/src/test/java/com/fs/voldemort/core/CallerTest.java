@@ -1,6 +1,7 @@
 package com.fs.voldemort.core;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import com.fs.voldemort.Wand;
 import com.fs.voldemort.core.support.CallerContext;
@@ -137,35 +138,58 @@ public class CallerTest {
             .exec(r -> Assert.assertEquals(r, 4));
     }
 
-    public void test_BusinessCaller() {
-        // BusinessCaller.create().call();
+    @Test
+    public void test_Context() {
+        CallerContext context = Wand.caller()
+            .call(p -> {
+                p.context().set("name", "Jack");
+                p.context().set("age", 18);
+                p.context().set("gender", "male");
+                return 1;
+            })
+            .call(p -> null)
+            .call(p -> null)
+            .call(p -> null)
+            .call(p -> {
+                p.context().set("alias", "Thon");
+                return p.context();
+            })
+            .exec();
 
-        // TccCaller.create().call();
+        Map<String, Object> contextMap = context.getValueMap();
+        CallerContext newContext = new CallerContext(contextMap);
+        Assert.assertTrue(contextMap.toString().equals(newContext.getValueMap().toString()));
+    }
 
-        /*
+    @Test
+    public void test_ContextWithParent() {
 
-            // Lambda调用链
-            Wand.caller().call().exec();
-            // 函数调用链
-            Wand.businessCaller().call().exec();
-            // TCC事务链
-            Wand.tccCaller().call().exec();
+        CallerContext context = Wand.caller()
+            .call(p -> {
+                p.context().set("name", "Jack");
+                p.context().set("age", 18);
+                p.context().set("gender", "male");
+                return 1;
+            })
+            .call(p -> Wand.callerAndContext(p).call(p1 -> { p1.context().set("score", 99); return p1.result; }))
+            .call(
+                Wand.caller()
+                    .call(p -> {
+                        p.context().set("alias", "Thon");
+                        return p.context();
+                    })
+            )
+            .call(p -> p.result)
+            .call(p -> {
+                p.context().set("alias", "Thon");
+                return p.result;
+            })
+            .exec();
 
-            // 多事务链
-            Wand.caller()
-                .call(
-                    Voldmort.tccCaller().call(ITCCNode.class)
-                )
-                .call(
-                    Voldmort.tccCaller().call(ITCCNode.class)
-                )
-                .exec();
-        
-        */
-
-        // CallerFactory.businessCaller().call();
-
-        // CallerFactory.tccCaller().call();
+        Map<String, Object> contextMap = context.getValueMap();
+        System.out.println(contextMap);
+        CallerContext newContext = new CallerContext(contextMap);
+        Assert.assertTrue(contextMap.toString().equals(newContext.getValueMap().toString()));
 
     }
     

@@ -8,6 +8,8 @@ public interface IBag<K, V> {
 
     void set(K key, V value);
 
+    boolean remove(K key);
+
     boolean contains(K key);
 
     Set<K> getKeys();

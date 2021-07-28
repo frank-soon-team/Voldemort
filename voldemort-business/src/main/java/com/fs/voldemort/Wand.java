@@ -23,6 +23,10 @@ public abstract class Wand {
         return new Caller(initParameter);
     }
 
+    public static Caller callerAndContext(CallerParameter initParameter) {
+        return new Caller(initParameter, true);
+    }
+
     //#endregion
 
     //#region BusinessCaller

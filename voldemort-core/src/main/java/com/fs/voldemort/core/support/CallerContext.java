@@ -100,6 +100,9 @@ public class CallerContext {
 
     /**
      * 将值放入Context中，如果key已经存在，则覆盖
+     * 每一个Caller的call链中会共享同一个Context，
+     * 如果遇到子Caller，父级Context的值无法通过set方法修改，
+     * 如需修改，可通过update方法
      * @param key
      * @param value
      */
@@ -108,7 +111,9 @@ public class CallerContext {
     }
 
     /**
-     * 更新Context，如果key不存在则不会放入value
+     * 更新Context
+     * 优先更新自己，如果key不存在则尝试更新parentContext
+     * 如果key不存在则不会放入value
      * @param key
      */
     public boolean update(String key, Object value) {
@@ -211,6 +216,10 @@ public class CallerContext {
 
     //#endregion
 
+    public boolean isRoot() {
+        return parentContext == null;
+    }
+
     public Map<String, Object> getValueMap() {
         Map<String, Object> parentValueMap = null;
         if(parentContext != null) {
@@ -238,8 +247,6 @@ public class CallerContext {
 
     @SuppressWarnings("unchecked")
     protected void parse(Map<String, Object> initailMap) {
-        ValueBag valueBag = new ValueBag();
-
         if(initailMap == null || initailMap.isEmpty()) {
             return;
         }
