@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>voldemort-parent</artifactId>
-        <groupId>com.fs</groupId>
-        <version>1.0.0</version>
+        <groupId>io.github.frank-soon-team</groupId>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.fs</groupId>
+            <groupId>io.github.frank-soon-team</groupId>
             <artifactId>voldemort-springboot-autoconfigure</artifactId>
             <version>${project.version}</version>
         </dependency>
