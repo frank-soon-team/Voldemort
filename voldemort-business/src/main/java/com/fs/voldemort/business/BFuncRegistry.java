@@ -1,7 +1,5 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.business.fit.FitMode;
-import com.fs.voldemort.business.support.BFuncCallable;
 import com.fs.voldemort.business.support.BFuncHorcruxes;
 import com.fs.voldemort.business.support.BFunc;
 import com.fs.voldemort.core.exception.CallerException;
