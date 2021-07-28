@@ -20,7 +20,7 @@ import com.fs.voldemort.tcc.strategy.ICancelCompensateStrategy;
 import com.fs.voldemort.tcc.strategy.IConfirmCompensateStrategy;
 
 /**
- * TCC分为三个阶段：<br />
+ * TCC分为三个阶段：<br>
  * <ol>
  * <li>
  * Try阶段：资源预留，Try阶段成功则事务一定会成功

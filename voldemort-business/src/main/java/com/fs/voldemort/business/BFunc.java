@@ -1,7 +1,6 @@
 package com.fs.voldemort.business;
 
 import com.fs.voldemort.core.functional.func.DynamicFunc;
-import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
 

@@ -1,7 +1,5 @@
 package com.fs.voldemort.business.fit;
 
-import com.fs.voldemort.business.support.BFuncCallable;
-
 import java.util.Objects;
 
 public class PArg {
