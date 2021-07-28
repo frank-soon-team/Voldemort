@@ -1,11 +1,10 @@
 package com.fs.voldemort.core.business.horcruxes;
 
-import com.fs.voldemort.business.support.BFuncCallable;
 import com.fs.voldemort.business.support.BFuncHorcruxes;
 import com.fs.voldemort.business.support.BFunc;
 
 @BFuncHorcruxes
-public class MarvoroGunterRing implements BFuncCallable {
+public class MarvoroGunterRing{
 
     @BFunc
     public String func(String result, String c3){

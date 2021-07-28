@@ -1,5 +1,7 @@
 package com.fs.voldemort.core.business;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fs.voldemort.business.BFuncCaller;
 import com.fs.voldemort.core.business.horcruxes.HutchpatchGoldenCup;
 import com.fs.voldemort.core.business.horcruxes.MarvoroGunterRing;
@@ -25,6 +27,11 @@ public class BFuncCallerTest {
                 .call(HutchpatchGoldenCup.class)
                 .call(Nagini.class)
                 .call(p->{
+                    try {
+                        System.out.println(new ObjectMapper().writeValueAsString(p));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
                     p.context().set("c3","C3!!!");
                     return "Result 666";
                 })

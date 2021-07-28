@@ -33,7 +33,7 @@ public @interface BFuncOperate {
             this.getFunc = getFunc;
         }
 
-        Func1<CallerContext,Object> getFunc;
+        public Func1<CallerContext,Object> getFunc;
     }
 
 }

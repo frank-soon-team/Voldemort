@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>com.fs</groupId>
+        <groupId>io.github.frank-soon-team</groupId>
         <artifactId>voldemort-parent</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,19 +18,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.fs</groupId>
+            <groupId>io.github.frank-soon-team</groupId>
             <artifactId>voldemort-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.fs</groupId>
+            <groupId>io.github.frank-soon-team</groupId>
             <artifactId>voldemort-business</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.fs</groupId>
+            <groupId>io.github.frank-soon-team</groupId>
             <artifactId>voldemort-business-tcc-support</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -38,6 +38,12 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.12.4</version>
         </dependency>
 
         <dependency>
