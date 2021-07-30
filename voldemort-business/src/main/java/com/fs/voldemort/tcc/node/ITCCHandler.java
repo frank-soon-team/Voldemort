@@ -7,21 +7,13 @@ import com.fs.voldemort.core.support.CallerParameter;
  */
 public interface ITCCHandler {
     
-    /**
-     * 检查预留资源，无状态
-     * @return
-     */
+    // 检查预留资源，无状态
     Object goTry(CallerParameter parameter);
 
-    /**
-     * 提交操作，支持幂等，支持悬挂提交
-     * @return
-     */
+    // 提交操作，支持幂等，支持悬挂提交
     void confirm(CallerParameter parameter);
 
-    /**
-     * 回滚操作，支持幂等，支持悬挂提交
-     */
+    // 回滚操作，支持幂等，支持悬挂提交
     void cancel(CallerParameter parameter);
 
 }

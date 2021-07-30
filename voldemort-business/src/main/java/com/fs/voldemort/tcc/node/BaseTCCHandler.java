@@ -11,10 +11,7 @@ public abstract class BaseTCCHandler implements ITCCHandler {
         this.name = name;
     }
 
-    /**
-     * TCC处理器的名称，用于在容器中注册时作为key
-     * @return
-     */
+    // TCC处理器的名称，用于在容器中注册时作为key
     public String getName() {
         return name;
     }
