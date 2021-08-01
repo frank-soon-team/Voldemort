@@ -1,8 +1,5 @@
 package com.fs.voldemort.tcc;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
@@ -193,63 +190,13 @@ public class TCCManager extends FuncLinkedList {
     }
 
     protected void commit(ITCCState state) {
-        List<TCCNode> triedNodeList = state.getTriedNodeList();
-        if(triedNodeList == null || triedNodeList.isEmpty()) {
-            return;
-        }
-
         TCCExecuteState tccState = (TCCExecuteState) state;
-        List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
-
-        for (TCCNode tccNode : triedNodeList) {
-            if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
-                continue;
-            }
-            try {
-                tccNode.doConfirm();
-                tccNode.setStatus(TCCStatus.ConfirmSuccess);
-            } catch(RuntimeException e) {
-                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
-                commitFailedList.add(tccNode);
-            }
-        }
-
-        if(commitFailedList.isEmpty()) {
-            tccState.setStatus(TCCStatus.ConfirmSuccess);
-        } else {
-            tccState.setStatus(TCCStatus.ConfirmFailed);
-        }
+        tccState.commit();
     }
 
     protected void rollback(ITCCState state) {
-        List<TCCNode> triedNodeList = state.getTriedNodeList();
-        if(triedNodeList == null || triedNodeList.isEmpty()) {
-            return;
-        }
-
         TCCExecuteState tccState = (TCCExecuteState) state;
-        int count = triedNodeList.size();
-        List<TCCNode> rollbackFailedList = new ArrayList<>(count);
-
-        for(int i = count - 1; i >= 0; i--) {
-            TCCNode tccNode = triedNodeList.get(i);
-            if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
-                continue;
-            }
-            try {
-                tccNode.doCancel();
-                tccNode.setStatus(TCCStatus.CancelSuccess);
-            } catch(RuntimeException e) {
-                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
-                rollbackFailedList.add(tccNode);
-            }
-        }
-
-        if(rollbackFailedList.isEmpty()) {
-            tccState.setStatus(TCCStatus.CancelSuccess);
-        } else {
-            tccState.setStatus(TCCStatus.CancelFailed);
-        }
+        tccState.rollback();
     }
 
     protected void compensate(ITCCState tccState) {
