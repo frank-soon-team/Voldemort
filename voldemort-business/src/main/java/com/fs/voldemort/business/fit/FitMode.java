@@ -3,7 +3,6 @@ package com.fs.voldemort.business.fit;
 import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
-import lombok.Getter;
 
 public enum FitMode {
 
@@ -43,10 +42,13 @@ public enum FitMode {
 
     CUSTOM(FitLibrary.CUSTOM_FIT_FUNC);
 
-    @Getter
     private final Func2<Class<?>,CallerParameter,Object[]> fitFunc;
 
     FitMode(Func2<Class<?>,CallerParameter, Object[]> fitFunc) {
         this.fitFunc = fitFunc;
+    }
+
+    public Func2<Class<?>, CallerParameter, Object[]> getFitFunc() {
+        return fitFunc;
     }
 }
