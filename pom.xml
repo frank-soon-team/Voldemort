@@ -12,6 +12,7 @@
     <name>voldemort-parent</name>
 
     <description>The parent of voldemort</description>
+    <url>https://github.com/frank-soon-team/Voldemort</url>
 
     <organization>
         <name>Frank-Soon-Team</name>
