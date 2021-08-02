@@ -11,6 +11,8 @@
 
     <name>voldemort-parent</name>
 
+    <description>The parent of voldemort</description>
+
     <organization>
         <name>Frank-Soon-Team</name>
     </organization>

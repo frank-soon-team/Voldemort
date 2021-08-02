@@ -11,6 +11,8 @@
 
     <artifactId>voldemort-business</artifactId>
 
+    <description>The support of voldemort business</description>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -14,6 +14,8 @@
     <artifactId>voldemort-core</artifactId>
     <name>voldemort-core</name>
 
+    <description>The core of voldemort</description>
+
     <packaging>jar</packaging>
 
     <dependencies>
