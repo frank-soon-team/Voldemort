@@ -10,6 +10,7 @@ import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.exception.TCCStateException;
+import com.fs.voldemort.tcc.exception.TCCTimeoutException;
 import com.fs.voldemort.tcc.node.TCCNode;
 
 public class TCCExecuteState implements ITCCState {
@@ -43,6 +44,8 @@ public class TCCExecuteState implements ITCCState {
         tccNodeList = new ArrayList<>(size);
         errorCollection = new ArrayList<>(size);
     }
+
+    //#region ITCCState
 
     @Override
     public String identify() {
@@ -159,4 +162,68 @@ public class TCCExecuteState implements ITCCState {
 
         return context;
     }
+
+    //#endregion
+
+    //#region Transaction Action
+
+    public void commit() {
+        List<TCCNode> triedNodeList = getTriedNodeList();
+        if(triedNodeList == null || triedNodeList.isEmpty()) {
+            return;
+        }
+
+        List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
+
+        for (TCCNode tccNode : triedNodeList) {
+            if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
+                continue;
+            }
+            try {
+                tccNode.doConfirm();
+                tccNode.setStatus(TCCStatus.ConfirmSuccess);
+            } catch(RuntimeException e) {
+                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
+                commitFailedList.add(tccNode);
+            }
+        }
+
+        if(commitFailedList.isEmpty()) {
+            setStatus(TCCStatus.ConfirmSuccess);
+        } else {
+            setStatus(TCCStatus.ConfirmFailed);
+        }
+    }
+
+    public void rollback() {
+        List<TCCNode> triedNodeList = getTriedNodeList();
+        if(triedNodeList == null || triedNodeList.isEmpty()) {
+            return;
+        }
+
+        int count = triedNodeList.size();
+        List<TCCNode> rollbackFailedList = new ArrayList<>(count);
+
+        for(int i = count - 1; i >= 0; i--) {
+            TCCNode tccNode = triedNodeList.get(i);
+            if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
+                continue;
+            }
+            try {
+                tccNode.doCancel();
+                tccNode.setStatus(TCCStatus.CancelSuccess);
+            } catch(RuntimeException e) {
+                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
+                rollbackFailedList.add(tccNode);
+            }
+        }
+
+        if(rollbackFailedList.isEmpty()) {
+            setStatus(TCCStatus.CancelSuccess);
+        } else {
+            setStatus(TCCStatus.CancelFailed);
+        }
+    }
+
+    //#endregion
 }
