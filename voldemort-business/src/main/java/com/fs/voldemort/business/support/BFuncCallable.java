@@ -4,7 +4,6 @@ import com.fs.voldemort.business.fit.CArg;
 import com.fs.voldemort.business.fit.PArg;
 import com.fs.voldemort.core.exception.CallerException;
 import com.fs.voldemort.core.support.CallerParameter;
-import lombok.NonNull;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -47,7 +46,11 @@ public interface BFuncCallable {
      *  func2(R arg,  C1 arg1, C2 arg2, C2 arg3, {@link BFuncOperate} Func2<String,Object,Boolean> f_setC)
      *
      */
-    default Object[] paramFit(@NonNull final CallerParameter p) {
+    default Object[] paramFit(final CallerParameter p) {
+
+        if(null == p) {
+            throw new CallerException("The parameter for paramFit is null!");
+        }
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
             .filter(method -> Arrays.stream(method.getDeclaredAnnotations())

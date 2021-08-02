@@ -9,6 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <description>The example of voldemort</description>
+
     <artifactId>voldemort-example.uranus</artifactId>
     <packaging>jar</packaging>
 

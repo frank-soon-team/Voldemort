@@ -2,14 +2,13 @@ package com.fs.voldemort.business.fit;
 
 import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.core.support.CallerContext;
-import lombok.NonNull;
 
 public class CArg {
 
     public final BFuncOperate.Oper oper;
     public final CallerContext context;
 
-    public CArg(@NonNull BFuncOperate.Oper oper, @NonNull CallerContext context) {
+    public CArg(BFuncOperate.Oper oper, CallerContext context) {
         this.oper = oper;
         this.context = context;
     }

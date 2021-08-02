@@ -11,6 +11,8 @@
 
     <artifactId>voldemort-example.service</artifactId>
 
+    <description>The example of voldemort</description>
+
     <dependencies>
 
     </dependencies>
