@@ -12,6 +12,8 @@
     <artifactId>voldemort-business-tcc-support</artifactId>
     <name>voldemort-business-tcc-support</name>
 
+    <description>The support of voldemort business tcc</description>
+
     <packaging>jar</packaging>
 
     <dependencies>

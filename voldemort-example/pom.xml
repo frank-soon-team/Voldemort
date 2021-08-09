@@ -13,6 +13,9 @@
 
     <artifactId>voldemort-example</artifactId>
     <name>voldemort-example</name>
+
+    <description>The example of voldemort</description>
+
     <packaging>pom</packaging>
 
     <properties>
