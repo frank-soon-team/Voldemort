@@ -11,7 +11,7 @@ import com.fs.voldemort.core.support.CallerParameter;
  */
 public class BFuncCaller extends BFuncAvailableCaller {
 
-    private BFuncCaller() {
+    public BFuncCaller() {
         super();
     }
 

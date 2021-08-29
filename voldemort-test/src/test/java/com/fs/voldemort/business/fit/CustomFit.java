@@ -1,8 +1,5 @@
-package com.fs.voldemort.core.business.fit;
+package com.fs.voldemort.business.fit;
 
-import com.fs.voldemort.business.fit.CArg;
-import com.fs.voldemort.business.fit.IFit;
-import com.fs.voldemort.business.fit.PArg;
 import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.core.support.CallerParameter;
 

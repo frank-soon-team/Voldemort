@@ -1,9 +1,8 @@
-package com.fs.voldemort.core;
+package com.fs.voldemort.parallel;
 
 import java.math.BigDecimal;
 
 import com.fs.voldemort.Wand;
-import com.fs.voldemort.parallel.ParallelTaskResult;
 
 import org.junit.Assert;
 import org.junit.Test;

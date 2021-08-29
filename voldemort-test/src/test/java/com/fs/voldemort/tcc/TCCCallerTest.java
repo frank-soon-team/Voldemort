@@ -1,11 +1,10 @@
-package com.fs.voldemort.core;
+package com.fs.voldemort.tcc;
  
 
 import com.fs.voldemort.Wand;
 import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.tcc.TCCCaller;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;

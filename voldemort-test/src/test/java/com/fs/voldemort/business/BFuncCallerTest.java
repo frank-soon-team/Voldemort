@@ -1,11 +1,11 @@
-package com.fs.voldemort.core.business;
+package com.fs.voldemort.business;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fs.voldemort.business.BFuncCaller;
-import com.fs.voldemort.core.business.horcruxes.HutchpatchGoldenCup;
-import com.fs.voldemort.core.business.horcruxes.MarvoroGunterRing;
-import com.fs.voldemort.core.business.horcruxes.Nagini;
+import com.fs.voldemort.business.horcruxes.HutchpatchGoldenCup;
+import com.fs.voldemort.business.horcruxes.MarvoroGunterRing;
+import com.fs.voldemort.business.horcruxes.Nagini;
+
 import org.junit.Test;
 
 import java.util.Arrays;
