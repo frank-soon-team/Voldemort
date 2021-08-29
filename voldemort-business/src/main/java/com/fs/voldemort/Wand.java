@@ -10,69 +10,20 @@ import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelCaller;
-import com.fs.voldemort.tcc.TCCCaller;
-import com.fs.voldemort.tcc.TCCManager;
-import com.fs.voldemort.tcc.node.TCCNodeParameter;
 
-public abstract class Wand {
+public interface Wand {
 
-    private Wand() {}
-
-    public static CallerWand<?> create() {
-        return new CallerWand<CallerWand<?>>(Caller.create(), null);
+    public static CallerWand<?> caller() {
+        return new CallerWand<CallerWand<?>>(Caller.create());
     }
 
-    //#region Caller
-
-    public static Caller caller() {
-        return Caller.create();
+    public static ParallelWand<?> parallel() {
+        return new ParallelWand<CallerWand<?>>(ParallelCaller.create());
     }
 
-    public static Caller caller(CallerParameter initParameter) {
-        return new Caller(initParameter);
+    public static BusinessWand<?> business() {
+        return new BusinessWand<CallerWand<?>>(BFuncCaller.create());
     }
-
-    public static Caller callerAndContext(CallerParameter initParameter) {
-        return new Caller(initParameter, true);
-    }
-
-    //#endregion
-
-    //#region BusinessCaller
-
-    public static BFuncCaller businessCaller() {
-        return BFuncCaller.create();
-    }
-
-    //#endregion
-
-    //#region TCCCaller
-
-    public static TCCCaller tccCaller(TCCManager tccManager) {
-        return TCCCaller.create(tccManager);
-    }
-
-    public static TCCCaller tccCaller(TCCManager tccManager, Object param) {
-        TCCCaller tccCaller = TCCCaller.create(tccManager);
-        return (TCCCaller) tccCaller.call(p -> {
-            ((TCCNodeParameter) p).getTCCState().setParam(param);
-            return null;
-        });
-    }
-
-    //#endregion
-
-    //#region ParallelCaller
-
-    public static ParallelCaller parallelCaller() {
-        return ParallelCaller.create();
-    }
-
-    public static ParallelCaller parallelCaller(final Func0<ThreadPoolExecutor> executorFactoryFunc) {
-        return ParallelCaller.createWithExecutor(executorFactoryFunc);
-    }
-
-    //#endregion
     
     public static class WandBuilder<P extends CallerWand<?>> {
 
@@ -108,6 +59,10 @@ public abstract class Wand {
 
         private final P parentWand;
         private final Caller caller;
+
+        public CallerWand(Caller caller) {
+            this(caller, null);
+        }
 
         protected CallerWand(Caller caller, P parentWand) {
             this.caller = caller;
@@ -156,6 +111,10 @@ public abstract class Wand {
 
     public static class ParallelWand<P extends CallerWand<?>> extends CallerWand<P> {
 
+        public ParallelWand(ParallelCaller parallelCaller) {
+            this(parallelCaller, null);
+        }
+
         protected ParallelWand(ParallelCaller parallelCaller, P parentWand) {
             super(parallelCaller, parentWand);
         }
@@ -168,6 +127,10 @@ public abstract class Wand {
     }
 
     public static class BusinessWand<P extends CallerWand<?>> extends CallerWand<P> {
+
+        public BusinessWand(BFuncCaller caller) {
+            this(caller, null);
+        }
 
         protected BusinessWand(BFuncCaller caller, P parentWand) {
             super(caller, parentWand);

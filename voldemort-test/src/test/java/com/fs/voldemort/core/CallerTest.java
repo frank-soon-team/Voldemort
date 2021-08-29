@@ -56,7 +56,7 @@ public class CallerTest {
         Wand.caller()
             .call(p -> 1)
             .call(p -> ((Integer) p.result) + 1)
-            .call(p -> Wand.caller(p).call(p2 -> ((Integer) p2.result) + 2))
+            .call(p -> Caller.create(p).call(p2 -> ((Integer) p2.result) + 2))
             .exec(r -> Assert.assertTrue(Integer.valueOf(4).equals(r)));
     }
 
@@ -140,7 +140,7 @@ public class CallerTest {
 
     @Test
     public void test_Context() {
-        CallerContext context = Wand.caller()
+        CallerContext context = Caller.create()
             .call(p -> {
                 p.context().set("name", "Jack");
                 p.context().set("age", 18);
@@ -164,16 +164,16 @@ public class CallerTest {
     @Test
     public void test_ContextWithParent() {
 
-        CallerContext context = Wand.caller()
+        CallerContext context = Caller.create()
             .call(p -> {
                 p.context().set("name", "Jack");
                 p.context().set("age", 18);
                 p.context().set("gender", "male");
                 return 1;
             })
-            .call(p -> Wand.callerAndContext(p).call(p1 -> { p1.context().set("score", 99); return p1.result; }))
+            .call(p -> Caller.createWithContext(p).call(p1 -> { p1.context().set("score", 99); return p1.result; }))
             .call(
-                Wand.caller()
+                Caller.create()
                     .call(p -> {
                         p.context().set("alias", "Thon");
                         return p.context();

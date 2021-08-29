@@ -1,7 +1,5 @@
 package com.fs.voldemort.tcc;
  
-
-import com.fs.voldemort.Wand;
 import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerParameter;
@@ -21,7 +19,7 @@ public class TCCCallerTest {
     
     @Test
     public void test_TCCCaller() {
-        Wand.tccCaller(buildMananger())
+        TCCCaller.create(buildMananger())
             .call(
                 createHandler(
                     "Coupon", 
@@ -50,7 +48,7 @@ public class TCCCallerTest {
     @Test
     public void test_TCC_Success() {
         int[] value = new int[] { 0 };
-        TCCCaller tccCaller = Wand.tccCaller(buildMananger(), value);
+        TCCCaller tccCaller = TCCCaller.create(buildMananger(), value);
         tccCaller
             .call(
                 createHandler(
@@ -114,7 +112,7 @@ public class TCCCallerTest {
     @Test
     public void test_TCC_Rollback() {
         int[] value = new int[] { 0 };
-        TCCCaller tccCaller = Wand.tccCaller(buildMananger(), value);
+        TCCCaller tccCaller = TCCCaller.create(buildMananger(), value);
         tccCaller
             .call(
                 createHandler(

@@ -69,6 +69,10 @@ public class Caller {
         CallerParameter resultParam = funcList.execute(parameter);
         return resultParam.result;
     }
+
+    public static Caller create() {
+        return new Caller();
+    }
     
     public static Caller create(Func0<Object> rootAct) {
         Caller caller = create();
@@ -78,8 +82,12 @@ public class Caller {
         return caller;
     }
 
-    public static Caller create() {
-        return new Caller();
+    public static Caller create(CallerParameter initParameter) {
+        return new Caller(initParameter);
+    }
+
+    public static Caller createWithContext(CallerParameter initParameter) {
+        return new Caller(initParameter, true);
     }
 
 }

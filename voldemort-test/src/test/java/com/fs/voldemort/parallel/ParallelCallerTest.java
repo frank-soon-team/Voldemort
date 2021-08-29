@@ -2,7 +2,8 @@ package com.fs.voldemort.parallel;
 
 import java.math.BigDecimal;
 
-import com.fs.voldemort.Wand;
+import com.fs.voldemort.core.Caller;
+import com.fs.voldemort.utilies.ThreadUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,17 +13,17 @@ public class ParallelCallerTest {
     @Test
     public void test_ParallelCaller() {
         long time = System.currentTimeMillis();
-        Object result = Wand.parallelCaller()
+        Object result = ParallelCaller.create()
                 .call(p -> {
-                    sleep(2000L);
+                    ThreadUtils.sleep(2000L);
                     return 1;
                 })
                 .call(p -> {
-                    sleep(2000L);
+                    ThreadUtils.sleep(2000L);
                     return 2;
                 })
                 .call(p -> {
-                    sleep(2000L);
+                    ThreadUtils.sleep(2000L);
                     return 3;
                 })
                 .exec();
@@ -38,22 +39,22 @@ public class ParallelCallerTest {
 
     @Test
     public void test_CallerWithParallel() {
-        Object result = Wand.caller()
+        Object result = Caller.create()
             .call(p -> 1)
             .call(p -> new BigDecimal("3").add(new BigDecimal(p.result.toString())))
             .call(
-                Wand.parallelCaller()
+                ParallelCaller.create()
                     .call(p -> p.result)
                     .call(p -> {
-                        sleep(3000L);
+                        ThreadUtils.sleep(3000L);
                         return 2;
                     })
                     .call(p -> {
-                        sleep(3000L);
+                        ThreadUtils.sleep(3000L);
                         return 2;
                     })
                     .call(p -> {
-                        sleep(3000L);
+                        ThreadUtils.sleep(3000L);
                         return 2;
                     })
             )
@@ -67,14 +68,6 @@ public class ParallelCallerTest {
             .exec();
 
         Assert.assertTrue(((BigDecimal)result).equals(new BigDecimal("10")));
-    }
-
-    public static void sleep(long time) {
-        try {
-            Thread.sleep(time);
-        } catch(InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
     }
     
 }
