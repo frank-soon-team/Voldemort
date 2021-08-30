@@ -3,7 +3,6 @@ package com.fs.voldemort.core;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import com.fs.voldemort.Wand;
 import com.fs.voldemort.core.support.CallerContext;
 
 import org.junit.Assert;
@@ -53,7 +52,7 @@ public class CallerTest {
 
     @Test
     public void test_dynamicCaller() {
-        Wand.caller()
+        Caller.create()
             .call(p -> 1)
             .call(p -> ((Integer) p.result) + 1)
             .call(p -> Caller.create(p).call(p2 -> ((Integer) p2.result) + 2))
@@ -62,7 +61,7 @@ public class CallerTest {
 
     @Test
     public void test_contextFunctional() {
-        Wand.caller()
+        Caller.create()
             .call(p -> 1)
             .call(p -> {
                 CallerContext context = p.context();
@@ -99,7 +98,7 @@ public class CallerTest {
 
     @Test
     public void test_contextFunctionalWithValue() {
-        Wand.caller()
+        Caller.create()
             .call(p -> 1)
             .call(p -> {
                 CallerContext context = p.context();

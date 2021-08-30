@@ -4,7 +4,6 @@ import com.fs.voldemort.business.BFuncCaller;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.functional.func.Func2;
@@ -14,18 +13,18 @@ import com.fs.voldemort.parallel.ParallelCaller;
 public interface Wand {
 
     public static CallerWand<?> caller() {
-        return new CallerWand<CallerWand<?>>(Caller.create());
+        return new CallerWand<>(Caller.create());
     }
 
     public static ParallelWand<?> parallel() {
-        return new ParallelWand<CallerWand<?>>(ParallelCaller.create());
+        return new ParallelWand<>(ParallelCaller.create());
     }
 
     public static BusinessWand<?> business() {
-        return new BusinessWand<CallerWand<?>>(BFuncCaller.create());
+        return new BusinessWand<>(BFuncCaller.create());
     }
     
-    public static class WandBridge<P extends CallerWand<?>> {
+    static class WandBridge<P extends BaseWand<?>> {
 
         private final P parentWand;
 
@@ -55,37 +54,18 @@ public interface Wand {
 
     }
 
-    public static class CallerWand<P extends CallerWand<?>> {
-
+    static abstract class BaseWand<P extends BaseWand<?>> {
         private final P parentWand;
         private final Caller caller;
 
-        public CallerWand(Caller caller) {
-            this(caller, null);
-        }
-
-        protected CallerWand(Caller caller, P parentWand) {
+        protected BaseWand(Caller caller, P parentWand) {
             this.caller = caller;
             this.parentWand = parentWand;
         }
 
-        public CallerWand<P> call(Func1<CallerParameter, Object> func) {
-            caller.call(func);
-            return this;
-        }
+        public abstract BaseWand<P> call(Func1<CallerParameter, Object> func);
 
-        public CallerWand<P> call(Caller subCaller) {
-            caller.call(subCaller);
-            return this;
-        }
-
-        public void exec(Action1<Object> action) {
-            caller.exec(action);
-        }
-
-        public WandBridge<?> sub() {
-            return new WandBridge<CallerWand<P>>(this);
-        }
+        public abstract BaseWand<P> call(Caller subCaller);
 
         public P end() {
             if(parentWand != null) {
@@ -98,18 +78,40 @@ public interface Wand {
             return caller;
         }
 
-        @SuppressWarnings("unchecked")
-        protected <C> C caller() {
-            return (C) caller;
-        }
-
         protected P parent() {
             return parentWand;
+        }
+    }
+
+    static class CallerWand<P extends BaseWand<?>> extends BaseWand<P> {
+
+        public CallerWand(Caller caller) {
+            this(caller, null);
+        }
+
+        protected CallerWand(Caller caller, P parentWand) {
+            super(caller, parentWand);
+        }
+
+        @Override
+        public CallerWand<P> call(Func1<CallerParameter, Object> func) {
+            get().call(func);
+            return this;
+        }
+
+        @Override
+        public CallerWand<P> call(Caller subCaller) {
+            get().call(subCaller);
+            return this;
+        }
+
+        public WandBridge<? extends CallerWand<P>> sub() {
+            return new WandBridge<>(this);
         }
 
     }
 
-    public static class ParallelWand<P extends CallerWand<?>> extends CallerWand<P> {
+    static class ParallelWand<P extends BaseWand<?>> extends BaseWand<P> {
 
         public ParallelWand(ParallelCaller parallelCaller) {
             this(parallelCaller, null);
@@ -120,13 +122,24 @@ public interface Wand {
         }
 
         @Override
-        public WandBridge<?> sub() {
-            return new WandBridge<ParallelWand<P>>(this);
+        public ParallelWand<P> call(Func1<CallerParameter, Object> func) {
+            get().call(func);
+            return this;
+        }
+
+        @Override
+        public ParallelWand<P> call(Caller subCaller) {
+            get().call(subCaller);
+            return this;
+        }
+
+        public WandBridge<ParallelWand<P>> sub() {
+            return new WandBridge<>(this);
         }
         
     }
 
-    public static class BusinessWand<P extends CallerWand<?>> extends CallerWand<P> {
+    static class BusinessWand<P extends BaseWand<?>> extends BaseWand<P> {
 
         public BusinessWand(BFuncCaller caller) {
             this(caller, null);
@@ -136,18 +149,27 @@ public interface Wand {
             super(caller, parentWand);
         }
 
-        public BusinessWand<P> call(Class<?> funcClazz) {
-            BFuncCaller caller = caller();
-            caller.call(funcClazz);
+        @Override
+        public BusinessWand<P> call(Func1<CallerParameter, Object> func) {
+            get().call(func);
             return this;
         }
 
         @Override
-        public WandBridge<?> sub() {
-            return new WandBridge<BusinessWand<P>>(this);
+        public BusinessWand<P> call(Caller subCaller) {
+            get().call(subCaller);
+            return this;
+        }
+
+        public BusinessWand<P> call(Class<?> funcClazz) {
+            ((BFuncCaller) get()).call(funcClazz);
+            return this;
+        }
+
+        public WandBridge<BusinessWand<P>> sub() {
+            return new WandBridge<>(this);
         }
 
     }
-
 
 }
