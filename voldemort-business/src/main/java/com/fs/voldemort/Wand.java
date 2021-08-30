@@ -25,11 +25,11 @@ public interface Wand {
         return new BusinessWand<CallerWand<?>>(BFuncCaller.create());
     }
     
-    public static class WandBuilder<P extends CallerWand<?>> {
+    public static class WandBridge<P extends CallerWand<?>> {
 
         private final P parentWand;
 
-        public WandBuilder(P parentWand) {
+        public WandBridge(P parentWand) {
             this.parentWand = parentWand;
         }
 
@@ -83,8 +83,8 @@ public interface Wand {
             caller.exec(action);
         }
 
-        public WandBuilder<?> sub() {
-            return new WandBuilder<CallerWand<P>>(this);
+        public WandBridge<?> sub() {
+            return new WandBridge<CallerWand<P>>(this);
         }
 
         public P end() {
@@ -120,8 +120,8 @@ public interface Wand {
         }
 
         @Override
-        public WandBuilder<?> sub() {
-            return new WandBuilder<ParallelWand<P>>(this);
+        public WandBridge<?> sub() {
+            return new WandBridge<ParallelWand<P>>(this);
         }
         
     }
@@ -143,8 +143,8 @@ public interface Wand {
         }
 
         @Override
-        public WandBuilder<?> sub() {
-            return new WandBuilder<BusinessWand<P>>(this);
+        public WandBridge<?> sub() {
+            return new WandBridge<BusinessWand<P>>(this);
         }
 
     }
