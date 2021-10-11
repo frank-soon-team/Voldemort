@@ -1,7 +1,7 @@
 package com.fs.voldemort.core.support;
 
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.exception.AvadaKedavraException;
 import com.fs.voldemort.core.exception.ImperioException;
 import com.fs.voldemort.core.functional.func.Func1;
 
@@ -97,7 +97,7 @@ public class FuncLinkedList {
 
     protected void checkOverflow(int index) {
         if(index > OVERFLOW_COUNT) {
-            throw new CrucioException("overflow");
+            throw new AvadaKedavraException("overflow");
         }
     }
 
