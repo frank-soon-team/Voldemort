@@ -1,27 +1,28 @@
 package com.fs.voldemort;
 
 import com.fs.voldemort.business.BFuncCaller;
-import java.util.concurrent.ThreadPoolExecutor;
+import com.fs.voldemort.business.NodeParam;
+import com.fs.voldemort.business.ParallelBFuncCaller;
 
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.functional.func.Func0;
+import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.func.Func1;
-import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
+import com.fs.voldemort.parallel.IAsyncStrategy;
 import com.fs.voldemort.parallel.ParallelCaller;
 
 public interface Wand {
 
     public static CallerWand<?> caller() {
-        return new CallerWand<>(Caller.create());
+        return new CallerWand<>(new Caller());
     }
 
     public static ParallelWand<?> parallel() {
-        return new ParallelWand<>(ParallelCaller.create());
+        return new ParallelWand<>(new ParallelBFuncCaller());
     }
 
     public static BusinessWand<?> business() {
-        return new BusinessWand<>(BFuncCaller.create());
+        return new BusinessWand<>(new BFuncCaller());
     }
     
     static class WandBridge<P extends BaseWand<?>> {
@@ -37,15 +38,11 @@ public interface Wand {
         }
 
         public ParallelWand<P> parallel() {
-            return new ParallelWand<P>(new ParallelCaller(), parentWand);
+            return new ParallelWand<P>(new ParallelBFuncCaller(), parentWand);
         }
 
-        public ParallelWand<P> parallel(final Func0<ThreadPoolExecutor> executorFactoryFunc) {
-            return new ParallelWand<P>(new ParallelCaller(executorFactoryFunc), parentWand);
-        }
-
-        public ParallelWand<P> parallel(final int capacity, final Func2<Integer, Integer, ThreadPoolExecutor> executorFactoryFunc) {
-            return new ParallelWand<P>(new ParallelCaller(capacity, executorFactoryFunc), parentWand);
+        public ParallelWand<P> parallel(final Func1<Integer, IAsyncStrategy> strategyFactoryFunc) {
+            return new ParallelWand<P>(new ParallelBFuncCaller(strategyFactoryFunc), parentWand);
         }
 
         public BusinessWand<P> business() {
@@ -133,6 +130,16 @@ public interface Wand {
             return this;
         }
 
+        public ParallelWand<P> call(Class<?> funcClazz) {
+            ((ParallelBFuncCaller) get()).call(funcClazz);
+            return this;
+        }
+
+        public ParallelWand<P> call(Class<?> funcClazz, NodeParam...params) {
+            ((ParallelBFuncCaller) get()).call(funcClazz, params);
+            return this;
+        }
+
         public WandBridge<ParallelWand<P>> sub() {
             return new WandBridge<>(this);
         }
@@ -155,6 +162,14 @@ public interface Wand {
             return this;
         }
 
+        public BusinessWand<P> call(Action1<CallerParameter> action) {
+            get().call(p -> {
+                action.apply(p);
+                return null;
+            });
+            return this;
+        }
+
         @Override
         public BusinessWand<P> call(Caller subCaller) {
             get().call(subCaller);
@@ -163,6 +178,11 @@ public interface Wand {
 
         public BusinessWand<P> call(Class<?> funcClazz) {
             ((BFuncCaller) get()).call(funcClazz);
+            return this;
+        }
+
+        public BusinessWand<P> call(Class<?> funcClazz, NodeParam...params) {
+            ((BFuncCaller) get()).call(funcClazz, params);
             return this;
         }
 

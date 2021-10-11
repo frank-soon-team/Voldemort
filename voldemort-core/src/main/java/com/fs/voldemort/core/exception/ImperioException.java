@@ -1,8 +1,7 @@
 package com.fs.voldemort.core.exception;
 
-public class ImperioException extends RuntimeException {
-
-    private static final long serialVersionUID = -649953252877047554L;
+// 一般用于包裹其他异常
+public class ImperioException extends IllegalStateException {
 
     public ImperioException(String message) {
         super(message);
@@ -14,7 +13,7 @@ public class ImperioException extends RuntimeException {
 
     @Override
     public String getLocalizedMessage() {
-        return "夺魂咒";
+        return "【夺魂咒】 > " + getMessage();
     }
     
 }

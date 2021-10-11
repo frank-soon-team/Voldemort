@@ -1,99 +1,60 @@
 package com.fs.voldemort.parallel;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
-
-import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.exception.ImperioException;
 import com.fs.voldemort.core.functional.func.Func1;
-import com.fs.voldemort.core.functional.func.Func2;
+import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
+import com.fs.voldemort.parallel.strategy.CompletedAsyncStrategy;
 
 public class ParallelTaskList extends FuncLinkedList {
-
-    private final static String THREAD_NAME = "ParallelCaller";
-
-    private final int capacity;
-    private final Func2<Integer, Integer, ThreadPoolExecutor> executorFactoryFunc;
+    
+    private final Func1<Integer, IAsyncStrategy> strategyFactory;
 
 
     public ParallelTaskList() {
-        this(-1, null);
+        this(size -> new CompletedAsyncStrategy(size));
     }
 
-    public ParallelTaskList(final int capacity) {
-        this(capacity, null);
-    }
-
-    public ParallelTaskList(Func2<Integer, Integer, ThreadPoolExecutor> executorFactoryFunc) {
-        this(-1, executorFactoryFunc);
-    }
-
-    public ParallelTaskList(final int capacity, Func2<Integer, Integer, ThreadPoolExecutor> executorFactoryFunc) {
-        this.capacity = capacity;
-        this.executorFactoryFunc = executorFactoryFunc != null ? executorFactoryFunc : createExecutorFactoryFunc();
+    public ParallelTaskList(Func1<Integer, IAsyncStrategy> strategyFactoryFunc) {
+        this.strategyFactory = strategyFactoryFunc;
     }
 
     @Override
-    public void add(Func1<CallerParameter, Object> func) {
+    public CallerNode add(Func1<CallerParameter, Object> func) {
         if(func == null) {
             throw new IllegalArgumentException("the parameter func is required.");
         }
 
         ParallelTaskNode node = new ParallelTaskNode(func);
         add(node);
+        return node;
     }
 
     @Override
     public CallerParameter execute(CallerParameter parameter) {
-        int executeCapacity = capacity;
-        if(executeCapacity == -1) {
-            executeCapacity = Runtime.getRuntime().availableProcessors();
-        }
-
         int size = this.size();
-        if(executeCapacity > size) {
-            executeCapacity = size;
-        }
 
-        ThreadPoolExecutor executor = executorFactoryFunc.call(executeCapacity, size);
-        ParallelTaskResult result = new ParallelTaskResult(size);
+        ParallelTaskResult result = null;
+        ParallelTaskNode currentNode = (ParallelTaskNode) getFirstNode();
+
         CallerParameter currentParameter = ensureCallerParameter(parameter);
-        try {
-            CountDownLatch latch = new CountDownLatch(size);
-            ParallelTaskNode currentNode = (ParallelTaskNode) getFirstNode();
-            
+
+        try(IAsyncStrategy asyncStrategy = strategyFactory.call(size)) {
             int index = 0;
             while(currentNode != null) {
-                currentNode.setCurrentCountDownLatch(latch);
-                currentNode.setCurrentCallerParameter(currentParameter);
-                currentNode.setCurrentResultSetter(result.getValueSetter(index));
-                executor.execute(currentNode);
-
+                asyncStrategy.addTaskNode(currentNode, currentParameter, index);
                 currentNode = (ParallelTaskNode) currentNode.getNextNode();
                 index++;
             }
-            latch.await();
-
+            result = asyncStrategy.execute();
+        } catch(ImperioException e) {
+            throw e;
         } catch(Exception e) {
-            throw new CrucioException("execute the parallel caller error.", e);
-        } finally {
-            executor.shutdown();
+            throw new ImperioException("execute the parallel caller error.", e);
         }
-        return createCallParameter(currentParameter, result);
-    }
 
-    private static Func2<Integer, Integer, ThreadPoolExecutor> createExecutorFactoryFunc() {
-        return (executorSize, maximumSize) -> {
-            return new ThreadPoolExecutor(
-                executorSize, maximumSize, 0L, TimeUnit.MILLISECONDS, 
-                new LinkedBlockingQueue<Runnable>(maximumSize.intValue()),
-                new ParallelExecutorThreadFactory(THREAD_NAME),
-                new CallerRunsPolicy());
-        };
+        return createCallParameter(currentParameter, result);
     }
     
 }

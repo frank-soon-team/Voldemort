@@ -15,7 +15,7 @@ public class BFuncCallerTest {
 
     private void init() {
         List<Object> HorcruxesList = Arrays.asList(new HutchpatchGoldenCup(),new Nagini(),new MarvoroGunterRing());
-        BFuncCaller.init(HorcruxesList);
+        BFuncManager.init(HorcruxesList);
     }
 
     @Test

@@ -3,7 +3,7 @@ package com.fs.voldemort.business.fit;
 import com.fs.voldemort.business.support.BFunc;
 import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.business.util.ConstructorHolder;
-import com.fs.voldemort.core.exception.CallerException;
+import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.functional.func.Func2;
 import com.fs.voldemort.core.support.CallerParameter;
@@ -28,7 +28,7 @@ public class FitLibrary {
                 .collect(Collectors.toList());
 
         if(funcMethodList.size() > 1) {
-            throw new CallerException("Settle function can only have one func method!");
+            throw new CrucioException("Settle function can only have one func method!");
         }else if(funcMethodList.isEmpty()) {
             return null;
         }
@@ -84,7 +84,7 @@ public class FitLibrary {
         //Get custom class
         final IFit iFit = ConstructorHolder.getNew(funcMethod.getAnnotation(BFunc.class).iFit());
         if(iFit == null)
-            throw new CallerException("Please check ");
+            throw new CrucioException("Please check ");
 
         return iFit.fit(funcMethod,param);
     };

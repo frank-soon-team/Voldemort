@@ -1,8 +1,7 @@
 package com.fs.voldemort.core.exception;
 
-public class AvadaKedavraException extends Exception {
-
-    private static final long serialVersionUID = -1740490685999402263L;
+// 致命异常，主动中断执行时使用
+public class AvadaKedavraException extends RuntimeException {
 
     public AvadaKedavraException(String message) {
         super(message);
@@ -14,7 +13,7 @@ public class AvadaKedavraException extends Exception {
 
     @Override
     public String getLocalizedMessage() {
-        return "阿瓦达索命";
+        return "【阿瓦达索命】 > " + getMessage();
     }
     
 }

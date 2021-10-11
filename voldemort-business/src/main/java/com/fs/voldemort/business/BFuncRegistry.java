@@ -2,7 +2,7 @@ package com.fs.voldemort.business;
 
 import com.fs.voldemort.business.support.BFuncHorcruxes;
 import com.fs.voldemort.business.support.BFunc;
-import com.fs.voldemort.core.exception.CallerException;
+import com.fs.voldemort.core.exception.ImperioException;
 import com.fs.voldemort.core.functional.func.Func1;
 
 import java.lang.annotation.Annotation;
@@ -51,7 +51,7 @@ public class BFuncRegistry {
                                     try {
                                         return method.invoke(assistFuncHorcruxesInstanceMap.get(method),args);
                                     } catch (Exception e) {
-                                        throw new CallerException(e.getMessage(),e);
+                                        throw new ImperioException(e.getMessage(),e);
                                     }
                                 },
                                 method.getAnnotation(BFunc.class).fit().getFitFunc()

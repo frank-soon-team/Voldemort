@@ -16,13 +16,14 @@ public class FuncLinkedList {
     public FuncLinkedList() {
     }
 
-    public void add(Func1<CallerParameter, Object> func) {
+    public CallerNode add(Func1<CallerParameter, Object> func) {
         if(func == null) {
             throw new IllegalArgumentException("the parameter func is required.");
         }
 
         CallerNode node = new CallerNode(func);
         add(node);
+        return node;
     }
 
     protected void add(CallerNode node) {

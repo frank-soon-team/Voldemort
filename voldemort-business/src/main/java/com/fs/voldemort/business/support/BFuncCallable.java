@@ -2,7 +2,7 @@ package com.fs.voldemort.business.support;
 
 import com.fs.voldemort.business.fit.CArg;
 import com.fs.voldemort.business.fit.PArg;
-import com.fs.voldemort.core.exception.CallerException;
+import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.reflect.Method;
@@ -49,7 +49,7 @@ public interface BFuncCallable {
     default Object[] paramFit(final CallerParameter p) {
 
         if(null == p) {
-            throw new CallerException("The parameter for paramFit is null!");
+            throw new CrucioException("The parameter for paramFit is null!");
         }
 
         final List<Method> funcMethodList = Arrays.stream(getClass().getDeclaredMethods())
@@ -58,7 +58,7 @@ public interface BFuncCallable {
             .collect(Collectors.toList());
 
         if(funcMethodList.size() > 1) {
-            throw new CallerException("Settle function can only have one func method!");
+            throw new CrucioException("Settle function can only have one func method!");
         }else if(funcMethodList.isEmpty()) {
             return new Object[0];
         }

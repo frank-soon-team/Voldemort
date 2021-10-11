@@ -1,41 +1,39 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
-import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.core.support.ShareContextCallerParameter;
+import com.fs.voldemort.parallel.IAsyncStrategy;
+import com.fs.voldemort.parallel.ParallelCaller;
+import com.fs.voldemort.parallel.ParallelTaskList;
 
-/**
- * Polymerize caller
- *
- * @author frank
- */
-public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCaller> {
+public class ParallelBFuncCaller extends ParallelCaller implements ICallWithParameter<ParallelBFuncCaller> {
 
-    public BFuncCaller() {
-        super(new BFuncLinkedList());
+    public ParallelBFuncCaller() {
+        super(new ParallelBFuncLinkedList());
+    }
+
+    public ParallelBFuncCaller(Func1<Integer, IAsyncStrategy> strategyFactoryFunc) {
+        super(new ParallelBFuncLinkedList(strategyFactoryFunc));
     }
 
     @Override
-    public BFuncCaller call(Class<?> funcClazz, NodeParam... params) {
-        ((BFuncLinkedList) this.funcList).add(p -> BFuncManager.invokeFunc(p, funcClazz), params);
+    public ParallelBFuncCaller call(Class<?> funcClazz, NodeParam... params) {
+        ((ParallelBFuncLinkedList) this.funcList).add(p -> BFuncManager.invokeFunc(p, funcClazz), params);
         return this;
     }
 
-    @Override
-    public BFuncCaller call(Func1<CallerParameter, Object> func) {
-        super.call(func);
-        return this;
-    }
+    static class ParallelBFuncLinkedList extends ParallelTaskList {
 
-    public static BFuncCaller create() {
-        return new BFuncCaller();
-    }
+        public ParallelBFuncLinkedList() {
+            super();
+        }
 
-    static class BFuncLinkedList extends FuncLinkedList {
+        public ParallelBFuncLinkedList(Func1<Integer, IAsyncStrategy> strategyFactoryFunc) {
+            super(strategyFactoryFunc);
+        }
 
         public CallerNode add(Func1<CallerParameter, Object> func, NodeParam... params) {
             CallerNode node = super.add(func);
@@ -59,5 +57,5 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
         }
 
     }
-
+    
 }
