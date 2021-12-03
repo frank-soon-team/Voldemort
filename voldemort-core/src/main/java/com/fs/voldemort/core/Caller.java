@@ -10,7 +10,7 @@ import com.fs.voldemort.core.support.ShareContextCallerParameter;
 public class Caller {
 
     protected final FuncLinkedList funcList;
-    private final CallerParameter initailizationParameter;
+    private final CallerParameter initializationParameter;
 
     public Caller() {
         this(new FuncLinkedList(), null);
@@ -35,7 +35,7 @@ public class Caller {
             throw new IllegalArgumentException("the parameter funcLinkedList of constructor is required.");
         }
         funcList = funcLinkedList;
-        initailizationParameter = initCallerParameter;
+        initializationParameter = initCallerParameter;
     }
 
     public Caller call(Func1<CallerParameter, Object> func) {
@@ -62,7 +62,7 @@ public class Caller {
 
     @SuppressWarnings("unchecked")
     public <R> R exec() {
-        return (R) exec(initailizationParameter);
+        return (R) exec(initializationParameter);
     }
     
     protected Object exec(CallerParameter parameter) {
