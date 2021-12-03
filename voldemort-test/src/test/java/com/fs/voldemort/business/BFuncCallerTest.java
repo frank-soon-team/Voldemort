@@ -224,11 +224,12 @@ public class BFuncCallerTest {
                 .end()
                 .call(p->{
                     p.context().set("c3","C3!!!");
-                    ParallelTaskResult spr1 = (ParallelTaskResult)((ParallelTaskResult)p.result).getResult();
+                    ParallelTaskResult p1 = (ParallelTaskResult)((ParallelTaskResult)p.result).getResult();
+                    String p2 = ((ParallelTaskResult)p.result).getResult().toString();
 
-                    System.out.println("SP1 call result: " + spr1.getResult());
-                    System.out.println("SP2 call result: " + spr1.getResult());
-                    return "\nRoinaRavenclawCrown Parallel call result: " + ((ParallelTaskResult)p.result).getResult();
+                    System.out.println("SP1 call result: " + p1.getResult());
+                    System.out.println("SP2 call result: " + p1.getResult());
+                    return "\nRoinaRavenclawCrown Parallel call result: " + p2;
                 })
                 /*
                  * 调用MarvoroGunterRing逻辑单元

@@ -11,7 +11,8 @@ import com.fs.voldemort.core.functional.action.Action2;
 @LogicCell
 public class HutchpatchGoldenCup {
 
-    @BFunc(fit = FitMode.CUSTOM, iFit = CustomFit.class)
+//    @BFunc(fit = FitMode.CUSTOM, iFit = CustomFit.class)
+    @BFunc
     public String func(String target,
         @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC){
         //Add param to call context

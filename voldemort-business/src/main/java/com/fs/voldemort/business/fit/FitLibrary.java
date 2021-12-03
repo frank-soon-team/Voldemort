@@ -59,8 +59,8 @@ public class FitLibrary {
         }).map(p-> new PArg(p.getName())).collect(Collectors.toList());
 
         if(!pArgSet.isEmpty()) {
-            //Deal context/nodeparam arg
-            pArgSet.stream().forEach(pArg -> {
+            //Deal context/node param arg
+            pArgSet.forEach(pArg -> {
                 pArg.value = param.getParameter(pArg.name);
                 if (pArg.value == null) {
                     pArg.value = param.context().get(pArg.name);

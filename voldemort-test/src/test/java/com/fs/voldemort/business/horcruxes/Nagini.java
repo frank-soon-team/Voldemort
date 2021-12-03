@@ -7,10 +7,10 @@ import com.fs.voldemort.core.functional.action.Action2;
 public class Nagini{
 
     @BFunc
-    public String func(@BFuncOperate(BFuncOperate.Oper.RESULT) String result,
-                       String c1, String c2,
+    public String func(String c1, String c2,
                        String cNull,
-                       @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC){
+                       @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC,
+                       @BFuncOperate(BFuncOperate.Oper.RESULT) String result){
         return "This is Nagini! Target is " + result + "c1:" + c1 + "c2:" + c2;
     }
 
