@@ -1,5 +1,6 @@
 package com.fs.voldemort.business.fit;
 
+import com.fs.voldemort.business.BFuncParameter;
 import com.fs.voldemort.business.support.BFunc;
 import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.business.util.ConstructorHolder;
@@ -36,7 +37,9 @@ public class FitLibrary {
         return funcMethodList.get(0);
     };
 
-    public static final Func2<Class<?>, CallerParameter, Object[]> AUTO_FIT_FUNC = (clazz,param) ->{
+    public static final Func2<Class<?>, CallerParameter, Object[]> AUTO_FIT_FUNC = (clazz,callerParameter) ->{
+
+        final BFuncParameter param = (BFuncParameter)callerParameter;
 
         final Method funcMethod = OBTAIN_METHOD.call(clazz);
         if(funcMethod == null)
@@ -49,27 +52,29 @@ public class FitLibrary {
         //Param arg temporary set
         final List<PArg> pArgSet = Arrays.stream(funcMethod.getParameters()).filter(p->{
             if(p.isAnnotationPresent(BFuncOperate.class)){
-                cArgSet.add(new CArg(p.getAnnotation(BFuncOperate.class).value(),param.context()));
+                cArgSet.add(new CArg(p.getAnnotation(BFuncOperate.class).value(), param.context(), param.result));
                 return false;
             }
             return true;
         }).map(p-> new PArg(p.getName())).collect(Collectors.toList());
 
         if(!pArgSet.isEmpty()) {
-            //Deal result arg
-            final PArg resultArg = pArgSet.iterator().next();
-            resultArg.value = param.result;
+            //Deal context/nodeparam arg
+            pArgSet.stream().forEach(pArg -> {
+                pArg.value = param.getParameter(pArg.name);
+                if (pArg.value == null) {
+                    pArg.value = param.context().get(pArg.name);
+                }
+            });
 
-            //Deal context arg
-            if(pArgSet.size()>1) {
-                pArgSet.stream().skip(1).forEach(pArg -> pArg.value = param.context().get(pArg.name));
-            }
             arg.addAll(pArgSet.stream().map(pArg -> pArg.value).collect(Collectors.toList()));
         }
 
         //Deal context operator func arg
         if(!cArgSet.isEmpty()) {
-            arg.addAll(cArgSet.stream().map(CArg::getOperFunc).collect(Collectors.toList()));
+            arg.addAll(cArgSet.stream()
+                    .map(cArg->cArg.oper == BFuncOperate.Oper.RESULT ? cArg.result : cArg.getOperFunc())
+                    .collect(Collectors.toList()));
         }
 
         return arg.toArray();

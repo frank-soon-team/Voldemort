@@ -72,7 +72,7 @@ public interface BFuncCallable {
         //Param arg temporary set
         final List<PArg> pArgSet = Arrays.stream(funcMethod.getParameters()).filter(param->{
             if(param.isAnnotationPresent(BFuncOperate.class)){
-                cArgSet.add(new CArg(param.getAnnotation(BFuncOperate.class).value(),p.context()));
+                cArgSet.add(new CArg(param.getAnnotation(BFuncOperate.class).value(), p.context(), p.result));
                 return false;
             }
             return true;

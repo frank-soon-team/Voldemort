@@ -1,10 +1,8 @@
 package com.fs.voldemort.business;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fs.voldemort.Wand;
 import com.fs.voldemort.business.horcruxes.*;
-
+import com.fs.voldemort.parallel.ParallelTaskResult;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -64,7 +62,7 @@ public class BFuncCallerTest {
                      * 写入上下文
                      */
                     p.context().set("Key1","First context value!");
-                    return "-> First call";
+                    return "-> First call! ";
                 })
                 .call(p->{
                     /*
@@ -115,26 +113,119 @@ public class BFuncCallerTest {
         Assert.assertEquals("-> First call! \n-> Second call! Context key1 value:First context value!", result);
     }
 
-
-
+    /**
+     * 第四步，调用链上下文由于其作用是为了承载业务上下文，在多变的业务场景中会存在上下文中的业务参数无法满足逻辑单元参数填充的问题（比如一些配置
+     * 或者特殊参数），Voldemort提供了临时参数入口{@link NodeParam}
+     */
     @Test
-    public void test_BusinessCaller() {
+    public void test_NodeParam() {
         init();
 
-        String result = BFuncCaller.create()
-                .call(p-> "Begin!")
+        String result =
+                Wand.business()
+                    .call(p->{
+                        p.context().set("Key1","First context value!");
+                        return "-> First call";
+                    })
+                    /*
+                     * 链接 TomRyderDiary 逻辑单元
+                     */
+                    .call(TomRyderDiary.class, new NodeParam("nodeKey1", "nodeValue"))
+                    .call(p->{
+                        return p.result + "\n->Second call! C:Key2->" + p.context().getString("Key2");
+                    })
+                    .get()
+                    .exec();
+
+        System.out.println(result);
+        //Assert.assertEquals("-> First call! \n-> call TomRyderDiary \n-> Second call! C:Key2->TomRyderDiary Key2 value", result);
+    }
+
+    /**
+     * 第四步，通过一个并行子链，并行地处理父链的请求
+     */
+    @Test
+    public void test_Parallel() {
+        init();
+
+        String result =
+            Wand.business()
+                .call(p->"->First call!")
                 .call(HutchpatchGoldenCup.class)
                 .call(Nagini.class)
+                /*
+                 * 创建子链
+                 */
+                .sub()
+                /*
+                 * 选择子链类型为parallel
+                 */
+                .parallel()
+                    /*
+                     * 异步线程1
+                     */
+                    .call(p -> p.result + " Parallel Thread 1:" + Thread.currentThread().getName())
+                    /*
+                     * 异步线程2
+                     */
+                    .call(p -> p.result + " Parallel Thread 2:" + Thread.currentThread().getName())
+                    /*
+                     * 异步线程3
+                     */
+                    .call(RoinaRavenclawCrown.class)
+                    /*
+                     * 子链结束
+                     */
+                    .end()
+                /*
+                 * 在子链end后的第一个函数中通过((ParallelTaskResult)p.result).getResult()获取并行结果
+                 */
                 .call(p->{
-                    try {
-                        System.out.println(new ObjectMapper().writeValueAsString(p));
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                    /*
+                     * 将key为c3的参数放入call链上下文
+                     */
                     p.context().set("c3","C3!!!");
-                    return "Result 666";
+                    /*
+                     * 第一次 ((ParallelTaskResult)p.result).getResult() 获取异步线程1的处理结果
+                     */
+                    System.out.println("p1 call result: " + ((ParallelTaskResult)p.result).getResult());
+                    /*
+                     * 第二次 ((ParallelTaskResult)p.result).getResult() 获取异步线程2的处理结果
+                     */
+                    return "p2 call result: " + ((ParallelTaskResult)p.result).getResult();
                 })
+                .get().exec();
+    }
+
+    /**
+     * 一个比较综合的调用链
+     */
+    @Test
+    public void test_LongParallelCaller() {
+        init();
+
+        String result =
+            Wand.business()
+                .call(p->"Begin!")
+                .call(HutchpatchGoldenCup.class)
+                .call(Nagini.class)
+                .sub().parallel()
+                    .sub().parallel()
+                        .call(p->p.result + " Parallel Thread1:" + Thread.currentThread().getName())
+                        .call(p->p.result + " Parallel Thread2:" + Thread.currentThread().getName())
+                        .end()
+                    .call(RoinaRavenclawCrown.class)
+                .end()
+                .call(p->{
+                    p.context().set("c3","C3!!!");
+                    System.out.println("p1 call result: " + ((ParallelTaskResult)p.result).getResult());
+                    return "p2 call result: " + ((ParallelTaskResult)p.result).getResult();
+                })
+                /*
+                 * 调用MarvoroGunterRing逻辑单元
+                 */
                 .call(MarvoroGunterRing.class)
+                .get()
                 .exec();
 
         System.out.println(result);
