@@ -18,7 +18,7 @@ public class HutchpatchGoldenCup {
         f_setC.apply("c1","context 1 result");
         f_setC.apply("c2","context 2 result");
 
-        return "This is Hutchpatch golden cup! Target is " + target;
+        return "\n This is Hutchpatch golden cup! Target is " + target;
     }
 
 }

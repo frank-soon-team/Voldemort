@@ -110,7 +110,9 @@ public class BFuncCallerTest {
                 .get()
                 .exec();
 
-        Assert.assertEquals("-> First call! \n-> Second call! Context key1 value:First context value!", result);
+        Assert.assertEquals("-> First call\n" +
+                "-> call TomRyderDiary\n" +
+                "->Second call!", result);
     }
 
     /**
@@ -190,9 +192,13 @@ public class BFuncCallerTest {
                      */
                     System.out.println("p1 call result: " + ((ParallelTaskResult)p.result).getResult());
                     /*
+                     * 第二次 ((ParallelTaskResult)p.result).getResult() 获取异步线程1的处理结果
+                     */
+                    System.out.println("p2 call result: " + ((ParallelTaskResult)p.result).getResult());
+                    /*
                      * 第二次 ((ParallelTaskResult)p.result).getResult() 获取异步线程2的处理结果
                      */
-                    return "p2 call result: " + ((ParallelTaskResult)p.result).getResult();
+                    return "p3 call result: " + ((ParallelTaskResult)p.result).getResult();
                 })
                 .get().exec();
     }
@@ -211,15 +217,18 @@ public class BFuncCallerTest {
                 .call(Nagini.class)
                 .sub().parallel()
                     .sub().parallel()
-                        .call(p->p.result + " Parallel Thread1:" + Thread.currentThread().getName())
-                        .call(p->p.result + " Parallel Thread2:" + Thread.currentThread().getName())
+                        .call(p->p.result + "Sub Parallel Thread1:" + Thread.currentThread().getName())
+                        .call(p->p.result + "Sub Parallel Thread2:" + Thread.currentThread().getName())
                         .end()
                     .call(RoinaRavenclawCrown.class)
                 .end()
                 .call(p->{
                     p.context().set("c3","C3!!!");
-                    System.out.println("p1 call result: " + ((ParallelTaskResult)p.result).getResult());
-                    return "p2 call result: " + ((ParallelTaskResult)p.result).getResult();
+                    ParallelTaskResult spr1 = (ParallelTaskResult)((ParallelTaskResult)p.result).getResult();
+
+                    System.out.println("SP1 call result: " + spr1.getResult());
+                    System.out.println("SP2 call result: " + spr1.getResult());
+                    return "\nRoinaRavenclawCrown Parallel call result: " + ((ParallelTaskResult)p.result).getResult();
                 })
                 /*
                  * 调用MarvoroGunterRing逻辑单元
