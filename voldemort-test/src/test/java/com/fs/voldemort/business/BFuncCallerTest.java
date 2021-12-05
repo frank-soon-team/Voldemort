@@ -241,4 +241,19 @@ public class BFuncCallerTest {
         System.out.println(result);
     }
 
+
+//    /**
+//     * A whole new one function invoke mode
+//     */
+//    public void  test_FunnyOne() {
+//        init();
+//
+//        String result =
+//            Wand.business()
+//                .call()
+//
+//
+//
+//
+//    }
 }
