@@ -18,7 +18,7 @@ public class PArg {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var args = (PArg) o;
+        PArg args = (PArg) o;
         return name.equals(args.name);
     }
 

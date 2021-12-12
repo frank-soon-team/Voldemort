@@ -1,11 +1,17 @@
 package com.fs.voldemort.business;
 
-import com.fs.voldemort.core.functional.action.Action0;
 import com.fs.voldemort.core.functional.action.Action1;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+import javassist.bytecode.CodeAttribute;
+import javassist.bytecode.LocalVariableAttribute;
+import javassist.bytecode.MethodInfo;
 import org.junit.Test;
 
 import java.lang.reflect.*;
-import java.util.function.Consumer;
+import java.util.Arrays;
 
 public class LambdaFunnyTest {
 
@@ -23,54 +29,16 @@ public class LambdaFunnyTest {
 //
 //        Class lambdaClazz = a.getClass();
 
-        Action1<?> b = (String s) -> System.out.println(s);
-
-        Class lambdaClazz = b.getClass();
-
-
+        Action1<?> b = (String s) -> {
+            System.out.println(s);
+        };
         System.out.println(getConsumerParameterType(b));
-
-    }
-
-    public Class<?> getErased(Type type)
-    {
-        if (type instanceof ParameterizedType)
-        {
-            return getErased(((ParameterizedType) type).getRawType());
-        }
-        if (type instanceof GenericArrayType)
-        {
-            return Array.newInstance(getErased(((GenericArrayType) type).getGenericComponentType()), 0).getClass();
-        }
-        if (type instanceof TypeVariable<?>)
-        {
-            var bounds = ((TypeVariable<?>) type).getBounds();
-            return bounds.length > 0 ? getErased(bounds[0]) : Object.class;
-        }
-        if (type instanceof WildcardType)
-        {
-            var bounds = ((WildcardType) type).getUpperBounds();
-            return bounds.length > 0 ? getErased(bounds[0]) : Object.class;
-        }
-        if (type instanceof Class<?>)
-        {
-            return (Class<?>) type;
-        }
-        return Object.class;
     }
 
     public Class<?> getConsumerParameterType(Action1<?> consumer) throws ReflectiveOperationException
     {
-        for (var type : consumer.getClass().getGenericInterfaces())
-        {
-            if (type instanceof ParameterizedType && ((ParameterizedType) type).getRawType() == Consumer.class)
-            {
-                return getErased(((ParameterizedType) type).getActualTypeArguments()[0]);
-            }
-        }
         if (consumer.getClass().isSynthetic())
         {
-            System.out.println(consumer.getClass().getName() + "is synthetic!");
             return getConsumerLambdaParameterType(consumer);
         }
         throw new NoSuchMethodException();
@@ -78,7 +46,7 @@ public class LambdaFunnyTest {
 
     public static Method getMethod(Class<?> objClass, String methodName) throws NoSuchMethodException
     {
-        for (var method : objClass.getDeclaredMethods())
+        for (Method method : objClass.getDeclaredMethods())
         {
             if (methodName.equals(method.getName()))
             {
@@ -90,25 +58,37 @@ public class LambdaFunnyTest {
 
     public static Object invoke(Object obj, String methodName, Object... args) throws ReflectiveOperationException
     {
-        var overrideField = AccessibleObject.class.getDeclaredField("override");
+        Field overrideField = AccessibleObject.class.getDeclaredField("override");
         overrideField.setAccessible(true);
-        var targetMethod = getMethod(obj.getClass(), methodName);
+        Method targetMethod = getMethod(obj.getClass(), methodName);
         overrideField.set(targetMethod, true);
         return targetMethod.invoke(obj, args);
     }
 
     public static Class<?> getConsumerLambdaParameterType(Action1<?> consumer) throws ReflectiveOperationException
     {
-        var consumerClass = consumer.getClass();
-        var constantPool = invoke(consumerClass, "getConstantPool");
-        for (var i = (int) invoke(constantPool, "getSize") - 1; i >= 0; --i)
+        Class consumerClass = consumer.getClass();
+        Object constantPool = invoke(consumerClass, "getConstantPool");
+        for (int i = (int) invoke(constantPool, "getSize") - 1; i >= 0; --i)
         {
             try
             {
-                var member = (Member) invoke(constantPool, "getMethodAt", i);
+                Member member = (Member) invoke(constantPool, "getMethodAt", i);
                 if (member instanceof Method && member.getDeclaringClass() != Object.class)
                 {
-                    return ((Method) member).getParameterTypes()[0];
+                    Method method = (Method) member;
+                    System.out.println(method.getName());
+                    Parameter[] params = method.getParameters();
+                    for(Parameter param : params) {
+                        System.out.println(param.getName());
+                        System.out.println(param.getType());
+                    }
+
+                    Class statementClazz = member.getDeclaringClass();
+                    String[] paramsName = getParamNames(statementClazz,method.getName());
+                    System.out.println(paramsName);
+
+                    return method.getParameterTypes()[0];
                 }
             }
             catch (Exception ignored)
@@ -118,4 +98,25 @@ public class LambdaFunnyTest {
         }
         throw new NoSuchMethodException();
     }
+
+
+    public static String[] getParamNames(Class clazz, String method) throws NotFoundException {
+        ClassPool pool = ClassPool.getDefault();
+        CtClass cc = pool.get(clazz.getName());
+        CtMethod cm = cc.getDeclaredMethod(method);
+        MethodInfo methodInfo = cm.getMethodInfo();
+        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
+        LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
+        if (attr == null) {
+            throw new NotFoundException("cannot get LocalVariableAttribute");
+        }
+        String[] paramNames = new String[cm.getParameterTypes().length];
+        int pos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
+        for (int i = 0; i < paramNames.length; i++) {
+            paramNames[i] = attr.variableName(i + pos);
+        }
+        return paramNames;
+    }
+
+
 }

@@ -27,7 +27,7 @@ public class CArg {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var args = (CArg) o;
+        CArg args = (CArg) o;
         return oper.equals(args.oper);
     }
 }
