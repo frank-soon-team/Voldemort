@@ -15,13 +15,17 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.github.frank-soon-team</groupId>
+            <artifactId>voldemort-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.github.frank-soon-team</groupId>
-            <artifactId>voldemort-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
         </dependency>
     </dependencies>
 

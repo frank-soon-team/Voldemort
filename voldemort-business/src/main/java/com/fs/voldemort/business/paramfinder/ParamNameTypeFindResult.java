@@ -1,8 +1,8 @@
-package com.fs.voldemort.business.util;
+package com.fs.voldemort.business.paramfinder;
 /**
  * The result of parameter finder{@link ParamFinder}
  */
-public interface ParamFindResult {
+public interface ParamNameTypeFindResult{
 
     /**
      * Parameter name

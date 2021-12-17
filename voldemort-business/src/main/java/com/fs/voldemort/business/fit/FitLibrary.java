@@ -45,6 +45,9 @@ public class FitLibrary {
         if(funcMethod == null)
             return EMPTY_RESULT;
 
+        //Get method parameter
+
+
         //arg result set
         final List<Object> arg = new LinkedList<>();
         //Context arg temporary set
@@ -89,7 +92,7 @@ public class FitLibrary {
         //Get custom class
         final IFit iFit = ConstructorHolder.getNew(funcMethod.getAnnotation(BFunc.class).iFit());
         if(iFit == null)
-            throw new CrucioException("Please check ");
+            throw new CrucioException("Please check custom fit func!");
 
         return iFit.fit(funcMethod,param);
     };

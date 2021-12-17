@@ -59,8 +59,7 @@ public class LambdaFunnyTest {
             try {
                 Member member = (Member) invoke(cp, "getMethodAt", i);
                 if (member instanceof Method && member.getDeclaringClass() != Object.class) {
-                    Class<?> statementClazz = member.getDeclaringClass();
-                    return getParam(statementClazz,member.getName());
+                    return getParam((Method)member);
                 }
             }
             catch (Exception ignored) {
@@ -70,10 +69,18 @@ public class LambdaFunnyTest {
     }
 
 
-    public static Collection<ParamInfo> getParam(Class<?> clazz, String method) throws NotFoundException, CannotCompileException, ClassNotFoundException {
+    public static Collection<ParamInfo> getParam(final Method method) throws NotFoundException, ClassNotFoundException {
+
+        if(method == null) {
+            throw new RuntimeException("Method Cannot be null!");
+        }
+
+        final String methodName = method.getName();
+        final Class clazz = method.getDeclaringClass();
+
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.get(clazz.getName());
-        CtMethod cm = cc.getDeclaredMethod(method);
+        CtMethod cm = cc.getDeclaredMethod(methodName);
         MethodInfo methodInfo = cm.getMethodInfo();
         CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
         LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
@@ -81,7 +88,7 @@ public class LambdaFunnyTest {
             throw new NotFoundException("cannot get LocalVariableAttribute");
         }
 
-        List<ParamInfo> params = new LinkedList<>();
+        Collection<ParamInfo> params = new LinkedList<>();
 
         int staticPos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
         CtClass[] ctClazzes = cm.getParameterTypes();
