@@ -1,63 +1,50 @@
 package com.fs.voldemort.business;
 
 import com.fs.voldemort.core.functional.action.Action1;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
 import org.junit.Test;
 
+import java.lang.reflect.Modifier;
 import java.lang.reflect.*;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class LambdaFunnyTest {
 
     @Test
     public void test_Lambda() throws ReflectiveOperationException {
-
-//        Consumer<String> a = new Consumer<String>()
-//        {
-//            @Override
-//            public void accept(String s)
-//            {
-//                System.out.println(s);
-//            }
-//        };
-//
-//        Class lambdaClazz = a.getClass();
-
         Action1<?> b = (String s) -> {
             System.out.println(s);
         };
-        System.out.println(getConsumerParameterType(b));
+
+        Collection<ParamInfo> paramInfos = getParam(b);
+        for (ParamInfo paramInfo : paramInfos) {
+            System.out.println(paramInfo.getParamClass().getName());
+            System.out.println(paramInfo.getParamName());
+        }
     }
 
-    public Class<?> getConsumerParameterType(Action1<?> consumer) throws ReflectiveOperationException
-    {
-        if (consumer.getClass().isSynthetic())
-        {
-            return getConsumerLambdaParameterType(consumer);
+    public <T> Collection<ParamInfo> getParam(T func) throws ReflectiveOperationException {
+        if (func.getClass().isSynthetic()) {
+            return getParameterTypeAndName(func);
         }
         throw new NoSuchMethodException();
     }
 
-    public static Method getMethod(Class<?> objClass, String methodName) throws NoSuchMethodException
-    {
-        for (Method method : objClass.getDeclaredMethods())
-        {
-            if (methodName.equals(method.getName()))
-            {
+    public static Method getMethod(Class<?> objClass, String methodName) throws NoSuchMethodException {
+        for (Method method : objClass.getDeclaredMethods()) {
+            if (methodName.equals(method.getName())) {
                 return method;
             }
         }
         throw new NoSuchMethodException();
     }
 
-    public static Object invoke(Object obj, String methodName, Object... args) throws ReflectiveOperationException
-    {
+    public static Object invoke(Object obj, String methodName, Object... args) throws ReflectiveOperationException {
         Field overrideField = AccessibleObject.class.getDeclaredField("override");
         overrideField.setAccessible(true);
         Method targetMethod = getMethod(obj.getClass(), methodName);
@@ -65,42 +52,25 @@ public class LambdaFunnyTest {
         return targetMethod.invoke(obj, args);
     }
 
-    public static Class<?> getConsumerLambdaParameterType(Action1<?> consumer) throws ReflectiveOperationException
-    {
-        Class consumerClass = consumer.getClass();
-        Object constantPool = invoke(consumerClass, "getConstantPool");
-        for (int i = (int) invoke(constantPool, "getSize") - 1; i >= 0; --i)
+    public static <T> Collection<ParamInfo> getParameterTypeAndName(T func) throws ReflectiveOperationException {
+        Object cp = invoke(func.getClass(), "getConstantPool");
+        for (int i = (int) invoke(cp, "getSize") - 1; i >= 0; --i)
         {
-            try
-            {
-                Member member = (Member) invoke(constantPool, "getMethodAt", i);
-                if (member instanceof Method && member.getDeclaringClass() != Object.class)
-                {
-                    Method method = (Method) member;
-                    System.out.println(method.getName());
-                    Parameter[] params = method.getParameters();
-                    for(Parameter param : params) {
-                        System.out.println(param.getName());
-                        System.out.println(param.getType());
-                    }
-
-                    Class statementClazz = member.getDeclaringClass();
-                    String[] paramsName = getParamNames(statementClazz,method.getName());
-                    System.out.println(paramsName);
-
-                    return method.getParameterTypes()[0];
+            try {
+                Member member = (Member) invoke(cp, "getMethodAt", i);
+                if (member instanceof Method && member.getDeclaringClass() != Object.class) {
+                    Class<?> statementClazz = member.getDeclaringClass();
+                    return getParam(statementClazz,member.getName());
                 }
             }
-            catch (Exception ignored)
-            {
-                // ignored
+            catch (Exception ignored) {
             }
         }
         throw new NoSuchMethodException();
     }
 
 
-    public static String[] getParamNames(Class clazz, String method) throws NotFoundException {
+    public static Collection<ParamInfo> getParam(Class<?> clazz, String method) throws NotFoundException, CannotCompileException, ClassNotFoundException {
         ClassPool pool = ClassPool.getDefault();
         CtClass cc = pool.get(clazz.getName());
         CtMethod cm = cc.getDeclaredMethod(method);
@@ -110,13 +80,51 @@ public class LambdaFunnyTest {
         if (attr == null) {
             throw new NotFoundException("cannot get LocalVariableAttribute");
         }
-        String[] paramNames = new String[cm.getParameterTypes().length];
-        int pos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
-        for (int i = 0; i < paramNames.length; i++) {
-            paramNames[i] = attr.variableName(i + pos);
+
+        List<ParamInfo> params = new LinkedList<>();
+
+        int staticPos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
+        CtClass[] ctClazzes = cm.getParameterTypes();
+        int indexRelatively = 0;
+        for (CtClass paramClazz : ctClazzes) {
+            params.add(new LambdaFuncParam(Class.forName(paramClazz.getName()) , attr.variableName(indexRelatively++ + staticPos)));
         }
-        return paramNames;
+        return params;
     }
 
+    public static interface ParamInfo{
+        String getParamName();
+        Class<?> getParamClass();
+    }
 
+    public static class LambdaFuncParam implements ParamInfo{
+
+        /**
+         * The class of param
+         */
+        private Class<?> clazz;
+
+        /**
+         * The name of param
+         */
+        private String name;
+
+        public LambdaFuncParam(){
+        }
+
+        public LambdaFuncParam(Class<?> clazz, String name){
+            this.clazz = clazz;
+            this.name = name;
+        }
+
+        @Override
+        public String getParamName() {
+            return this.name;
+        }
+
+        @Override
+        public Class<?> getParamClass() {
+            return this.clazz;
+        }
+    }
 }
