@@ -43,5 +43,22 @@ public class WandTest {
 
         Assert.assertTrue(((BigDecimal)result).equals(new BigDecimal("10")));
     }
+
+    @Test
+    public void test_intoContext() {
+        Integer result = Wand.caller()
+            .into("num1", 1)
+            .call(p -> 1)
+            .into("num2", 1)
+            .into("num3", 1)
+            .call(p -> {
+                Integer num1 = p.context().getInteger("num1");
+                Integer num2 = p.context().getInteger("num2");
+                Integer num3 = p.context().getInteger("num3");
+                return ((Integer) p.result) + num1 + num2 + num3;
+            })
+            .exec();
+        Assert.assertTrue(result.intValue() == 4);
+    }
     
 }

@@ -75,6 +75,10 @@ public interface Wand {
             return caller;
         }
 
+        public Caller into(String name, Object value) {
+            return caller.into(name, value);
+        }
+
         protected P parent() {
             return parentWand;
         }
