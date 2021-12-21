@@ -1,8 +1,9 @@
 package com.fs.voldemort.business.fit;
 
 import com.fs.voldemort.business.BFuncParameter;
+import com.fs.voldemort.business.paramfinder.ParamFinderLibrary;
+import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.support.BFunc;
-import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.business.util.ConstructorHolder;
 import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.functional.func.Func1;
@@ -11,12 +12,43 @@ import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Param fit library
+ * #Definition
+ *  R func(
+ *      Part 1-> Result arg
+ *      Part 2-> Context arg
+ *      Part 3-> Operate function
+ *  )
+ *
+ * #Part1  & Part2
+ * Get arg info of target function method, and adapt result that has been executed by last function:
+ * ## Role 1
+ *     Last function    call    Current function
+ *     R func1()        --->    func2(R arg)
+ * ## Role 2
+ *     Last function    call    Current function
+ *     R func1()        --->    func2(R arg,   C1 arg1, C2 arg2, C2 arg3)
+ *  ### Parameter description
+ *     R arg                    -> The result of last function
+ *     C1 arg1  context param   -> The arg of context param
+ *                                 Context param class is C1.class
+ *                                 Context param key is     'arg1'
+ *     C2 arg2                  -> Class: C1.class      key:'arg2'
+ *     C2 arg3                  -> Class: C2.class      key:'arg3'
+ *
+ * #Part3
+ * The above has been described the role which fill the result and parameters into the current function,
+ * but there is still such a scene, developer need to manipulate context parameters in the function, that`s
+ * why BFunc provides the entry of the operation function in the formal parameter;
+ * For example base on above # role 2 current function:
+ *  func2(R arg,  C1 arg1, C2 arg2, C2 arg3, {@link com.fs.voldemort.business.support.BFuncOperate} Func2<String,Object,Boolean> f_setC)
+ *
  */
 public class FitLibrary {
 
@@ -45,42 +77,15 @@ public class FitLibrary {
         if(funcMethod == null)
             return EMPTY_RESULT;
 
-        //Get method parameter
-
-
-        //arg result set
-        final List<Object> arg = new LinkedList<>();
-        //Context arg temporary set
-        final List<CArg> cArgSet = new LinkedList<>();
-        //Param arg temporary set
-        final List<PArg> pArgSet = Arrays.stream(funcMethod.getParameters()).filter(p->{
-            if(p.isAnnotationPresent(BFuncOperate.class)){
-                cArgSet.add(new CArg(p.getAnnotation(BFuncOperate.class).value(), param.context(), param.result));
-                return false;
+        final List<PArg> resultArgs = ParamFinderLibrary.methodParamFinder.getParam(funcMethod).stream().map(arg -> {
+            Object value = param.getParameter(arg.getParamName());
+            if (value == null) {
+                value = param.context().get(arg.getParamName());
             }
-            return true;
-        }).map(p-> new PArg(p.getName())).collect(Collectors.toList());
-
-        if(!pArgSet.isEmpty()) {
-            //Deal context/node param arg
-            pArgSet.forEach(pArg -> {
-                pArg.value = param.getParameter(pArg.name);
-                if (pArg.value == null) {
-                    pArg.value = param.context().get(pArg.name);
-                }
-            });
-
-            arg.addAll(pArgSet.stream().map(pArg -> pArg.value).collect(Collectors.toList()));
-        }
-
-        //Deal context operator func arg
-        if(!cArgSet.isEmpty()) {
-            arg.addAll(cArgSet.stream()
-                    .map(cArg->cArg.oper == BFuncOperate.Oper.RESULT ? cArg.result : cArg.getOperFunc())
-                    .collect(Collectors.toList()));
-        }
-
-        return arg.toArray();
+            return value == null ? new PArg(arg.getParamName(), arg.getParamClazz())
+                    : new PArg(arg.getParamName(), arg.getParamClazz(), value);
+        }).collect(Collectors.toList());
+        return resultArgs.toArray();
     };
 
     public static final Func2<Class<?>, CallerParameter, Object[]> CUSTOM_FIT_FUNC = (clazz,param) ->{

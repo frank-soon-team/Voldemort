@@ -23,7 +23,7 @@ public class CustomFit implements IFit {
                 return false;
             }
             return true;
-        }).map(param-> new PArg(param.getName())).collect(Collectors.toList());
+        }).map(param-> new PArg(param.getName(), null)).collect(Collectors.toList());
 
         if(!pArgSet.isEmpty()) {
             //Deal result arg

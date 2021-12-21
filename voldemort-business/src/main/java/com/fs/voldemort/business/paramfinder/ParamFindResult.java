@@ -2,7 +2,7 @@ package com.fs.voldemort.business.paramfinder;
 /**
  * The result of parameter finder{@link ParamFinder}
  */
-public interface ParamNameTypeFindResult{
+public interface ParamFindResult {
 
     /**
      * Parameter name

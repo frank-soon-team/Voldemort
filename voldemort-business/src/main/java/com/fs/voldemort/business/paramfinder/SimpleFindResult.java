@@ -1,6 +1,6 @@
 package com.fs.voldemort.business.paramfinder;
 
-public class SimpleFindResult implements ParamNameTypeFindResult{
+public class SimpleFindResult implements ParamFindResult {
 
     private String name;
 

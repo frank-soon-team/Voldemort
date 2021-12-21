@@ -1,6 +1,6 @@
 package com.fs.voldemort.business.paramfinder.util;
 
-import com.fs.voldemort.business.paramfinder.ParamNameTypeFindResult;
+import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.paramfinder.SimpleFindResult;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -17,7 +17,7 @@ import java.util.LinkedList;
 
 public class JavassistUtil {
 
-    public static Collection<ParamNameTypeFindResult> getParam(final Method method) throws NotFoundException, ClassNotFoundException{
+    public static Collection<ParamFindResult> getParam(final Method method) throws NotFoundException, ClassNotFoundException{
         if(method == null) {
             throw new IllegalArgumentException("Method Cannot be null!");
         }
@@ -34,7 +34,7 @@ public class JavassistUtil {
             throw new NotFoundException("cannot get LocalVariableAttribute");
         }
 
-        Collection<ParamNameTypeFindResult> params = new LinkedList<>();
+        Collection<ParamFindResult> params = new LinkedList<>();
         int staticPos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
         CtClass[] ctClazzes = cm.getParameterTypes();
         int indexRelatively = 0;
