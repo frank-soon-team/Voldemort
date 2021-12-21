@@ -3,7 +3,6 @@ package com.fs.voldemort.core;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import com.fs.voldemort.core.exception.AvadaKedavraException;
 import com.fs.voldemort.core.support.CallerContext;
 
 import org.junit.Assert;
@@ -190,34 +189,7 @@ public class CallerTest {
         System.out.println(contextMap);
         CallerContext newContext = new CallerContext(contextMap);
         Assert.assertTrue(contextMap.toString().equals(newContext.getValueMap().toString()));
-    }
 
-    @Test
-    public void test_intoContext() {
-        Integer result = Caller.create()
-            .into("name", "call into()")
-            .call(p -> 1)
-            .call(p -> {
-                p.context().set("call2", "step second call()");
-                return ((Integer) p.result) + 1;
-            })
-            .into("num3", 3)
-            .into("num4", 4)
-            .into("num5", 5)
-            .call(p -> {
-                if(!p.context().get("name").equals("call into()")) {
-                    throw new AvadaKedavraException("the context value by key [name] lost.");
-                }
-                if(!p.context().get("call2").equals("step second call()")) {
-                    throw new AvadaKedavraException("the context value by key [call2] lost.");
-                }
-                Integer num3 = (Integer) p.context().get("num3");
-                Integer num4 = (Integer) p.context().get("num4");
-                Integer num5 = (Integer) p.context().get("num5");
-                return ((Integer) p.result) + num3 + num4 + num5;
-            })
-            .exec();
-        Assert.assertTrue(result.intValue() == 14);
     }
     
 }

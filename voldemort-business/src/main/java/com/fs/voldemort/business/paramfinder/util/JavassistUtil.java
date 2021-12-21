@@ -6,9 +6,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.LocalVariableAttribute;
-import javassist.bytecode.MethodInfo;
+import javassist.bytecode.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -34,9 +32,16 @@ public class JavassistUtil {
             throw new NotFoundException("cannot get LocalVariableAttribute");
         }
 
+        TypeAnnotationsAttribute typeAnnotationsAttribute = (TypeAnnotationsAttribute)methodInfo.getAttribute(TypeAnnotationsAttribute.visibleTag);
+        System.out.println(typeAnnotationsAttribute.numAnnotations());
+        System.out.println(typeAnnotationsAttribute.getName());
+        System.out.println(typeAnnotationsAttribute.getConstPool().getUtf8Info(57));
+
+
         Collection<ParamFindResult> params = new LinkedList<>();
         int staticPos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
         CtClass[] ctClazzes = cm.getParameterTypes();
+
         int indexRelatively = 0;
         for (CtClass paramClazz : ctClazzes) {
             params.add(new SimpleFindResult(attr.variableName(indexRelatively++ + staticPos), Class.forName(paramClazz.getName())));

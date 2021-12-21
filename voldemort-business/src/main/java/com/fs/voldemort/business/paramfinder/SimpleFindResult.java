@@ -1,25 +1,39 @@
 package com.fs.voldemort.business.paramfinder;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * The result which is hold name, class and annotation that belong args of method
+ */
 public class SimpleFindResult implements ParamFindResult {
 
-    private String name;
+    /**
+     * The name of args
+     */
+    private final String name;
 
-    private Class<?> clazz;
+    /**
+     * The class of args
+     */
+    private final Class<?> clazz;
 
-    public SimpleFindResult() {
-    }
+    /**
+     * The annotations of args
+     */
+    private final Collection<Annotation> annotations;
 
     public SimpleFindResult(String name, Class<?> clazz) {
         this.name = name;
         this.clazz = clazz;
+        this.annotations = new ArrayList<>();
     }
 
-    public void setName(String name) {
+    public SimpleFindResult(String name, Class<?> clazz, Collection<Annotation> annotations) {
         this.name = name;
-    }
-
-    public void setClazz(Class<?> clazz) {
         this.clazz = clazz;
+        this.annotations = annotations;
     }
 
     @Override
@@ -30,5 +44,10 @@ public class SimpleFindResult implements ParamFindResult {
     @Override
     public Class<?> getParamClazz() {
         return this.clazz;
+    }
+
+    @Override
+    public Collection<Annotation> getAnnotation() {
+        return annotations;
     }
 }

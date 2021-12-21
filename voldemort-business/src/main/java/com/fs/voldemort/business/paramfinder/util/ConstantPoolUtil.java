@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
  */
 public class ConstantPoolUtil {
 
-    public static <T> Method getParameterTypeAndName(T func) throws ReflectiveOperationException {
+    public static <T> Method getRealityMethod(T func) throws ReflectiveOperationException {
         Object cp = invoke(func.getClass(), "getConstantPool");
         for (int i = (int) invoke(cp, "getSize") - 1; i >= 0; --i)
         {

@@ -2,7 +2,6 @@ package com.fs.voldemort.business.fit;
 
 import com.fs.voldemort.business.BFuncParameter;
 import com.fs.voldemort.business.paramfinder.ParamFinderLibrary;
-import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.support.BFunc;
 import com.fs.voldemort.business.util.ConstructorHolder;
 import com.fs.voldemort.core.exception.CrucioException;
@@ -12,8 +11,6 @@ import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +51,7 @@ public class FitLibrary {
 
     public static final Object[] EMPTY_RESULT = new Object[0];
 
-    public static final Func1<Class<?>,Method> OBTAIN_METHOD = clazz -> {
+    public static final Func1<Class<?>,Method> f_obtainMethod = clazz -> {
         final List<Method> funcMethodList = Arrays.stream(clazz.getDeclaredMethods())
                 .filter(method -> Arrays.stream(method.getDeclaredAnnotations())
                         .anyMatch(annotation -> annotation.annotationType().equals(BFunc.class)))
@@ -69,15 +66,15 @@ public class FitLibrary {
         return funcMethodList.get(0);
     };
 
-    public static final Func2<Class<?>, CallerParameter, Object[]> AUTO_FIT_FUNC = (clazz,callerParameter) ->{
+    public static final Func2<Class<?>, CallerParameter, Object[]> f_autoFit = (clazz, callerParameter) ->{
 
         final BFuncParameter param = (BFuncParameter)callerParameter;
 
-        final Method funcMethod = OBTAIN_METHOD.call(clazz);
+        final Method funcMethod = f_obtainMethod.call(clazz);
         if(funcMethod == null)
             return EMPTY_RESULT;
 
-        final List<PArg> resultArgs = ParamFinderLibrary.methodParamFinder.getParam(funcMethod).stream().map(arg -> {
+        final List<PArg> resultArgs = ParamFinderLibrary.f_MethodParamFinder.getParam(funcMethod).stream().map(arg -> {
             Object value = param.getParameter(arg.getParamName());
             if (value == null) {
                 value = param.context().get(arg.getParamName());
@@ -88,9 +85,9 @@ public class FitLibrary {
         return resultArgs.toArray();
     };
 
-    public static final Func2<Class<?>, CallerParameter, Object[]> CUSTOM_FIT_FUNC = (clazz,param) ->{
+    public static final Func2<Class<?>, CallerParameter, Object[]> f_customFit = (clazz, param) ->{
 
-        final Method funcMethod = OBTAIN_METHOD.call(clazz);
+        final Method funcMethod = f_obtainMethod.call(clazz);
         if(funcMethod == null)
             return EMPTY_RESULT;
 
