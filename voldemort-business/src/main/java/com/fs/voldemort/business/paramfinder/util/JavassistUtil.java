@@ -8,8 +8,12 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.*;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -21,31 +25,24 @@ public class JavassistUtil {
         }
         final String methodName = method.getName();
         final Class clazz = method.getDeclaringClass();
+        final AnnotatedType[] at = method.getAnnotatedParameterTypes();
 
-        ClassPool pool = ClassPool.getDefault();
-        CtClass cc = pool.get(clazz.getName());
-        CtMethod cm = cc.getDeclaredMethod(methodName);
-        MethodInfo methodInfo = cm.getMethodInfo();
-        CodeAttribute codeAttribute = methodInfo.getCodeAttribute();
-        LocalVariableAttribute attr = (LocalVariableAttribute) codeAttribute.getAttribute(LocalVariableAttribute.tag);
+        CtMethod cm = ClassPool.getDefault().get(clazz.getName()).getDeclaredMethod(methodName);
+        LocalVariableAttribute attr = (LocalVariableAttribute) cm.getMethodInfo().getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
         if (attr == null) {
-            throw new NotFoundException("cannot get LocalVariableAttribute");
+            throw new NotFoundException("Cannot get LocalVariableAttribute!");
         }
-
-        TypeAnnotationsAttribute typeAnnotationsAttribute = (TypeAnnotationsAttribute)methodInfo.getAttribute(TypeAnnotationsAttribute.visibleTag);
-        System.out.println(typeAnnotationsAttribute.numAnnotations());
-        System.out.println(typeAnnotationsAttribute.getName());
-        System.out.println(typeAnnotationsAttribute.getConstPool().getUtf8Info(57));
-
 
         Collection<ParamFindResult> params = new LinkedList<>();
         int staticPos = Modifier.isStatic(cm.getModifiers()) ? 0 : 1;
         CtClass[] ctClazzes = cm.getParameterTypes();
 
-        int indexRelatively = 0;
-        for (CtClass paramClazz : ctClazzes) {
-            params.add(new SimpleFindResult(attr.variableName(indexRelatively++ + staticPos), Class.forName(paramClazz.getName())));
+        for(int i=0; i<ctClazzes.length; i++) {
+            Collection<Annotation> annotations = at[i].getAnnotations().length == 0 ? new ArrayList<>()
+                    : Arrays.asList(at[i].getAnnotations());
+            params.add(new SimpleFindResult(attr.variableName(i + staticPos), Class.forName(ctClazzes[i].getName()), annotations));
         }
+
         return params;
     }
 }
