@@ -1,12 +1,18 @@
 package com.fs.voldemort.business;
 
+import com.fs.voldemort.business.paramfinder.ParamFindResult;
+import com.fs.voldemort.business.paramfinder.ParamFinderLibrary;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.func.Func1;
+import com.fs.voldemort.core.functional.func.Func2;
+import com.fs.voldemort.core.functional.func.Func3;
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.core.support.ShareContextCallerParameter;
+
+import java.util.Collection;
 
 /**
  * Polymerize caller
@@ -25,9 +31,26 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
         return this;
     }
 
-    @Override
     public BFuncCaller call(Func1<CallerParameter, Object> func) {
         super.call(func);
+        return this;
+    }
+
+    public BFuncCaller call(Func2 func) {
+
+        Collection<ParamFindResult> fParams = ParamFinderLibrary.f_LambdaParamFinder.getParam(func);
+
+        Func1<CallerParameter, Object> shellFunc = p->{
+            return func.call(null,null);
+        };
+
+        super.call(shellFunc);
+
+        return this;
+    }
+
+    public BFuncCaller call(Func3 func) {
+
         return this;
     }
 

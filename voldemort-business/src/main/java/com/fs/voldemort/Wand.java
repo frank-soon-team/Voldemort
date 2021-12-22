@@ -7,6 +7,9 @@ import com.fs.voldemort.business.ParallelBFuncCaller;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.core.functional.func.Func1;
+import com.fs.voldemort.core.functional.func.Func2;
+import com.fs.voldemort.core.functional.func.Func3;
+import com.fs.voldemort.core.functional.func.Func4;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.IAsyncStrategy;
 import com.fs.voldemort.parallel.ParallelCaller;
@@ -192,6 +195,18 @@ public interface Wand {
 
         public WandBridge<BusinessWand<P>> sub() {
             return new WandBridge<>(this);
+        }
+
+        public BusinessWand<P> call(Func2 func) {
+            return this;
+        }
+
+        public BusinessWand<P> call(Func3 func) {
+            return this;
+        }
+
+        public BusinessWand<P> call(Func4 func) {
+            return this;
         }
 
     }
