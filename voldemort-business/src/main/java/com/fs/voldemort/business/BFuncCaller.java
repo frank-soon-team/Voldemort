@@ -13,6 +13,8 @@ import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.core.support.ShareContextCallerParameter;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Polymerize caller
@@ -39,6 +41,14 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
     public BFuncCaller call(Func2 func) {
 
         Collection<ParamFindResult> fParams = ParamFinderLibrary.f_LambdaParamFinder.getParam(func);
+
+
+
+
+
+
+
+        List<?> args = new LinkedList<>();
 
         Func1<CallerParameter, Object> shellFunc = p->{
             return func.call(null,null);

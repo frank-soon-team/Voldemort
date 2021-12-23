@@ -1,6 +1,7 @@
 package com.fs.voldemort;
 
 import java.math.BigDecimal;
+import java.util.function.Function;
 
 import com.fs.voldemort.parallel.ParallelTaskResult;
 import com.fs.voldemort.utilies.ThreadUtils;

@@ -6,4 +6,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE})
 public @interface ContextOnly {
+    FitArg f_getArg = (clazz, name, fitContext) -> fitContext.getBean(clazz,name);
 }
