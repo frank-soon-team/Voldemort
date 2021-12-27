@@ -6,8 +6,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE})
 public @interface AutoFit {
-    FitArg f_getArg = (clazz, name, fitContext) -> {
-        Object result = fitContext.getContext(name);
-        return result != null ? result : fitContext.getBean(clazz,name);
+    FitArg f_getArg = (paramFindResult, fitContext) -> {
+        Object result = fitContext.getContext(paramFindResult.getParamName());
+        return result != null ? result : fitContext.getBean(paramFindResult.getParamClazz(),paramFindResult.getParamName());
     };
 }

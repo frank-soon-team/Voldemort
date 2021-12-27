@@ -9,5 +9,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE})
 public @interface ContainerOnly{
-    FitArg f_getArg = (clazz, name, fitContext) -> fitContext.getContext(name);
+    FitArg f_getArg = (paramFindResult, fitContext) -> fitContext.getContext(paramFindResult.getParamName());
 }

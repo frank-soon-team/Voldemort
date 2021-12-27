@@ -12,10 +12,7 @@ import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FitLibrary {
@@ -70,37 +67,65 @@ public class FitLibrary {
         return iFit.fit(funcMethod,param);
     };
 
-    private static final Collection<Class> uniqueCheckFitAnnotations = new HashSet(){{
+    private static final Collection<Class> uniqueCheckFitAnnotations = new HashSet() {{
         add(ContextOnly.class);
         add(ContainerOnly.class);
         add(AutoFit.class);
     }};
 
     public static final Func2<Collection<ParamFindResult>, FitContext, Collection<?>> f_lambdaFit = (paramFindResults,fitContext) -> {
+        
+        final Collection args = new LinkedList<>();
 
         for (ParamFindResult paramFindResult : paramFindResults) {
 
-            //Unique annotation check flag
-            boolean hasUniqueAnnotation = true;
-
-            //Arg find func
+            //Arg fix func
+            FitArg f_fitArg = null;
 
             //Arg default
+            String defaultValue = null;
 
+            //Unique annotation check flag
+            boolean hasExplicitUniqueAnnotation = false;
 
             for (Annotation annotation : paramFindResult.getAnnotation()) {
                 //Unique check
+                if(hasExplicitUniqueAnnotation) {
+                    throw new FitException("Multiple unique annotations declared, please check!");
+                }
 
+                if(uniqueCheckFitAnnotations.contains(annotation.annotationType())) {
+                    hasExplicitUniqueAnnotation = true;
+                    //Get arg fix func TODO:动态获取优化
+                    if(annotation instanceof ContextOnly) {
+                        f_fitArg = ContextOnly.f_getArg;
+                    }else if(annotation instanceof ContainerOnly){
+                        f_fitArg = ContainerOnly.f_getArg;
+                    }else if(annotation instanceof AutoFit){
+                        f_fitArg = AutoFit.f_getArg;
+                    }
+                    continue;
+                }
 
+                //Get default value
+                if(annotation instanceof Default) {
+                    defaultValue = ((Default)annotation).value();
+                }
             }
 
+            //Get real arg
+            if(f_fitArg == null) {
+                f_fitArg = AutoFit.f_getArg;
+            }
 
-
+            Object arg = f_fitArg.getParam(paramFindResult,fitContext);
+            if(arg == null && defaultValue != null) {
+                //TODO:默认值转换约束检查
+                arg = defaultValue;
+            }
+            args.add(arg);
         }
-        return null;
+        return args;
     };
-
-
-
 
 }
