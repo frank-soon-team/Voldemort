@@ -197,18 +197,24 @@ public interface Wand {
             return new WandBridge<>(this);
         }
 
-        public BusinessWand<P> call(Func2 func) {
+        public BusinessWand<P> callFitly(Func1 func) {
+            ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> call(Func3 func) {
+        public BusinessWand<P> callFitly(Func2<?,?,?> func) {
+            ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> call(Func4 func) {
+        public BusinessWand<P> callFitly(Func3 func) {
+            ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
+        public BusinessWand<P> callFitly(Func4 func) {
+            ((BFuncCaller) get()).callFitly(func);
+            return this;
+        }
     }
-
 }

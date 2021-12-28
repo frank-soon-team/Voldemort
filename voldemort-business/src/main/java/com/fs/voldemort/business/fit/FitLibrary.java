@@ -50,7 +50,7 @@ public class FitLibrary {
             return value == null ? new PArg(arg.getParamName(), arg.getParamClazz())
                     : new PArg(arg.getParamName(), arg.getParamClazz(), value);
         }).collect(Collectors.toList());
-        return resultArgs.toArray();
+        return resultArgs.stream().map(pArg -> pArg.value).toArray();
     };
 
     public static final Func2<Class<?>, CallerParameter, Object[]> f_logicCellCustomFit = (clazz, param) ->{

@@ -13,12 +13,7 @@ public class HutchpatchGoldenCup {
 
 //    @BFunc(fit = FitMode.CUSTOM, iFit = CustomFit.class)
     @BFunc
-    public String func(String target,
-        @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC){
-        //Add param to call context
-        f_setC.apply("c1","context 1 result");
-        f_setC.apply("c2","context 2 result");
-
+    public String func(String target){
         return "\n This is Hutchpatch golden cup! Target is " + target;
     }
 

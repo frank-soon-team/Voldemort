@@ -89,16 +89,6 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
         return this;
     }
 
-    public BFuncCaller callFitly(Func10 func){
-
-        return this;
-    }
-
-    public BFuncCaller call(Func3 func) {
-
-        return this;
-    }
-
     public static BFuncCaller create() {
         return new BFuncCaller();
     }

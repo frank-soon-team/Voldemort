@@ -28,16 +28,11 @@ public class TomRyderDiary {
      * @return 逻辑单元结果
      */
     @BFunc
-    public String func(String nodeKey1, String Key1,
-                       @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC,
-                       @BFuncOperate(BFuncOperate.Oper.RESULT) String result) {
+    public String func(String nodeKey1, String Key1) {
 
         System.out.println("[TomRyderDiary] Key1:" + Key1 + " nodeKey1:" + nodeKey1);
-        System.out.println("\n [TomRyderDiary] Result:" + result);
 
-        f_setC.apply("Key2","TomRyderDiary Key2 value");
-
-        return result + "\n-> call TomRyderDiary";
+        return "\n-> call TomRyderDiary";
     }
 
 }

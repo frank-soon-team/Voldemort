@@ -8,10 +8,8 @@ public class Nagini{
 
     @BFunc
     public String func(String c1, String c2,
-                       String cNull,
-                       @BFuncOperate(BFuncOperate.Oper.SET) Action2<String,Object> f_setC,
-                       @BFuncOperate(BFuncOperate.Oper.RESULT) String result){
-        return "This is Nagini! Target is " + result + "c1:" + c1 + "c2:" + c2;
+                       String cNull){
+        return "This is Nagini! Target is c1:" + c1 + "c2:" + c2;
     }
 
 }

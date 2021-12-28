@@ -9,8 +9,8 @@ import com.fs.voldemort.business.support.LogicCell;
 public class MarvoroGunterRing{
 
     @BFunc
-    public String func(String c3, @BFuncOperate(BFuncOperate.Oper.RESULT) String result){
-        return "This is Marvoro Gunter Ring! Result is " + result + "c3:" + c3;
+    public String func(String c3){
+        return "This is Marvoro Gunter Ring! Result is c3:" + c3;
     }
 
 }
