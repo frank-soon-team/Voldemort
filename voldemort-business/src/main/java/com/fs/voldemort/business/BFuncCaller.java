@@ -1,20 +1,22 @@
 package com.fs.voldemort.business;
 
+import com.fs.voldemort.business.fit.FitContext;
+import com.fs.voldemort.business.fit.FitLibrary;
 import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.paramfinder.ParamFinderLibrary;
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.functional.func.Func1;
-import com.fs.voldemort.core.functional.func.Func2;
-import com.fs.voldemort.core.functional.func.Func3;
+import com.fs.voldemort.core.functional.func.*;
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.core.support.ShareContextCallerParameter;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Polymerize caller
@@ -33,28 +35,61 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
         return this;
     }
 
-    public BFuncCaller call(Func1<CallerParameter, Object> func) {
-        super.call(func);
+    public BFuncCaller callFitly(Func1 func) {
+
         return this;
     }
 
-    public BFuncCaller call(Func2 func) {
+    public BFuncCaller callFitly(Func2 func) {
 
         Collection<ParamFindResult> fParams = ParamFinderLibrary.f_LambdaParamFinder.getParam(func);
-
-
-
-
-
-
-
-        List<?> args = new LinkedList<>();
-
+        final Func2<Class, String, ?> getIocInstance = (clazz,name)-> BFuncManager.getIocInstanceByName(name);
         Func1<CallerParameter, Object> shellFunc = p->{
-            return func.call(null,null);
+            Collection<?> argsCollection = FitLibrary.f_lambdaFit.call(fParams, new FitContext(p, getIocInstance));
+            Object[] args = argsCollection.toArray();
+            return func.call(args[0],args[1]);
         };
 
         super.call(shellFunc);
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func3 func) {
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func4 func){
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func5 func){
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func6 func){
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func7 func){
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func8 func){
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func9 func){
+
+        return this;
+    }
+
+    public BFuncCaller callFitly(Func10 func){
 
         return this;
     }
