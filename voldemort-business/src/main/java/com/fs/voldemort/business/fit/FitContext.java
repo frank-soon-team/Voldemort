@@ -8,9 +8,9 @@ public class FitContext {
 
     private final CallerParameter callerParameter;
 
-    private final Func2<Class, String, ?> getIocInstance;
+    private final Func2<Class<?>, String, ?> getIocInstance;
 
-    public FitContext(CallerParameter callerParameter, Func2<Class, String, ?> getIocInstance) {
+    public FitContext(CallerParameter callerParameter, Func2<Class<?>, String, ?> getIocInstance) {
         this.callerParameter = callerParameter;
         this.getIocInstance = getIocInstance;
     }
@@ -27,7 +27,7 @@ public class FitContext {
         return callerContext().get(key);
     }
 
-    public Object getBean(Class beanClazz, String beanName) {
-        return getIocInstance.call(beanClazz, beanName);
+    public Object getIocInstance(Class<?> iocInstanceClazz, String iocInstanceName) {
+        return getIocInstance.call(iocInstanceClazz, iocInstanceName);
     }
 }

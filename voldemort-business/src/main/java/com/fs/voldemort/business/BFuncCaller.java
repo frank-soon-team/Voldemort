@@ -40,16 +40,14 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
         return this;
     }
 
-    public BFuncCaller callFitly(Func2 func) {
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func2 func) {
         Collection<ParamFindResult> fParams = ParamFinderLibrary.f_LambdaParamFinder.getParam(func);
-        final Func2<Class, String, ?> getIocInstance = (clazz,name)-> BFuncManager.getIocInstanceByName(name);
+        final Func2<Class<?>, String, ?> getIocInstance = (clazz,name)-> BFuncManager.getIocInstanceByName(name);
         Func1<CallerParameter, Object> shellFunc = p->{
-            Collection<?> argsCollection = FitLibrary.f_lambdaFit.call(fParams, new FitContext(p, getIocInstance));
-            Object[] args = argsCollection.toArray();
+            Object[] args = FitLibrary.f_lambdaFit.call(fParams, new FitContext(p, getIocInstance)).toArray();
             return func.call(args[0],args[1]);
         };
-
         super.call(shellFunc);
         return this;
     }

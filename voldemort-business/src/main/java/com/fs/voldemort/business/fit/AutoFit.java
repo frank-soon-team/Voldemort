@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 public @interface AutoFit {
     FitArg f_getArg = (paramFindResult, fitContext) -> {
         Object result = fitContext.getContext(paramFindResult.getParamName());
-        return result != null ? result : fitContext.getBean(paramFindResult.getParamClazz(),paramFindResult.getParamName());
+        return result != null ? result : fitContext.getIocInstance(paramFindResult.getParamClazz(),paramFindResult.getParamName());
     };
 }
