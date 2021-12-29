@@ -5,6 +5,8 @@ import com.fs.voldemort.business.fit.FitLibrary;
 import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.paramfinder.ParamFinderLibrary;
 import com.fs.voldemort.core.Caller;
+import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.functional.DynamicFunc;
 import com.fs.voldemort.core.functional.func.*;
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
@@ -35,55 +37,63 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
         return this;
     }
 
-    public BFuncCaller callFitly(Func1 func) {
+    private Func1<CallerParameter, Object> generateShellFunc(final Object func, final Func1<Object[],Object> invokeAdaptFunc) {
+        Collection<ParamFindResult> fParams = ParamFinderLibrary.f_LambdaParamFinder.getParam(func);
+        Func2<Class<?>, String, ?> getIocInstance = (clazz,name)-> BFuncManager.getIocInstanceByName(name);
+        return p-> invokeAdaptFunc.call(FitLibrary.f_lambdaFit.call(fParams, new FitContext(p, getIocInstance)).toArray());
+    }
 
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func1 func) {
+        super.call(generateShellFunc(func, args -> func.call(args[0])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
     public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func2 func) {
-        Collection<ParamFindResult> fParams = ParamFinderLibrary.f_LambdaParamFinder.getParam(func);
-        final Func2<Class<?>, String, ?> getIocInstance = (clazz,name)-> BFuncManager.getIocInstanceByName(name);
-        Func1<CallerParameter, Object> shellFunc = p->{
-            Object[] args = FitLibrary.f_lambdaFit.call(fParams, new FitContext(p, getIocInstance)).toArray();
-            return func.call(args[0],args[1]);
-        };
-        super.call(shellFunc);
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func3 func) {
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func3 func) {
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func4 func){
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func4 func){
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func5 func){
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func5 func){
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func6 func){
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func6 func){
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func7 func){
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func7 func){
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5],args[6])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func8 func){
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func8 func){
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7])));
         return this;
     }
 
-    public BFuncCaller callFitly(Func9 func){
-
+    @SuppressWarnings("unchecked")
+    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func9 func){
+        super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])));
         return this;
     }
 
