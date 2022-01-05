@@ -7,5 +7,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE})
 public @interface ContextOnly {
-    FitArg f_getArg = (paramFindResult, fitContext) -> fitContext.getIocInstance(paramFindResult.getParamClazz(), paramFindResult.getParamName());
+    FitArg f_getArg = (paramFindResult, fitContext) -> fitContext.getContext(paramFindResult.getParamName());
 }

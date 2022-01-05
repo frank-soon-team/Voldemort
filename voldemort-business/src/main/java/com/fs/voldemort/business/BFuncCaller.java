@@ -5,8 +5,6 @@ import com.fs.voldemort.business.fit.FitLibrary;
 import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.paramfinder.ParamFinderLibrary;
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.exception.CrucioException;
-import com.fs.voldemort.core.functional.DynamicFunc;
 import com.fs.voldemort.core.functional.func.*;
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
@@ -14,11 +12,7 @@ import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.core.support.ShareContextCallerParameter;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * Polymerize caller

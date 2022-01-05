@@ -8,6 +8,7 @@ import com.fs.voldemort.business.util.ConstructorHolder;
 import com.fs.voldemort.core.exception.CrucioException;
 import com.fs.voldemort.core.functional.func.Func1;
 import com.fs.voldemort.core.functional.func.Func2;
+import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.annotation.Annotation;
@@ -67,10 +68,10 @@ public class FitLibrary {
         return iFit.fit(funcMethod,param);
     };
 
-    private static final Collection<Class> uniqueCheckFitAnnotations = new HashSet() {{
-        add(ContextOnly.class);
-        add(ContainerOnly.class);
-        add(AutoFit.class);
+    private static final Map<Class,FitArg> fitAnnotations = new HashMap() {{
+        put(ContextOnly.class, ContextOnly.f_getArg);
+        put(ContainerOnly.class, ContainerOnly.f_getArg);
+        put(AutoFit.class, AutoFit.f_getArg);
     }};
 
     public static final Func2<Collection<ParamFindResult>, FitContext, Collection<?>> f_lambdaFit = (paramFindResults,fitContext) -> {
@@ -85,25 +86,25 @@ public class FitLibrary {
             //Arg default
             String defaultValue = null;
 
+            //Caller original parameter filling
+            if(paramFindResult.getParamClazz() == CallerParameter.class) {
+                args.add(fitContext.callerParameter());
+                continue;
+            }else if(paramFindResult.getParamClazz() == CallerContext.class){
+                args.add(fitContext.callerContext());
+                continue;
+            }
+
             //Unique annotation check flag
             boolean hasExplicitUniqueAnnotation = false;
-
             for (Annotation annotation : paramFindResult.getAnnotation()) {
-                //Unique check
-                if(hasExplicitUniqueAnnotation) {
-                    throw new FitException("Multiple unique annotations declared, please check!");
-                }
-
-                if(uniqueCheckFitAnnotations.contains(annotation.annotationType())) {
-                    hasExplicitUniqueAnnotation = true;
-                    //Get arg fix func TODO:动态获取优化
-                    if(annotation instanceof ContextOnly) {
-                        f_fitArg = ContextOnly.f_getArg;
-                    }else if(annotation instanceof ContainerOnly){
-                        f_fitArg = ContainerOnly.f_getArg;
-                    }else if(annotation instanceof AutoFit){
-                        f_fitArg = AutoFit.f_getArg;
+                if(fitAnnotations.containsKey(annotation.annotationType())) {
+                    //Unique check
+                    if(hasExplicitUniqueAnnotation) {
+                        throw new FitException("Multiple unique annotations declared, please check!");
                     }
+                    hasExplicitUniqueAnnotation = true;
+                    f_fitArg = fitAnnotations.get(annotation.getClass());
                     continue;
                 }
 
@@ -120,12 +121,20 @@ public class FitLibrary {
 
             Object arg = f_fitArg.getParam(paramFindResult,fitContext);
             if(arg == null && defaultValue != null) {
-                //TODO:默认值转换约束检查
                 arg = defaultValue;
             }
             args.add(arg);
         }
         return args;
     };
+
+    public static void main(String[] args) {
+
+        
+
+
+
+
+    }
 
 }

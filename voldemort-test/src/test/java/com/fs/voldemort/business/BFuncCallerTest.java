@@ -1,6 +1,9 @@
 package com.fs.voldemort.business;
 
 import com.fs.voldemort.Wand;
+import com.fs.voldemort.business.fit.ContainerOnly;
+import com.fs.voldemort.business.fit.ContextOnly;
+import com.fs.voldemort.business.fit.Default;
 import com.fs.voldemort.business.horcruxes.*;
 import com.fs.voldemort.business.ioc.AService;
 import com.fs.voldemort.business.ioc.BService;
@@ -259,7 +262,7 @@ public class BFuncCallerTest {
      * A whole new one function invoke mode
      */
     @Test
-    public void  test_FunnyOne() {
+    public void  test_callFitly() {
         /*
          * 手动初始化函数库
          */
@@ -269,12 +272,25 @@ public class BFuncCallerTest {
             Wand
                 .business()
                 .call(p->{
-                    p.context().set("Key1","First context value!");
+                    p.context().set("name","v_name");
                     return "-> First call";
                 })
                 .callFitly((AService aService, CMapper cMapper)->{
                     aService.aMethod();
                     cMapper.cMethod();
+                    return null;
+                })
+                .callFitly((@ContextOnly String name, @ContainerOnly CMapper cMapper)->{
+                    Assert.assertEquals(name,"v_name");
+                    Assert.assertEquals(cMapper.cMethod(), "cMethod check");
+                    return null;
+                })
+                .callFitly((@ContextOnly @Default("d_name") String d_name)->{
+                    Assert.assertEquals(d_name,"d_name");
+                    return null;
+                })
+                .callFitly((@ContextOnly String null_name)->{
+                    Assert.assertEquals(null_name,null);
                     return null;
                 })
                 .get()
