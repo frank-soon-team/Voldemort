@@ -19,3 +19,4 @@ logs
 target/nexus-staging
 *.asc
 target
+.DS_Store

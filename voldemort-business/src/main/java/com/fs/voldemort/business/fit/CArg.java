@@ -7,10 +7,12 @@ public class CArg {
 
     public final BFuncOperate.Oper oper;
     public final CallerContext context;
+    public final Object result;
 
-    public CArg(BFuncOperate.Oper oper, CallerContext context) {
+    public CArg(BFuncOperate.Oper oper, CallerContext context, Object result) {
         this.oper = oper;
         this.context = context;
+        this.result = result;
     }
 
     public Object getOperFunc() {
@@ -25,7 +27,7 @@ public class CArg {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var args = (CArg) o;
+        CArg args = (CArg) o;
         return oper.equals(args.oper);
     }
 }

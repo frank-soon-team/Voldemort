@@ -1,7 +1,7 @@
 package com.fs.voldemort.core.support;
 
 import com.fs.voldemort.core.Caller;
-import com.fs.voldemort.core.exception.CrucioException;
+import com.fs.voldemort.core.exception.AvadaKedavraException;
 import com.fs.voldemort.core.exception.ImperioException;
 import com.fs.voldemort.core.functional.func.Func1;
 
@@ -16,13 +16,14 @@ public class FuncLinkedList {
     public FuncLinkedList() {
     }
 
-    public void add(Func1<CallerParameter, Object> func) {
+    public CallerNode add(Func1<CallerParameter, Object> func) {
         if(func == null) {
             throw new IllegalArgumentException("the parameter func is required.");
         }
 
         CallerNode node = new CallerNode(func);
         add(node);
+        return node;
     }
 
     protected void add(CallerNode node) {
@@ -96,7 +97,7 @@ public class FuncLinkedList {
 
     protected void checkOverflow(int index) {
         if(index > OVERFLOW_COUNT) {
-            throw new CrucioException("overflow");
+            throw new AvadaKedavraException("overflow");
         }
     }
 

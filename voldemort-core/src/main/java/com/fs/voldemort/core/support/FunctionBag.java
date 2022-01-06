@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.fs.voldemort.core.functional.func.DynamicFunc;
+import com.fs.voldemort.core.functional.DynamicFunc;
 
 public class FunctionBag implements IBag<String, DynamicFunc<Object>> {
 

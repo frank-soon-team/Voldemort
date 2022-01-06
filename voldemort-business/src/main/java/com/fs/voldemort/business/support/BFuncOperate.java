@@ -27,7 +27,11 @@ public @interface BFuncOperate {
         /**
          * Func1: (contextKey, contextValue)
          */
-        GET(c-> (Func1<String,Object>) c::get);
+        GET(c-> (Func1<String,Object>) c::get),
+        /**
+         * Result
+         */
+        RESULT(null);
 
         Oper(Func1<CallerContext, Object> getFunc) {
             this.getFunc = getFunc;

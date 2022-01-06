@@ -38,9 +38,9 @@ public enum FitMode {
      *  func2(R arg,  C1 arg1, C2 arg2, C2 arg3, {@link BFuncOperate} Func2<String,Object,Boolean> f_setC)
      *
      */
-    AUTO(FitLibrary.AUTO_FIT_FUNC),
+    AUTO(FitLibrary.f_logicCellAutoFit),
 
-    CUSTOM(FitLibrary.CUSTOM_FIT_FUNC);
+    CUSTOM(FitLibrary.f_logicCellCustomFit);
 
     private final Func2<Class<?>,CallerParameter,Object[]> fitFunc;
 

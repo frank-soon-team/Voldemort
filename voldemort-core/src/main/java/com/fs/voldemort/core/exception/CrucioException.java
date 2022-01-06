@@ -1,8 +1,7 @@
 package com.fs.voldemort.core.exception;
 
-public class CrucioException extends IllegalStateException {
-
-    private static final long serialVersionUID = -7751387277203980437L;
+// 用于校验性异常，通常主动抛出
+public class CrucioException extends IllegalArgumentException {
 
     public CrucioException(String message) {
         super(message);
@@ -14,7 +13,7 @@ public class CrucioException extends IllegalStateException {
 
     @Override
     public String getLocalizedMessage() {
-        return "钻心咒";
+        return "【钻心咒】 > " + getMessage();
     }
     
 }

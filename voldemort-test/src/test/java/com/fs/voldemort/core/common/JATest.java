@@ -8,7 +8,7 @@ public class JATest {
         ClassPool pool = ClassPool.getDefault();
 
         // 1. 创建一个空类
-        CtClass cc = pool.makeClass(com.fs.voldemort.core.business.horcruxes.HutchpatchGoldenCup.class.getName()+"$VWrapper");
+        CtClass cc = pool.makeClass(com.fs.voldemort.business.horcruxes.HutchpatchGoldenCup.class.getName()+"$VWrapper");
 
         // 2. 新增一个字段 private String name;
         // 字段名为name

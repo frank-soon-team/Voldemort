@@ -5,6 +5,6 @@ import java.io.Serializable;
 @FunctionalInterface
 public interface Action1<T1> extends Serializable {
 
-    void apply(T1 param);
+    void apply(T1 t1);
     
 }

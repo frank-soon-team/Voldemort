@@ -7,7 +7,9 @@ import com.fs.voldemort.tcc.node.TCCNode;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
+import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
 import com.fs.voldemort.tcc.state.ITCCState;
+import com.fs.voldemort.tcc.state.TCCExecuteState;
 
 public class SimpleTCCCancelRetryBiz extends BaseTCCBiz implements Action1<ITCCState> {
 
@@ -37,7 +39,12 @@ public class SimpleTCCCancelRetryBiz extends BaseTCCBiz implements Action1<ITCCS
             throw new IllegalStateException("the TCCNodeList is empty.");
         }
 
-        // TODO 处理回滚补偿流程
+        TCCExecuteState tccState = (TCCExecuteState) state;
+        tccState.rollback();
+
+        TCCTaskModel tccTask = changeToTCCModel(tccState);
+        getRepositoryGear().update(tccTask);
+
     }
     
 }
