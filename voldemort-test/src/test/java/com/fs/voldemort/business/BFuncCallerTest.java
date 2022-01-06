@@ -8,6 +8,8 @@ import com.fs.voldemort.business.horcruxes.*;
 import com.fs.voldemort.business.ioc.AService;
 import com.fs.voldemort.business.ioc.BService;
 import com.fs.voldemort.business.ioc.CMapper;
+import com.fs.voldemort.core.support.CallerContext;
+import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.parallel.ParallelTaskResult;
 import org.junit.Assert;
 import org.junit.Test;
@@ -289,13 +291,64 @@ public class BFuncCallerTest {
                     Assert.assertEquals(d_name,"d_name");
                     return null;
                 })
-                .callFitly((@ContextOnly String null_name)->{
+                .callFitly((@ContextOnly String null_name, CallerContext c)->{
                     Assert.assertEquals(null_name,null);
+                    c.set("C1","VC1");
+                    return "CallerParameter result";
+                })
+                .callFitly((CallerParameter p, CallerContext c, @ContextOnly String null_name)->{
+                    Assert.assertEquals(null_name,null);
+                    Assert.assertNotNull(p);
+                    Assert.assertNotNull(c);
+                    Assert.assertEquals(p.result,"CallerParameter result");
+                    Assert.assertEquals(c.get("C1"),"VC1");
                     return null;
                 })
                 .get()
                 .exec();
+    }
 
-        System.out.println(result);
+    /**
+     * 针对多次调用，BFunc提供了缓存机制以避免不必要的反射调用
+     */
+    @Test
+    public void  test_callFitlyCache() {
+        /*
+         * 手动初始化函数库
+         */
+        init();
+
+        System.out.println(callFitly());
+        System.out.println(callFitly());
+        System.out.println(callFitly());
+    }
+
+    private String callFitly() {
+        return Wand
+                        .business()
+                        .call(p->{
+                            p.context().set("name","v_name");
+                            return "-> First call";
+                        })
+                        .callFitly((AService aService, CMapper cMapper)->{
+                            aService.aMethod();
+                            cMapper.cMethod();
+                            return null;
+                        })
+                        .callFitly((@ContextOnly String name, @ContainerOnly CMapper cMapper)->{
+                            Assert.assertEquals(name,"v_name");
+                            Assert.assertEquals(cMapper.cMethod(), "cMethod check");
+                            return null;
+                        })
+                        .callFitly((@ContextOnly @Default("d_name") String d_name)->{
+                            Assert.assertEquals(d_name,"d_name");
+                            return null;
+                        })
+                        .callFitly((@ContextOnly String null_name)->{
+                            Assert.assertEquals(null_name,null);
+                            return null;
+                        })
+                        .get()
+                        .exec();
     }
 }

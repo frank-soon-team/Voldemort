@@ -4,6 +4,7 @@ import com.fs.voldemort.business.paramfinder.util.ConstantPoolUtil;
 import com.fs.voldemort.business.paramfinder.util.JavassistUtil;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 public class ParamFinderLibrary {
 
@@ -12,8 +13,13 @@ public class ParamFinderLibrary {
             throw new ParamFinderException("The target of MethodParamFinder can not be null!");
         }
 
+        Collection<ParamFindResult> paramFindResults = ParamFindResultStore.get(target);
+        if(paramFindResults != null) {
+            return paramFindResults;
+        }
+
         try {
-            return JavassistUtil.getParam(target);
+            return ParamFindResultStore.put(target, JavassistUtil.getParam(target));
         } catch (Exception e) {
             throw new ParamFinderException(e);
         }
@@ -26,7 +32,11 @@ public class ParamFinderLibrary {
 
         if (target.getClass().isSynthetic()) {
             try {
-                return JavassistUtil.getParam(ConstantPoolUtil.getRealityMethod(target));
+                Collection<ParamFindResult> paramFindResults = ParamFindResultStore.get(target.getClass());
+                if(paramFindResults != null) {
+                    return paramFindResults;
+                }
+                return ParamFindResultStore.put(target.getClass(), JavassistUtil.getParam(ConstantPoolUtil.getRealityMethod(target)));
             } catch (Exception e) {
                 throw new ParamFinderException(e);
             }

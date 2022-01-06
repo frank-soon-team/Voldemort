@@ -2,10 +2,10 @@ package com.fs.voldemort.business.fit;
 
 import java.lang.annotation.*;
 
-@Fit
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE})
+@CallerFitlyAnnotation
 public @interface AutoFit {
     FitArg f_getArg = (paramFindResult, fitContext) -> {
         Object result = fitContext.getContext(paramFindResult.getParamName());

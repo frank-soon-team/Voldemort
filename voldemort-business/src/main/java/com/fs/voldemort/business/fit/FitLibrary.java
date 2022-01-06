@@ -12,6 +12,7 @@ import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,12 +69,6 @@ public class FitLibrary {
         return iFit.fit(funcMethod,param);
     };
 
-    private static final Map<Class,FitArg> fitAnnotations = new HashMap() {{
-        put(ContextOnly.class, ContextOnly.f_getArg);
-        put(ContainerOnly.class, ContainerOnly.f_getArg);
-        put(AutoFit.class, AutoFit.f_getArg);
-    }};
-
     public static final Func2<Collection<ParamFindResult>, FitContext, Collection<?>> f_lambdaFit = (paramFindResults,fitContext) -> {
         
         final Collection args = new LinkedList<>();
@@ -98,13 +93,13 @@ public class FitLibrary {
             //Unique annotation check flag
             boolean hasExplicitUniqueAnnotation = false;
             for (Annotation annotation : paramFindResult.getAnnotation()) {
-                if(fitAnnotations.containsKey(annotation.annotationType())) {
+                if(CallerFitlyManager.containFitAnnotation(annotation.annotationType())) {
                     //Unique check
                     if(hasExplicitUniqueAnnotation) {
                         throw new FitException("Multiple unique annotations declared, please check!");
                     }
                     hasExplicitUniqueAnnotation = true;
-                    f_fitArg = fitAnnotations.get(annotation.getClass());
+                    f_fitArg = CallerFitlyManager.getFitArg(annotation.getClass());
                     continue;
                 }
 
@@ -127,14 +122,5 @@ public class FitLibrary {
         }
         return args;
     };
-
-    public static void main(String[] args) {
-
-        
-
-
-
-
-    }
 
 }

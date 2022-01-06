@@ -1,6 +1,7 @@
 package com.fs.voldemort.business.paramfinder.util;
 
 import com.fs.voldemort.business.paramfinder.ParamFindResult;
+import com.fs.voldemort.business.paramfinder.ParamFindResultStore;
 import com.fs.voldemort.business.paramfinder.SimpleFindResult;
 import javassist.ClassPool;
 import javassist.CtClass;
