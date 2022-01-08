@@ -13,8 +13,8 @@ import com.fs.voldemort.parallel.ParallelCaller;
 
 public interface Wand {
 
-    public static <R> CallerWand<?> caller() {
-        return new CallerWand<>(new Caller<R>());
+    public static CallerWand<?> caller() {
+        return new CallerWand<>(new Caller<Object>());
     }
 
     public static ParallelWand<?> parallel() {
@@ -33,8 +33,8 @@ public interface Wand {
             this.parentWand = parentWand;
         }
 
-        public <R> CallerWand<P> caller() {
-            return new CallerWand<P>(new Caller<R>(), parentWand);
+        public CallerWand<P> caller() {
+            return new CallerWand<P>(new Caller<Object>(), parentWand);
         }
 
         public ParallelWand<P> parallel() {
