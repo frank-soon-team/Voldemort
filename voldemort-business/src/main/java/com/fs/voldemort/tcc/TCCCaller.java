@@ -5,7 +5,7 @@ import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;;
 
-public class TCCCaller extends Caller {
+public class TCCCaller extends Caller<Void> {
 
     public TCCCaller(TCCManager tccManager) {
         super(tccManager);

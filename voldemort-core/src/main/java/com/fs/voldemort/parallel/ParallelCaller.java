@@ -3,7 +3,7 @@ package com.fs.voldemort.parallel;
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.func.Func1;
 
-public class ParallelCaller extends Caller {
+public class ParallelCaller extends Caller<ParallelTaskResult> {
 
     //#region constructors
 
@@ -17,19 +17,6 @@ public class ParallelCaller extends Caller {
 
     protected ParallelCaller(ParallelTaskList taskList) {
         super(taskList);
-    }
-
-    //#endregion
-
-
-    //#region factory methods
-
-    public static ParallelCaller create() {
-        return new ParallelCaller();
-    }
-
-    public static ParallelCaller createWithExecutor(final Func1<Integer, IAsyncStrategy> strategyFactoryFunc) {
-        return new ParallelCaller(strategyFactoryFunc);
     }
 
     //#endregion

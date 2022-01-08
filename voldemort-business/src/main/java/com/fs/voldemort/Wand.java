@@ -13,8 +13,8 @@ import com.fs.voldemort.parallel.ParallelCaller;
 
 public interface Wand {
 
-    public static CallerWand<?> caller() {
-        return new CallerWand<>(new Caller());
+    public static <R> CallerWand<?> caller() {
+        return new CallerWand<>(new Caller<R>());
     }
 
     public static ParallelWand<?> parallel() {
@@ -33,8 +33,8 @@ public interface Wand {
             this.parentWand = parentWand;
         }
 
-        public CallerWand<P> caller() {
-            return new CallerWand<P>(new Caller(), parentWand);
+        public <R> CallerWand<P> caller() {
+            return new CallerWand<P>(new Caller<R>(), parentWand);
         }
 
         public ParallelWand<P> parallel() {
@@ -53,16 +53,16 @@ public interface Wand {
 
     static abstract class BaseWand<P extends BaseWand<?>> {
         private final P parentWand;
-        private final Caller caller;
+        private final Caller<?> caller;
 
-        protected BaseWand(Caller caller, P parentWand) {
+        protected BaseWand(Caller<?> caller, P parentWand) {
             this.caller = caller;
             this.parentWand = parentWand;
         }
 
         public abstract BaseWand<P> call(Func1<CallerParameter, Object> func);
 
-        public abstract BaseWand<P> call(Caller subCaller);
+        public abstract BaseWand<P> call(Caller<?> subCaller);
 
         public P end() {
             if(parentWand != null) {
@@ -71,26 +71,40 @@ public interface Wand {
             return parentWand;
         }
 
-        public Caller get() {
-            return caller;
+        public BaseWand<P> into(String name, Object value) {
+            caller.into(name, value);
+            return this;
         }
 
-        public Caller into(String name, Object value) {
-            return caller.into(name, value);
+        @SuppressWarnings("unchecked")
+        public <R> R exec() {
+            return (R) get().exec();
+        }
+
+        public void exec(Action1<Object> action) {
+            if(action == null) {
+                throw new IllegalArgumentException("the parameter action is required.");
+            }
+            Object result = exec();
+            action.apply(result);
         }
 
         protected P parent() {
             return parentWand;
         }
+
+        protected Caller<?> get() {
+            return caller;
+        }
     }
 
     static class CallerWand<P extends BaseWand<?>> extends BaseWand<P> {
 
-        public CallerWand(Caller caller) {
+        public CallerWand(Caller<?> caller) {
             this(caller, null);
         }
 
-        protected CallerWand(Caller caller, P parentWand) {
+        protected CallerWand(Caller<?> caller, P parentWand) {
             super(caller, parentWand);
         }
 
@@ -101,7 +115,7 @@ public interface Wand {
         }
 
         @Override
-        public CallerWand<P> call(Caller subCaller) {
+        public CallerWand<P> call(Caller<?> subCaller) {
             get().call(subCaller);
             return this;
         }
@@ -129,7 +143,7 @@ public interface Wand {
         }
 
         @Override
-        public ParallelWand<P> call(Caller subCaller) {
+        public ParallelWand<P> call(Caller<?> subCaller) {
             get().call(subCaller);
             return this;
         }
@@ -175,7 +189,7 @@ public interface Wand {
         }
 
         @Override
-        public BusinessWand<P> call(Caller subCaller) {
+        public BusinessWand<P> call(Caller<?> subCaller) {
             get().call(subCaller);
             return this;
         }

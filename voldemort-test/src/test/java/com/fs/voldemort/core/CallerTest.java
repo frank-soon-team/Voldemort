@@ -12,8 +12,7 @@ public class CallerTest {
 
     @Test
     public void test_Caller() {
-        String result = Caller
-            .create()
+        String result = new Caller<String>()
             .call(p -> {
                 System.out.println("call1:" + String.valueOf(p.result));
                 p.context().set("c_key","c_value1");
@@ -25,8 +24,7 @@ public class CallerTest {
                 return ((BigDecimal)p.result).add(new BigDecimal("1"));
             })
             .call(
-                Caller
-                    .create()
+                new Caller<String>()
                     .call(p -> {
                         BigDecimal num = (BigDecimal) p.context().get("c_num_key");
                         System.out.println("c_num_key: " + num);
@@ -52,16 +50,16 @@ public class CallerTest {
 
     @Test
     public void test_dynamicCaller() {
-        Caller.create()
+        new Caller<Integer>()
             .call(p -> 1)
             .call(p -> ((Integer) p.result) + 1)
-            .call(p -> Caller.create(p).call(p2 -> ((Integer) p2.result) + 2))
+            .call(p -> new Caller<Integer>(p).call(p2 -> ((Integer) p2.result) + 2))
             .exec(r -> Assert.assertTrue(Integer.valueOf(4).equals(r)));
     }
 
     @Test
     public void test_contextFunctional() {
-        Caller.create()
+        new Caller<>()
             .call(p -> 1)
             .call(p -> {
                 CallerContext context = p.context();
@@ -98,7 +96,7 @@ public class CallerTest {
 
     @Test
     public void test_contextFunctionalWithValue() {
-        Caller.create()
+        new Caller<>()
             .call(p -> 1)
             .call(p -> {
                 CallerContext context = p.context();
@@ -139,7 +137,7 @@ public class CallerTest {
 
     @Test
     public void test_Context() {
-        CallerContext context = Caller.create()
+        CallerContext context = new Caller<CallerContext>()
             .call(p -> {
                 p.context().set("name", "Jack");
                 p.context().set("age", 18);
@@ -163,16 +161,16 @@ public class CallerTest {
     @Test
     public void test_ContextWithParent() {
 
-        CallerContext context = Caller.create()
+        CallerContext context = new Caller<CallerContext>()
             .call(p -> {
                 p.context().set("name", "Jack");
                 p.context().set("age", 18);
                 p.context().set("gender", "male");
                 return 1;
             })
-            .call(p -> Caller.createWithContext(p).call(p1 -> { p1.context().set("score", 99); return p1.result; }))
+            .call(p -> new Caller<>(p, true).call(p1 -> { p1.context().set("score", 99); return p1.result; }))
             .call(
-                Caller.create()
+                new Caller<>()
                     .call(p -> {
                         p.context().set("alias", "Thon");
                         return p.context();

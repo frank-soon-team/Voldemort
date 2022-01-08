@@ -21,4 +21,9 @@ public class CallerParameter {
     public CallerContext context() {
         return context;
     }
+
+    @SuppressWarnings("unchecked")
+    public <R> R castResult() {
+        return (R) result;
+    }
 }

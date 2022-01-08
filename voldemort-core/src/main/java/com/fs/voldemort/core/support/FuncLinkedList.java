@@ -107,7 +107,7 @@ public class FuncLinkedList {
         int index = 1;
         while(resultValue instanceof Caller) {
             checkOverflow(index);
-            resultValue = ((Caller) result).exec();
+            resultValue = ((Caller<?>) result).exec();
             index++;
         }
 

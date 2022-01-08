@@ -7,13 +7,20 @@ import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.core.support.ShareContextCallerParameter;
 
-public class Caller {
+public class Caller<R> {
 
     protected final FuncLinkedList funcList;
     private final CallerParameter initializationParameter;
 
     public Caller() {
         this(new FuncLinkedList(), null);
+    }
+
+    public Caller(Func0<Object> rootAct) {
+        this();
+        if(rootAct != null) {
+            funcList.add(p -> rootAct.call());
+        }
     }
 
     public Caller(CallerParameter initParameter) {
@@ -38,12 +45,12 @@ public class Caller {
         initializationParameter = initCallerParameter;
     }
 
-    public Caller call(Func1<CallerParameter, Object> func) {
+    public Caller<R> call(Func1<CallerParameter, Object> func) {
         funcList.add(func);
         return this;
     }
 
-    public Caller call(Caller caller) {
+    public Caller<R> call(Caller<?> caller) {
         if(caller == null) {
             throw new IllegalArgumentException("the parameter caller is required.");
         }
@@ -52,61 +59,36 @@ public class Caller {
         return this;
     }
 
-    public Caller into(String name, Object value) {
-        IntoCaller intoCaller = new IntoCaller(this);
+    public Caller<R> into(String name, Object value) {
+        IntoCaller<R> intoCaller = new IntoCaller<R>(this);
         intoCaller.into(name, value);
         
         funcList.add(p -> intoCaller.exec(new ShareContextCallerParameter(p.result, p.context())));
         return intoCaller;
     }
 
-    public void exec(Action1<Object> action) {
+    public void exec(Action1<R> action) {
         if(action == null) {
             throw new IllegalArgumentException("the parameter action is required.");
         }
-        Object result = exec();
+        R result = exec();
         action.apply(result);
     }
 
-    @SuppressWarnings("unchecked")
-    public <R> R exec() {
-        return (R) exec(initializationParameter);
+    public R exec() {
+        return exec(initializationParameter);
     }
     
-    protected Object exec(CallerParameter parameter) {
+    protected R exec(CallerParameter parameter) {
         CallerParameter resultParam = funcList.execute(parameter);
-        return resultParam.result;
+        return resultParam.castResult();
     }
 
-    //#region Factory Functions
+    public static class IntoCaller<R> extends Caller<R> {
 
-    public static Caller create() {
-        return new Caller();
-    }
-    
-    public static Caller create(Func0<Object> rootAct) {
-        Caller caller = create();
-        if(rootAct != null) {
-            caller.funcList.add(p -> rootAct.call());
-        }
-        return caller;
-    }
+        private final Caller<R> parentCaller;
 
-    public static Caller create(CallerParameter initParameter) {
-        return new Caller(initParameter);
-    }
-
-    public static Caller createWithContext(CallerParameter initParameter) {
-        return new Caller(initParameter, true);
-    }
-
-    //#endregion
-
-    public static class IntoCaller extends Caller {
-
-        private final Caller parentCaller;
-
-        private IntoCaller(Caller parentCaller) {
+        private IntoCaller(Caller<R> parentCaller) {
             super();
             if(parentCaller == null) {
                 throw new IllegalArgumentException("the parameter [initParameter] of constructor is required.");
@@ -115,7 +97,7 @@ public class Caller {
         }
 
         @Override
-        public Caller into(String name, Object value) {
+        public Caller<R> into(String name, Object value) {
             super.call(p -> {
                 p.context().set(name, value);
                 return p.result;
@@ -126,27 +108,27 @@ public class Caller {
         //#region implements Caller API with parentCaller
 
         @Override
-        public Caller call(Caller caller) {
+        public Caller<R> call(Caller<?> caller) {
             return parentCaller.call(caller);
         }
 
         @Override
-        public Caller call(Func1<CallerParameter, Object> func) {
+        public Caller<R> call(Func1<CallerParameter, Object> func) {
             return parentCaller.call(func);
         }
 
         @Override
-        public <R> R exec() {
+        public R exec() {
             return parentCaller.exec();
         }
 
         @Override
-        public void exec(Action1<Object> action) {
+        public void exec(Action1<R> action) {
             parentCaller.exec(action);
         }
 
         @Override
-        protected Object exec(CallerParameter parameter) {
+        protected R exec(CallerParameter parameter) {
             return super.exec(parameter);
         }
 

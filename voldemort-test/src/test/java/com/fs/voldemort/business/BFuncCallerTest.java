@@ -56,10 +56,6 @@ public class BFuncCallerTest {
                          */
                         .call(p -> p.result + "\n-> Second call!")
                         /*
-                         * 获取call链实例
-                         */
-                        .get()
-                        /*
                          * 执行call链
                          */
                         .exec();
@@ -89,7 +85,6 @@ public class BFuncCallerTest {
                             String context1 = p.context().getString("Key1");
                             return p.result + "\n-> Second call! Context key1 value:" + context1 ;
                         })
-                        .get()
                         .exec();
 
         Assert.assertEquals("-> First call! \n-> Second call! Context key1 value:First context value!", result);
@@ -125,12 +120,11 @@ public class BFuncCallerTest {
                             System.out.println(p.context().getString("Key2"));
                             return p.result + "\n->Second call!";
                         })
-                        .get()
                         .exec();
 
-//        Assert.assertEquals("-> First call\n" +
-//                "-> call TomRyderDiary\n" +
-//                "->Second call!", result);
+    //    Assert.assertEquals("-> First call\n" +
+    //            "-> call TomRyderDiary\n" +
+    //            "->Second call!", result);
     }
 
     /**
@@ -154,10 +148,9 @@ public class BFuncCallerTest {
                         .call(p->{
                             return p.result + "\n->Second call! C:Key2->" + p.context().getString("Key2");
                         })
-                        .get()
                         .exec();
 
-        System.out.println(result);
+        //System.out.println(result);
         //Assert.assertEquals("-> First call! \n-> call TomRyderDiary \n-> Second call! C:Key2->TomRyderDiary Key2 value", result);
     }
 
@@ -218,7 +211,7 @@ public class BFuncCallerTest {
                              */
                             return "p3 call result: " + ((ParallelTaskResult)p.result).getResult();
                         })
-                        .get().exec();
+                        .exec();
     }
 
     /**
@@ -253,7 +246,6 @@ public class BFuncCallerTest {
                          * 调用MarvoroGunterRing逻辑单元
                          */
                         .call(MarvoroGunterRing.class)
-                        .get()
                         .exec();
 
         System.out.println(result);
@@ -304,8 +296,8 @@ public class BFuncCallerTest {
                     Assert.assertEquals(c.get("C1"),"VC1");
                     return null;
                 })
-                .get()
                 .exec();
+        Assert.assertTrue(result == null);
     }
 
     /**
@@ -348,7 +340,6 @@ public class BFuncCallerTest {
                             Assert.assertEquals(null_name,null);
                             return null;
                         })
-                        .get()
                         .exec();
     }
 }

@@ -13,7 +13,7 @@ public class ParallelCallerTest {
     @Test
     public void test_ParallelCaller() {
         long time = System.currentTimeMillis();
-        Object result = ParallelCaller.create()
+        ParallelTaskResult result = new ParallelCaller()
                 .call(p -> {
                     ThreadUtils.sleep(2000L);
                     return 1;
@@ -31,19 +31,18 @@ public class ParallelCallerTest {
         long expendTime = System.currentTimeMillis() - time;
         Assert.assertTrue(expendTime < 6000L);
 
-        ParallelTaskResult parallelTaskResult = (ParallelTaskResult) result;
-        Assert.assertTrue(Integer.valueOf(1).equals(parallelTaskResult.getResult()));
-        Assert.assertTrue(Integer.valueOf(2).equals(parallelTaskResult.getResult()));
-        Assert.assertTrue(Integer.valueOf(3).equals(parallelTaskResult.getResult()));
+        Assert.assertTrue(Integer.valueOf(1).equals(result.getResult()));
+        Assert.assertTrue(Integer.valueOf(2).equals(result.getResult()));
+        Assert.assertTrue(Integer.valueOf(3).equals(result.getResult()));
     }
 
     @Test
     public void test_CallerWithParallel() {
-        Object result = Caller.create()
+        BigDecimal result = new Caller<BigDecimal>()
             .call(p -> 1)
             .call(p -> new BigDecimal("3").add(new BigDecimal(p.result.toString())))
             .call(
-                ParallelCaller.create()
+                new ParallelCaller()
                     .call(p -> p.result)
                     .call(p -> {
                         ThreadUtils.sleep(3000L);

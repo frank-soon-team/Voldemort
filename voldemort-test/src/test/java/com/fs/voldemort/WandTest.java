@@ -1,7 +1,6 @@
 package com.fs.voldemort;
 
 import java.math.BigDecimal;
-import java.util.function.Function;
 
 import com.fs.voldemort.parallel.ParallelTaskResult;
 import com.fs.voldemort.utilies.ThreadUtils;
@@ -13,7 +12,7 @@ public class WandTest {
 
     @Test
     public void test_wandBasic() {
-        Object result = Wand.caller()
+        BigDecimal result = Wand.caller()
             .call(p -> 1)
             .call(p -> new BigDecimal("3").add(new BigDecimal(p.result.toString())))
             .sub()
@@ -39,10 +38,9 @@ public class WandTest {
                     .add(new BigDecimal(parallelTaskResult.getResult().toString()))
                     .add(new BigDecimal(parallelTaskResult.getResult().toString()));
             })
-            .get()
             .exec();
 
-        Assert.assertTrue(((BigDecimal)result).equals(new BigDecimal("10")));
+        Assert.assertTrue(result.equals(new BigDecimal("10")));
     }
 
     @Test
