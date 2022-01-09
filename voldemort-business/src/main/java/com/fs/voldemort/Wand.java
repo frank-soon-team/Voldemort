@@ -85,7 +85,7 @@ public interface Wand {
             if(action == null) {
                 throw new IllegalArgumentException("the parameter action is required.");
             }
-            Object result = exec();
+            Object result = get().exec();
             action.apply(result);
         }
 
@@ -208,45 +208,45 @@ public interface Wand {
             return new WandBridge<>(this);
         }
 
-        public BusinessWand<P> callFitly(Func1<?,?> func) {
+        public BusinessWand<P> callFitly(Func1<?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> callFitly(Func2<?,?,?> func) {
+        public BusinessWand<P> callFitly(Func2<?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> callFitly(Func3<?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func3<?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> callFitly(Func4<?,?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func4<?, ?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> callFitly(Func5<?,?,?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func5<?, ?, ?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> callFitly(Func6<?,?,?,?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func6<?, ?, ?, ?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
 
-        public BusinessWand<P> callFitly(Func7<?,?,?,?,?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func7<?, ?, ?, ?, ?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
-        public BusinessWand<P> callFitly(Func8<?,?,?,?,?,?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func8<?, ?, ?, ?, ?, ?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }
-        public BusinessWand<P> callFitly(Func9<?,?,?,?,?,?,?,?,?,?> func) {
+        public BusinessWand<P> callFitly(Func9<?, ?, ?, ?, ?, ?, ?, ?, ?, ?> func) {
             ((BFuncCaller) get()).callFitly(func);
             return this;
         }

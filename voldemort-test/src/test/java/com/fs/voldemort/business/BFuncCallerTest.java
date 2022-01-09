@@ -222,31 +222,32 @@ public class BFuncCallerTest {
         init();
 
         String result =
-                Wand.business()
-                        .call(p->"Begin!")
-                        .call(HutchpatchGoldenCup.class)
-                        .call(Nagini.class)
-                        .sub().parallel()
-                        .sub().parallel()
-                        .call(p->p.result + "Sub Parallel Thread1:" + Thread.currentThread().getName())
-                        .call(p->p.result + "Sub Parallel Thread2:" + Thread.currentThread().getName())
-                        .end()
-                        .call(RoinaRavenclawCrown.class)
-                        .end()
-                        .call(p->{
-                            p.context().set("c3","C3!!!");
-                            ParallelTaskResult p1 = (ParallelTaskResult)((ParallelTaskResult)p.result).getResult();
-                            String p2 = ((ParallelTaskResult)p.result).getResult().toString();
+                Wand
+                    .business()
+                    .call(p->"Begin!")
+                    .call(HutchpatchGoldenCup.class)
+                    .call(Nagini.class)
+                    .sub().parallel()
+                    .sub().parallel()
+                    .call(p->p.result + "Sub Parallel Thread1:" + Thread.currentThread().getName())
+                    .call(p->p.result + "Sub Parallel Thread2:" + Thread.currentThread().getName())
+                    .end()
+                    .call(RoinaRavenclawCrown.class)
+                    .end()
+                    .call(p->{
+                        p.context().set("c3","C3!!!");
+                        ParallelTaskResult p1 = (ParallelTaskResult)((ParallelTaskResult)p.result).getResult();
+                        String p2 = ((ParallelTaskResult)p.result).getResult().toString();
 
-                            System.out.println("SP1 call result: " + p1.getResult());
-                            System.out.println("SP2 call result: " + p1.getResult());
-                            return "\nRoinaRavenclawCrown Parallel call result: " + p2;
-                        })
-                        /*
-                         * 调用MarvoroGunterRing逻辑单元
-                         */
-                        .call(MarvoroGunterRing.class)
-                        .exec();
+                        System.out.println("SP1 call result: " + p1.getResult());
+                        System.out.println("SP2 call result: " + p1.getResult());
+                        return "\nRoinaRavenclawCrown Parallel call result: " + p2;
+                    })
+                    /*
+                     * 调用MarvoroGunterRing逻辑单元
+                     */
+                    .call(MarvoroGunterRing.class)
+                    .exec();
 
         System.out.println(result);
     }
@@ -317,29 +318,29 @@ public class BFuncCallerTest {
 
     private String callFitly() {
         return Wand
-                        .business()
-                        .call(p->{
-                            p.context().set("name","v_name");
-                            return "-> First call";
-                        })
-                        .callFitly((AService aService, CMapper cMapper)->{
-                            aService.aMethod();
-                            cMapper.cMethod();
-                            return null;
-                        })
-                        .callFitly((@ContextOnly String name, @ContainerOnly CMapper cMapper)->{
-                            Assert.assertEquals(name,"v_name");
-                            Assert.assertEquals(cMapper.cMethod(), "cMethod check");
-                            return null;
-                        })
-                        .callFitly((@ContextOnly @Default("d_name") String d_name)->{
-                            Assert.assertEquals(d_name,"d_name");
-                            return null;
-                        })
-                        .callFitly((@ContextOnly String null_name)->{
-                            Assert.assertEquals(null_name,null);
-                            return null;
-                        })
-                        .exec();
+                .business()
+                .call(p->{
+                    p.context().set("name","v_name");
+                    return "-> First call";
+                })
+                .callFitly((AService aService, CMapper cMapper)->{
+                    aService.aMethod();
+                    cMapper.cMethod();
+                    return null;
+                })
+                .callFitly((@ContextOnly String name, @ContainerOnly CMapper cMapper)->{
+                    Assert.assertEquals(name,"v_name");
+                    Assert.assertEquals(cMapper.cMethod(), "cMethod check");
+                    return null;
+                })
+                .callFitly((@ContextOnly @Default("d_name") String d_name)->{
+                    Assert.assertEquals(d_name,"d_name");
+                    return null;
+                })
+                .callFitly((@ContextOnly String null_name)->{
+                    Assert.assertEquals(null_name,null);
+                    return null;
+                })
+                .exec();
     }
 }
