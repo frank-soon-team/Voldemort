@@ -19,7 +19,7 @@ public class TCCCallerTest {
     
     @Test
     public void test_TCCCaller() {
-        TCCCaller.create(buildMananger())
+        new TCCCaller(buildMananger())
             .call(
                 createHandler(
                     "Coupon", 
@@ -48,7 +48,7 @@ public class TCCCallerTest {
     @Test
     public void test_TCC_Success() {
         int[] value = new int[] { 0 };
-        TCCCaller tccCaller = TCCCaller.create(buildMananger(), value);
+        TCCCaller tccCaller = new TCCCaller(buildMananger(), value);
         tccCaller
             .call(
                 createHandler(
@@ -112,7 +112,7 @@ public class TCCCallerTest {
     @Test
     public void test_TCC_Rollback() {
         int[] value = new int[] { 0 };
-        TCCCaller tccCaller = TCCCaller.create(buildMananger(), value);
+        TCCCaller tccCaller = new TCCCaller(buildMananger(), value);
         tccCaller
             .call(
                 createHandler(
