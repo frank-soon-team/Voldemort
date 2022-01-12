@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * @author frank
  */
-public class BFuncAvailableCaller extends Caller {
+public class BFuncAvailableCaller extends Caller<Object> {
 
     protected static Func1<Class<?>, BFunc> getFunc;
 

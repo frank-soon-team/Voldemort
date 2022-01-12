@@ -1,7 +1,6 @@
 package com.fs.voldemort.business.horcruxes;
 
 import com.fs.voldemort.business.support.*;
-import com.fs.voldemort.core.functional.action.Action2;
 
 @LogicCell
 public class Nagini{

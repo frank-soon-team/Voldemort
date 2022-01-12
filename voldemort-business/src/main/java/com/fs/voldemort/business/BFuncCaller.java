@@ -19,14 +19,14 @@ import java.util.Collection;
  *
  * @author frank
  */
-public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCaller> {
+public class BFuncCaller<R> extends Caller<R> implements ICallWithParameter<BFuncCaller<R>> {
 
     public BFuncCaller() {
         super(new BFuncLinkedList());
     }
 
     @Override
-    public BFuncCaller call(Class<?> funcClazz, NodeParam... params) {
+    public BFuncCaller<R> call(Class<?> funcClazz, NodeParam... params) {
         ((BFuncLinkedList) this.funcList).add(p -> BFuncManager.invokeFunc(p, funcClazz), params);
         return this;
     }
@@ -38,61 +38,61 @@ public class BFuncCaller extends Caller implements ICallWithParameter<BFuncCalle
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func1 func) {
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func1 func) {
         super.call(generateShellFunc(func, args -> func.call(args[0])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func2 func) {
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func2 func) {
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func3 func) {
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func3 func) {
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func4 func){
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func4 func){
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func5 func){
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func5 func){
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func6 func){
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func6 func){
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func7 func){
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func7 func){
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5],args[6])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func8 func){
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func8 func){
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7])));
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public BFuncCaller callFitly(@SuppressWarnings("rawtypes") Func9 func){
+    public BFuncCaller<R> callFitly(@SuppressWarnings("rawtypes") Func9 func){
         super.call(generateShellFunc(func, args -> func.call(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])));
         return this;
     }
 
-    public static BFuncCaller create() {
-        return new BFuncCaller();
+    public static <R> BFuncCaller<R> create() {
+        return new BFuncCaller<R>();
     }
 
     static class BFuncLinkedList extends FuncLinkedList {

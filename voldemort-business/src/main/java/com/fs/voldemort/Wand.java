@@ -22,7 +22,7 @@ public interface Wand {
     }
 
     public static BusinessWand<?> business() {
-        return new BusinessWand<>(new BFuncCaller());
+        return new BusinessWand<>(new BFuncCaller<Object>());
     }
     
     static class WandBridge<P extends BaseWand<?>> {
@@ -46,7 +46,7 @@ public interface Wand {
         }
 
         public BusinessWand<P> business() {
-            return new BusinessWand<P>(new BFuncCaller(), parentWand);
+            return new BusinessWand<P>(new BFuncCaller<Object>(), parentWand);
         }
 
     }
@@ -166,11 +166,11 @@ public interface Wand {
 
     static class BusinessWand<P extends BaseWand<?>> extends BaseWand<P> {
 
-        public BusinessWand(BFuncCaller caller) {
+        public BusinessWand(BFuncCaller<Object> caller) {
             this(caller, null);
         }
 
-        protected BusinessWand(BFuncCaller caller, P parentWand) {
+        protected BusinessWand(BFuncCaller<Object> caller, P parentWand) {
             super(caller, parentWand);
         }
 
@@ -194,13 +194,15 @@ public interface Wand {
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> call(Class<?> funcClazz) {
-            ((BFuncCaller) get()).call(funcClazz);
+            ((BFuncCaller<Object>) get()).call(funcClazz);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> call(Class<?> funcClazz, NodeParam...params) {
-            ((BFuncCaller) get()).call(funcClazz, params);
+            ((BFuncCaller<Object>) get()).call(funcClazz, params);
             return this;
         }
 
@@ -208,46 +210,57 @@ public interface Wand {
             return new WandBridge<>(this);
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func1<?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func2<?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func3<?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func4<?, ?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func5<?, ?, ?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func6<?, ?, ?, ?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
 
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func7<?, ?, ?, ?, ?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
+
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func8<?, ?, ?, ?, ?, ?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
+
+        @SuppressWarnings("unchecked")
         public BusinessWand<P> callFitly(Func9<?, ?, ?, ?, ?, ?, ?, ?, ?, ?> func) {
-            ((BFuncCaller) get()).callFitly(func);
+            ((BFuncCaller<Object>) get()).callFitly(func);
             return this;
         }
     }

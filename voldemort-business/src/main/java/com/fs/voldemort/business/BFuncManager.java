@@ -13,7 +13,7 @@ public class BFuncManager {
 
     protected static Func1<String,?> f_getIocInstanceByName;
 
-    protected static Func1<Class,?> f_getIocInstanceByClass;
+    protected static Func1<Class<?>,?> f_getIocInstanceByClass;
 
     public static void initByAnnotation(Func1<Class<? extends Annotation>, Collection<Object>> getBusinessFuncHorcruxesFunc) {
         f_getBFunc = new BFuncContainer().init(getBusinessFuncHorcruxesFunc).getFunc();
@@ -23,12 +23,12 @@ public class BFuncManager {
         f_getBFunc = new BFuncContainer().init(businessFuncHorcruxesFuncCollection).getFunc();
     }
 
-    public static void initIocInstanceGetFunc(Func1<Class,?> getIocInstanceByClazzFunc, Func1<String,?> getIocInstanceByNameFunc) {
+    public static void initIocInstanceGetFunc(Func1<Class<?>,?> getIocInstanceByClazzFunc, Func1<String,?> getIocInstanceByNameFunc) {
         BFuncManager.f_getIocInstanceByClass = getIocInstanceByClazzFunc;
         BFuncManager.f_getIocInstanceByName = getIocInstanceByNameFunc;
     }
 
-    public static Object getIocInstanceByClazz(Class clazz) {
+    public static Object getIocInstanceByClazz(Class<?> clazz) {
         if(f_getIocInstanceByClass == null) {
             throw new BusinessFuncInitializationException("Can not get ioc instance, please ensure BFuncManager#initGetBeanFunc has been invoked!");
         }
