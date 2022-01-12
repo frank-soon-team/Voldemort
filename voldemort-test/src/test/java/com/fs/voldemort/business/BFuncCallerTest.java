@@ -14,6 +14,8 @@ import com.fs.voldemort.parallel.ParallelTaskResult;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -125,6 +127,7 @@ public class BFuncCallerTest {
     //    Assert.assertEquals("-> First call\n" +
     //            "-> call TomRyderDiary\n" +
     //            "->Second call!", result);
+        assertNotNull(result); 
     }
 
     /**
@@ -152,6 +155,7 @@ public class BFuncCallerTest {
 
         //System.out.println(result);
         //Assert.assertEquals("-> First call! \n-> call TomRyderDiary \n-> Second call! C:Key2->TomRyderDiary Key2 value", result);
+        assertNotNull(result);
     }
 
     /**
@@ -212,6 +216,7 @@ public class BFuncCallerTest {
                             return "p3 call result: " + ((ParallelTaskResult)p.result).getResult();
                         })
                         .exec();
+        assertNotNull(result);
     }
 
     /**
@@ -250,6 +255,7 @@ public class BFuncCallerTest {
                     .exec();
 
         System.out.println(result);
+        assertNotNull(result);
     }
 
 

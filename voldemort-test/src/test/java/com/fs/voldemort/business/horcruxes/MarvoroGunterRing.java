@@ -1,8 +1,6 @@
 package com.fs.voldemort.business.horcruxes;
 
-import com.fs.voldemort.business.support.BFuncHorcruxes;
 import com.fs.voldemort.business.support.BFunc;
-import com.fs.voldemort.business.support.BFuncOperate;
 import com.fs.voldemort.business.support.LogicCell;
 
 @LogicCell

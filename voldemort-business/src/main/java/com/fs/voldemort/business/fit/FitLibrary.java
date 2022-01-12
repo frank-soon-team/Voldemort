@@ -12,7 +12,6 @@ import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,7 +70,7 @@ public class FitLibrary {
 
     public static final Func2<Collection<ParamFindResult>, FitContext, Collection<?>> f_lambdaFit = (paramFindResults,fitContext) -> {
         
-        final Collection args = new LinkedList<>();
+        final Collection<Object> args = new LinkedList<>();
 
         for (ParamFindResult paramFindResult : paramFindResults) {
 

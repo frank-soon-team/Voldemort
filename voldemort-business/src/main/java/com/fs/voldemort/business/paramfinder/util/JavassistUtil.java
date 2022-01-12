@@ -1,7 +1,6 @@
 package com.fs.voldemort.business.paramfinder.util;
 
 import com.fs.voldemort.business.paramfinder.ParamFindResult;
-import com.fs.voldemort.business.paramfinder.ParamFindResultStore;
 import com.fs.voldemort.business.paramfinder.SimpleFindResult;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -25,7 +24,7 @@ public class JavassistUtil {
             throw new IllegalArgumentException("Method Cannot be null!");
         }
         final String methodName = method.getName();
-        final Class clazz = method.getDeclaringClass();
+        final Class<?> clazz = method.getDeclaringClass();
         final AnnotatedType[] at = method.getAnnotatedParameterTypes();
 
         CtMethod cm = ClassPool.getDefault().get(clazz.getName()).getDeclaredMethod(methodName);

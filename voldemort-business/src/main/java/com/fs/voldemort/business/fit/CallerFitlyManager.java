@@ -12,7 +12,7 @@ public class CallerFitlyManager {
 
     private static boolean isInitialized = false;
 
-    private static final Map<Class,FitArg> callerFitlyAnnotationMap = new ConcurrentHashMap<>();
+    private static final Map<Class<?>,FitArg> callerFitlyAnnotationMap = new ConcurrentHashMap<>();
 
     private static final String CALL_FIT_ANNOTATION_FIELD_NAME = "f_getArg";
 
@@ -43,21 +43,21 @@ public class CallerFitlyManager {
         })));
     }
 
-    public static FitArg getFitArg(Class fitAnnotationClazz) {
+    public static FitArg getFitArg(Class<?> fitAnnotationClazz) {
         if(!isInitialized) {
             throw new FitException("CallerFitlyManager uninitialized, please check!");
         }
         return callerFitlyAnnotationMap.get(fitAnnotationClazz);
     }
 
-    public static Set<Class> getAllFitAnnotation() {
+    public static Set<Class<?>> getAllFitAnnotation() {
         if(!isInitialized) {
             throw new FitException("CallerFitlyManager uninitialized, please check!");
         }
         return callerFitlyAnnotationMap.keySet();
     }
 
-    public static boolean containFitAnnotation(Class fitAnnotationClazz) {
+    public static boolean containFitAnnotation(Class<?> fitAnnotationClazz) {
         return callerFitlyAnnotationMap.containsKey(fitAnnotationClazz);
     }
 }
