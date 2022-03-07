@@ -7,5 +7,7 @@ public interface IBusinessSupportGear {
     String getTraceID(CallerContext context);
 
     String getBizCode(CallerContext context);
+
+    void setTransactionId(String transactionId);
     
 }

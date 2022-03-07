@@ -2,6 +2,7 @@ package com.fs.voldemort.tcc.exception;
 
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
+import com.fs.voldemort.tcc.node.TCCNode;
 
 public class ExecuteCallerNodeException extends IllegalStateException {
 
@@ -11,14 +12,17 @@ public class ExecuteCallerNodeException extends IllegalStateException {
 
     private String name;
 
-    public ExecuteCallerNodeException(Throwable e, CallerNode node, CallerParameter parameter) {
-        this(e, node, null, parameter);
+    public ExecuteCallerNodeException(Throwable e, CallerNode node) {
+        this(e, node, null);
     }
 
-    public ExecuteCallerNodeException(Throwable e, CallerNode node, String name, CallerParameter parameter) {
+    public ExecuteCallerNodeException(Throwable e, CallerNode node, CallerParameter parameter) {
         super(e);
         this.node = node;
         this.parameter = parameter;
+        if(node instanceof TCCNode) {
+            this.name = ((TCCNode) node).getName();
+        }
     }
 
     public CallerNode getNode() {
@@ -31,6 +35,19 @@ public class ExecuteCallerNodeException extends IllegalStateException {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getMessage() {
+        if(node instanceof TCCNode) {
+            TCCNode tccNode = (TCCNode) node;
+            return String.format("[%s][%s][%d], %s", 
+                name, 
+                tccNode.getStatus().getStage(), 
+                tccNode.getStatus().getValue(), 
+                super.getMessage());
+        }
+        return super.getMessage();
     }
     
 }

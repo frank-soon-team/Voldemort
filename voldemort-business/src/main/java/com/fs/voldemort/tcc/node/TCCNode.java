@@ -1,6 +1,7 @@
 package com.fs.voldemort.tcc.node;
 
 import com.fs.voldemort.core.support.CallerNode;
+import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.state.TCCStatus;
 
 public class TCCNode extends CallerNode {
@@ -8,6 +9,7 @@ public class TCCNode extends CallerNode {
     private final ITCCHandler tccHandler;
     private TCCNodeParameter nodeParameter;
     private TCCStatus status;
+    private ExecuteCallerNodeException error;
 
     public TCCNode(ITCCHandler tccHandler) {
         this(tccHandler, TCCStatus.Initail);
@@ -51,6 +53,14 @@ public class TCCNode extends CallerNode {
 
     public void setStatus(TCCStatus status) {
         this.status = status;
+    }
+
+    public ExecuteCallerNodeException getError() {
+        return error;
+    }
+
+    public void setError(ExecuteCallerNodeException error) {
+        this.error = error;
     }
 
     public String getName() {

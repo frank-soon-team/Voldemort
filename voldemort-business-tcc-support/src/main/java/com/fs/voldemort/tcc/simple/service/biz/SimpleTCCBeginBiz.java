@@ -15,7 +15,6 @@ public class SimpleTCCBeginBiz extends BaseTCCBiz implements Action1<ITCCState> 
         ISerializeGear serializeGear) {
 
         super(repositoryGear, serializeGear);
-
     }
 
     public SimpleTCCBeginBiz(

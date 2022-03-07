@@ -4,12 +4,16 @@ import java.io.Serializable;
 
 public class TCCTaskNode implements Serializable {
 
+    /** TCC 节点名称 */
     private String nodeName;
 
+    /** TCC 节点参数 */
     private String nodeParamStr;
 
+    /** TCC 节点状态码 */
     private int statusCode;
 
+    /** 节点错误信息 */
     private String errorMessage;
 
     public String getNodeName() {

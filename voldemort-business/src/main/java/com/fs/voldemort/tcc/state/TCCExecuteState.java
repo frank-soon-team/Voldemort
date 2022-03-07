@@ -21,7 +21,7 @@ public class TCCExecuteState implements ITCCState {
     private TCCStatus status = TCCStatus.Initail;
     // 待提交、待回滚列表
     private final List<TCCNode> tccNodeList;
-    // 异常列表
+    // Caller执行异常列表
     private final List<ExecuteCallerNodeException> errorCollection;
     // TCC状态异常
     private TCCStateException stateException;
@@ -173,25 +173,31 @@ public class TCCExecuteState implements ITCCState {
             return;
         }
 
-        List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
+        TCCStatus status = getStatus();
+        if(status == TCCStatus.TrySuccess || status == TCCStatus.ConfirmFailed || status == TCCStatus.ConfirmTimeout) {
+            List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
 
-        for (TCCNode tccNode : triedNodeList) {
-            if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
-                continue;
+            for (TCCNode tccNode : triedNodeList) {
+                if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
+                    continue;
+                }
+                try {
+                    tccNode.doConfirm();
+                    tccNode.setStatus(TCCStatus.ConfirmSuccess);
+                } catch(RuntimeException e) {
+                    tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
+                    tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
+                    commitFailedList.add(tccNode);
+                }
             }
-            try {
-                tccNode.doConfirm();
-                tccNode.setStatus(TCCStatus.ConfirmSuccess);
-            } catch(RuntimeException e) {
-                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
-                commitFailedList.add(tccNode);
-            }
-        }
 
-        if(commitFailedList.isEmpty()) {
-            setStatus(TCCStatus.ConfirmSuccess);
+            if(commitFailedList.isEmpty()) {
+                setStatus(TCCStatus.ConfirmSuccess);
+            } else {
+                setStatus(TCCStatus.ConfirmFailed);
+            }
         } else {
-            setStatus(TCCStatus.ConfirmFailed);
+            throw new TCCStateException("TCC confirm stage error", TCCStatus.TrySuccess.getValue(), getStatus().getValue());
         }
     }
 
@@ -201,27 +207,33 @@ public class TCCExecuteState implements ITCCState {
             return;
         }
 
-        int count = triedNodeList.size();
-        List<TCCNode> rollbackFailedList = new ArrayList<>(count);
+        TCCStatus status = getStatus();
+        if(status == TCCStatus.TryFaild || status == TCCStatus.CancelFailed || status == TCCStatus.CancelTimeout) {
+            int count = triedNodeList.size();
+            List<TCCNode> rollbackFailedList = new ArrayList<>(count);
 
-        for(int i = count - 1; i >= 0; i--) {
-            TCCNode tccNode = triedNodeList.get(i);
-            if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
-                continue;
+            for(int i = count - 1; i >= 0; i--) {
+                TCCNode tccNode = triedNodeList.get(i);
+                if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
+                    continue;
+                }
+                try {
+                    tccNode.doCancel();
+                    tccNode.setStatus(TCCStatus.CancelSuccess);
+                } catch(RuntimeException e) {
+                    tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
+                    tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
+                    rollbackFailedList.add(tccNode);
+                }
             }
-            try {
-                tccNode.doCancel();
-                tccNode.setStatus(TCCStatus.CancelSuccess);
-            } catch(RuntimeException e) {
-                tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
-                rollbackFailedList.add(tccNode);
-            }
-        }
 
-        if(rollbackFailedList.isEmpty()) {
-            setStatus(TCCStatus.CancelSuccess);
+            if(rollbackFailedList.isEmpty()) {
+                setStatus(TCCStatus.CancelSuccess);
+            } else {
+                setStatus(TCCStatus.CancelFailed);
+            }
         } else {
-            setStatus(TCCStatus.CancelFailed);
+            throw new TCCStateException("TCC cancel stage error", TCCStatus.TrySuccess.getValue(), getStatus().getValue());
         }
     }
 

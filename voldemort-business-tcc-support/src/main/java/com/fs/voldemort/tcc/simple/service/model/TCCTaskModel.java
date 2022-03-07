@@ -6,18 +6,28 @@ import java.util.List;
 
 public class TCCTaskModel implements Serializable {
 
+    /** TCC 任务唯一标识 */
     private String transactionId;
 
+    /** TCC 阶段标识 */
+    private String stage;
+
+    /** TCC 任务当前状态 */
     private int statusCode;
     
+    /** TCC 执行参数 */
     private String paramStr;
 
+    /** TCC 任务状态描述 */
     private String statusDescription;
 
-    private int retryTimes;
+    /** 重试次数 */
+    private int retryTimes = 0;
 
+    /** 跟踪ID */
     private String traceId;
 
+    /** 业务编号，用于标识业务 */
     private String bizCode;
 
     private List<TCCTaskNode> nodeList;
@@ -28,6 +38,14 @@ public class TCCTaskModel implements Serializable {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public String getStage() {
+        return stage;
+    }
+
+    public void setStage(String stage) {
+        this.stage = stage;
     }
 
     public int getStatusCode() {

@@ -26,6 +26,18 @@ public enum TCCStatus {
         return value;
     }
 
+    public String getStage() {
+        if(value == 1) {
+            return TCCStage.INITIAL;
+        } else if(value >= 10 && value <= 20) {
+            return TCCStage.TRY;
+        } else if (value >= 20 && value <= 30) {
+            return TCCStage.CONFIRM;
+        } else {
+            return TCCStage.CANCEL;
+        }
+    }
+
     public static TCCStatus valueOf(int value) {
         TCCStatus[] values = values();
         for(int i = 0; i < values.length; i++) {
