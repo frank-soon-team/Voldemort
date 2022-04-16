@@ -1,15 +1,16 @@
 package com.fs.voldemort.tcc;
 
+import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.tcc.state.IStateManager;
-import com.fs.voldemort.tcc.strategy.ICancelCompensateStrategy;
-import com.fs.voldemort.tcc.strategy.IConfirmCompensateStrategy;
+import com.fs.voldemort.tcc.state.ITCCState;
+import com.fs.voldemort.tcc.strategy.ICompensateStrategy;
 
 public interface ITCCManagerAdapter {
 
     IStateManager getStateManager();
 
-    IConfirmCompensateStrategy getConfirmCompensateStrategy();
+    ICompensateStrategy getCompensateStrategy();
 
-    ICancelCompensateStrategy getCancelCompensateStrategy();
+    Func0<ITCCState> getTCCStateGetter();
     
 }

@@ -10,15 +10,16 @@ import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.exception.TCCStateException;
-import com.fs.voldemort.tcc.exception.TCCTimeoutException;
 import com.fs.voldemort.tcc.node.TCCNode;
 
 public class TCCExecuteState implements ITCCState {
 
     // TCC事务ID
     private final String tccTransactionId;
-    // 当前执行状态
-    private TCCStatus status = TCCStatus.Initail;
+    // TCC任务状态
+    private TCCTaskStatus taskStatus = TCCTaskStatus.Start;
+    // TCC状态
+    private TCCStatus status = TCCStatus.TryPending;
     // 待提交、待回滚列表
     private final List<TCCNode> tccNodeList;
     // Caller执行异常列表
@@ -45,10 +46,8 @@ public class TCCExecuteState implements ITCCState {
         errorCollection = new ArrayList<>(size);
     }
 
-    //#region ITCCState
-
     @Override
-    public String identify() {
+    public String getTCCTransactionId() {
         return this.tccTransactionId;
     }
 
@@ -79,7 +78,18 @@ public class TCCExecuteState implements ITCCState {
     public TCCStatus getStatus() {
         return status;
     }
-    
+
+    public void setTaskStatus(TCCTaskStatus taskStatus) {
+        if(taskStatus == null) {
+            throw new IllegalArgumentException("the parameter taskStatus is required.");
+        }
+        this.taskStatus = taskStatus;
+    }
+
+    @Override
+    public TCCTaskStatus getTaskStatus() {
+        return taskStatus;
+    }
 
     @Override
     public void collectExceptional(ExecuteCallerNodeException e) {
@@ -111,7 +121,7 @@ public class TCCExecuteState implements ITCCState {
     @Override
     public List<TCCNode> getTriedNodeList() {
         return tccNodeList.stream()
-                    .filter(n -> n.getStatus() != TCCStatus.Initail)
+                    .filter(n -> n.getStatus() != TCCStatus.TryPending)
                     .collect(Collectors.toList());
     }
 
@@ -163,79 +173,4 @@ public class TCCExecuteState implements ITCCState {
         return context;
     }
 
-    //#endregion
-
-    //#region Transaction Action
-
-    public void commit() {
-        List<TCCNode> triedNodeList = getTriedNodeList();
-        if(triedNodeList == null || triedNodeList.isEmpty()) {
-            return;
-        }
-
-        TCCStatus status = getStatus();
-        if(status == TCCStatus.TrySuccess || status == TCCStatus.ConfirmFailed || status == TCCStatus.ConfirmTimeout) {
-            List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
-
-            for (TCCNode tccNode : triedNodeList) {
-                if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
-                    continue;
-                }
-                try {
-                    tccNode.doConfirm();
-                    tccNode.setStatus(TCCStatus.ConfirmSuccess);
-                } catch(RuntimeException e) {
-                    tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
-                    tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
-                    commitFailedList.add(tccNode);
-                }
-            }
-
-            if(commitFailedList.isEmpty()) {
-                setStatus(TCCStatus.ConfirmSuccess);
-            } else {
-                setStatus(TCCStatus.ConfirmFailed);
-            }
-        } else {
-            throw new TCCStateException("TCC confirm stage error", TCCStatus.TrySuccess.getValue(), getStatus().getValue());
-        }
-    }
-
-    public void rollback() {
-        List<TCCNode> triedNodeList = getTriedNodeList();
-        if(triedNodeList == null || triedNodeList.isEmpty()) {
-            return;
-        }
-
-        TCCStatus status = getStatus();
-        if(status == TCCStatus.TryFaild || status == TCCStatus.CancelFailed || status == TCCStatus.CancelTimeout) {
-            int count = triedNodeList.size();
-            List<TCCNode> rollbackFailedList = new ArrayList<>(count);
-
-            for(int i = count - 1; i >= 0; i--) {
-                TCCNode tccNode = triedNodeList.get(i);
-                if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
-                    continue;
-                }
-                try {
-                    tccNode.doCancel();
-                    tccNode.setStatus(TCCStatus.CancelSuccess);
-                } catch(RuntimeException e) {
-                    tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
-                    tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
-                    rollbackFailedList.add(tccNode);
-                }
-            }
-
-            if(rollbackFailedList.isEmpty()) {
-                setStatus(TCCStatus.CancelSuccess);
-            } else {
-                setStatus(TCCStatus.CancelFailed);
-            }
-        } else {
-            throw new TCCStateException("TCC cancel stage error", TCCStatus.TrySuccess.getValue(), getStatus().getValue());
-        }
-    }
-
-    //#endregion
 }

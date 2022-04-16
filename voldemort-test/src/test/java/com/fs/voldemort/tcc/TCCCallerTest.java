@@ -8,9 +8,12 @@ import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCStateBiz;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
 import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
+import com.fs.voldemort.tcc.simple.service.model.Transfer;
+import com.fs.voldemort.tcc.state.ITCCState;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -212,6 +215,11 @@ public class TCCCallerTest {
                         System.out.println("update TCCTaskModel");
                         return true;
                     }
+
+                    @Override
+                    public TCCTaskModel get(String tccTransactionId) {
+                        return null;
+                    }
                     
                 })
                 .setSerializeGear(new ISerializeGear(){
@@ -237,6 +245,12 @@ public class TCCCallerTest {
         //     .setTCCConfirmRetryBiz(new SimpleTCCConfirmRetryBiz())
         //     .setTCCCancelRetryBiz(new SimpleTCCCancelRetryBiz())
         //     .build();
+    }
+
+    public void loadTCCExecuteState() {
+        String tccTransactionId = "";
+        SimpleTCCStateBiz tccStateBiz = new SimpleTCCStateBiz(null, null);
+        ITCCState tccState = tccStateBiz.call(tccTransactionId);
     }
 
 }

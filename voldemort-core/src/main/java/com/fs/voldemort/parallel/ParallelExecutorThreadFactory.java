@@ -19,8 +19,7 @@ public class ParallelExecutorThreadFactory implements ThreadFactory {
         this.prefix = name + "-";
         this.daemon = daemon;
 
-        SecurityManager securityManager = System.getSecurityManager();
-        this.group = securityManager == null ? Thread.currentThread().getThreadGroup() : securityManager.getThreadGroup();
+        this.group = Thread.currentThread().getThreadGroup();
     }
 
     @Override

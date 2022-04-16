@@ -75,6 +75,10 @@ public class FuncLinkedList {
     public int size() {
         return _size;
     }
+
+    public boolean isEmpty() {
+        return firstNode == null;
+    }
     
     protected CallerParameter ensureCallerParameter(CallerParameter parameter) {
         CallerParameter result = null;

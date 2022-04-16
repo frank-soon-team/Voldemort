@@ -1,21 +1,28 @@
 package com.fs.voldemort.tcc.simple;
 
+import com.fs.voldemort.core.functional.func.Func0;
+import com.fs.voldemort.tcc.ITCCManagerAdapter;
 import com.fs.voldemort.tcc.TCCManager;
-import com.fs.voldemort.tcc.simple.adapter.SimpleCancelCompensateAdapter;
 import com.fs.voldemort.tcc.simple.adapter.SimpleStateManagerAdapter;
-import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCCancelRetryBiz;
 import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCBeginBiz;
-import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCConfirmRetryBiz;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCCompensateBiz;
 import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCEndBiz;
+import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCStateBiz;
 import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCUpdateBiz;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
-import com.fs.voldemort.tcc.simple.adapter.SimpleConfirmCompensateAdapter;
+import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
+import com.fs.voldemort.tcc.simple.service.model.Transfer;
+import com.fs.voldemort.tcc.state.IStateManager;
+import com.fs.voldemort.tcc.state.ITCCState;
+import com.fs.voldemort.tcc.strategy.ICompensateStrategy;
+import com.fs.voldemort.tcc.simple.adapter.SimpleCompensateAdapter;
 
 public class SimpleTCCManager extends TCCManager {
 
-    private SimpleTCCManager() {
+    private SimpleTCCManager(ITCCManagerAdapter adapter) {
+        super(adapter);
     }
 
 
@@ -27,17 +34,59 @@ public class SimpleTCCManager extends TCCManager {
         return new SimpleTCCManagerExtendBuilder();
     }
 
+    public static class SimpleTCCManagerAdapter implements ITCCManagerAdapter {
+
+        private Func0<ITCCState> tccStateGetter;
+        private IStateManager stateManager;
+        private ICompensateStrategy compensateStrategy;
+
+        public void setStateManager(IStateManager stateManager) {
+            this.stateManager = stateManager;
+        }
+
+        @Override
+        public IStateManager getStateManager() {
+            return this.stateManager;
+        }
+
+        public void setCompensateStrategy(ICompensateStrategy compensateStrategy) {
+            this.compensateStrategy = compensateStrategy;
+        }
+
+        @Override
+        public ICompensateStrategy getCompensateStrategy() {
+            return this.compensateStrategy;
+        }
+
+        public void setTCCStateGetter(Func0<ITCCState> tccStateGetter) {
+            this.tccStateGetter = tccStateGetter;
+        }
+
+        @Override
+        public Func0<ITCCState> getTCCStateGetter() {
+            return this.tccStateGetter;
+        }
+
+    }
+
     public static class SimpleTCCManagerBuilder {
 
         private SimpleTCCManagerBuilder() {
 
         }
 
+        private String tccTransactionId;
+
         private IRepositoryGear repositoryGear;
         
         private ISerializeGear serializeGear;
 
         private IBusinessSupportGear businessSupportGear;
+
+        public SimpleTCCManagerBuilder setTCCTransactionId(String tccTransactionId) {
+            this.tccTransactionId = tccTransactionId;
+            return this;
+        }
 
         public SimpleTCCManagerBuilder setRepositoryGear(IRepositoryGear repositoryGear) {
             this.repositoryGear = repositoryGear;
@@ -55,25 +104,24 @@ public class SimpleTCCManager extends TCCManager {
         }
 
         public SimpleTCCManager build() {
-
-            SimpleTCCManager simpleTCCManager = new SimpleTCCManager();
-            simpleTCCManager.setStateManager(
+            SimpleTCCManagerAdapter adapter = new SimpleTCCManagerAdapter();
+            if(tccTransactionId != null && tccTransactionId.length() > 0) {
+                SimpleTCCStateBiz tccStateBiz = new SimpleTCCStateBiz(repositoryGear, serializeGear);
+                adapter.setTCCStateGetter(() -> tccStateBiz.call(tccTransactionId));
+            }
+            adapter.setStateManager(
                 new SimpleStateManagerAdapter(
                     new SimpleTCCBeginBiz(repositoryGear, serializeGear, businessSupportGear), 
                     new SimpleTCCUpdateBiz(repositoryGear, serializeGear, businessSupportGear), 
                     new SimpleTCCEndBiz(repositoryGear, serializeGear, businessSupportGear))
             );
-            simpleTCCManager.setConfirmCompensateStrategy(
-                new SimpleConfirmCompensateAdapter(
-                    new SimpleTCCConfirmRetryBiz(repositoryGear, serializeGear, businessSupportGear)
+            adapter.setCompensateStrategy(
+                new SimpleCompensateAdapter(
+                    new SimpleTCCCompensateBiz(repositoryGear, serializeGear, businessSupportGear)
                 )
             );
-            simpleTCCManager.setCancelCompensateStrategy(
-                new SimpleCancelCompensateAdapter(
-                    new SimpleTCCCancelRetryBiz(repositoryGear, serializeGear, businessSupportGear)
-                )
-            );
-            return simpleTCCManager;
+            
+            return new SimpleTCCManager(adapter);
         }
 
     }
@@ -85,15 +133,20 @@ public class SimpleTCCManager extends TCCManager {
 
         }
 
+        private Func0<ITCCState> tccStateGetter;
+
         private SimpleTCCBeginBiz tccBeginBiz;
 
         private SimpleTCCUpdateBiz tccUpdateBiz;
 
         private SimpleTCCEndBiz tccEndBiz;
 
-        private SimpleTCCConfirmRetryBiz tccConfirmRetryBiz;
+        private SimpleTCCCompensateBiz tccCompensateBiz;
 
-        private SimpleTCCCancelRetryBiz tccCancelRetryBiz;
+        public SimpleTCCManagerExtendBuilder setTCCStateGetter(Func0<ITCCState> tccStateGetter) {
+            this.tccStateGetter = tccStateGetter;
+            return this;
+        }
 
         public SimpleTCCManagerExtendBuilder setTCCBeginBiz(SimpleTCCBeginBiz beginBiz) {
             this.tccBeginBiz = beginBiz;
@@ -110,29 +163,23 @@ public class SimpleTCCManager extends TCCManager {
             return this;
         }
 
-        public SimpleTCCManagerExtendBuilder setTCCConfirmRetryBiz(SimpleTCCConfirmRetryBiz confirmRetryBiz) {
-            this.tccConfirmRetryBiz = confirmRetryBiz;
-            return this;
-        }
-
-        public SimpleTCCManagerExtendBuilder setTCCCancelRetryBiz(SimpleTCCCancelRetryBiz cancelRetryBiz) {
-            this.tccCancelRetryBiz = cancelRetryBiz;
+        public SimpleTCCManagerExtendBuilder setTCCCompensateBiz(SimpleTCCCompensateBiz tccCompensateBiz) {
+            this.tccCompensateBiz = tccCompensateBiz;
             return this;
         }
 
 
         public SimpleTCCManager build() {
-            SimpleTCCManager simpleTCCManager = new SimpleTCCManager();
-            simpleTCCManager.setStateManager(
+            SimpleTCCManagerAdapter adapter = new SimpleTCCManagerAdapter();
+            adapter.setTCCStateGetter(tccStateGetter);
+            adapter.setStateManager(
                 new SimpleStateManagerAdapter(tccBeginBiz, tccUpdateBiz, tccEndBiz)
             );
-            simpleTCCManager.setConfirmCompensateStrategy(
-                new SimpleConfirmCompensateAdapter(tccConfirmRetryBiz)
+            adapter.setCompensateStrategy(
+                new SimpleCompensateAdapter(tccCompensateBiz)
             );
-            simpleTCCManager.setCancelCompensateStrategy(
-                new SimpleCancelCompensateAdapter(tccCancelRetryBiz)
-            );
-            return simpleTCCManager;
+            
+            return new SimpleTCCManager(adapter);
         }
 
     }

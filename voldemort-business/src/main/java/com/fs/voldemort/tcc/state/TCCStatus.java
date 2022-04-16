@@ -2,16 +2,17 @@ package com.fs.voldemort.tcc.state;
 
 public enum TCCStatus {
 
-    Initail(1),
-
+    TryPending(11),
     TrySuccess(12),
     TryFaild(13),
     TryTimeout(14),
     
+    ConfirmPending(21),
     ConfirmSuccess(22),
     ConfirmFailed(23),
     ConfirmTimeout(24),
 
+    CancelPending(31),
     CancelSuccess(32),
     CancelFailed(33),
     CancelTimeout(34);
@@ -27,9 +28,7 @@ public enum TCCStatus {
     }
 
     public String getStage() {
-        if(value == 1) {
-            return TCCStage.INITIAL;
-        } else if(value >= 10 && value <= 20) {
+        if(value >= 10 && value <= 20) {
             return TCCStage.TRY;
         } else if (value >= 20 && value <= 30) {
             return TCCStage.CONFIRM;

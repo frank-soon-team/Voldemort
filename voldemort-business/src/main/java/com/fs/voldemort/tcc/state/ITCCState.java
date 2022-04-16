@@ -8,7 +8,7 @@ import com.fs.voldemort.tcc.node.TCCNode;
 
 public interface ITCCState {
 
-    String identify();
+    String getTCCTransactionId();
 
     void collectExceptional(ExecuteCallerNodeException e);
 
@@ -37,6 +37,8 @@ public interface ITCCState {
     boolean isEnd();
 
     TCCStatus getStatus();
+
+    TCCTaskStatus getTaskStatus();
 
     void setParam(Object param);
 

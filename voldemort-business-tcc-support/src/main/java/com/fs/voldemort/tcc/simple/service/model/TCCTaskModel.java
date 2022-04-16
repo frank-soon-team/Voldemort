@@ -12,8 +12,11 @@ public class TCCTaskModel implements Serializable {
     /** TCC 阶段标识 */
     private String stage;
 
-    /** TCC 任务当前状态 */
-    private int statusCode;
+    /** TCC 任务状态 */
+    private String taskStatus;
+
+    /** TCC 流程状态 */
+    private int tccStatusCode;
     
     /** TCC 执行参数 */
     private String paramStr;
@@ -48,12 +51,20 @@ public class TCCTaskModel implements Serializable {
         this.stage = stage;
     }
 
-    public int getStatusCode() {
-        return statusCode;
+    public String getTaskStatus() {
+        return taskStatus;
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public void setTaskStatus(String taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
+    public int getTccStatusCode() {
+        return tccStatusCode;
+    }
+
+    public void setTccStatusCode(int tccStatusCode) {
+        this.tccStatusCode = tccStatusCode;
     }
 
     public String getParamStr() {

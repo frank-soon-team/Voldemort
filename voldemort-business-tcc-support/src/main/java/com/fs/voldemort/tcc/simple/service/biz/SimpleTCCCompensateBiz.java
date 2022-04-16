@@ -1,27 +1,26 @@
 package com.fs.voldemort.tcc.simple.service.biz;
 
-import java.util.List;
-
 import com.fs.voldemort.core.functional.action.Action1;
-import com.fs.voldemort.tcc.node.TCCNode;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
 import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.state.TCCExecuteState;
+import com.fs.voldemort.tcc.state.TCCTaskStatus;
 
-public class SimpleTCCCancelRetryBiz extends BaseTCCBiz implements Action1<ITCCState> {
+/**
+ * 简单的TCC补偿实现，将当前的状态切换位WaitingForRetry，并持久化
+ */
+public class SimpleTCCCompensateBiz extends BaseTCCBiz implements Action1<ITCCState> {
 
-    public SimpleTCCCancelRetryBiz(
+    public SimpleTCCCompensateBiz(
         IRepositoryGear repositoryGear, 
         ISerializeGear serializeGear) {
-
-        super(repositoryGear, serializeGear);
-
+        super(repositoryGear, serializeGear, null);
     }
 
-    public SimpleTCCCancelRetryBiz(
+    public SimpleTCCCompensateBiz(
         IRepositoryGear repositoryGear, 
         ISerializeGear serializeGear,
         IBusinessSupportGear businessSupportGear) {
@@ -30,21 +29,13 @@ public class SimpleTCCCancelRetryBiz extends BaseTCCBiz implements Action1<ITCCS
 
     @Override
     public void apply(ITCCState state) {
-        if(!state.isSuccess()) {
-            return;
+
+        if(state instanceof TCCExecuteState) {
+            ((TCCExecuteState) state).setTaskStatus(TCCTaskStatus.WaitingForRetry);
         }
 
-        List<TCCNode> triedNodeList = state.getTriedNodeList();
-        if(triedNodeList == null || triedNodeList.isEmpty()) {
-            throw new IllegalStateException("the TCCNodeList is empty.");
-        }
-
-        TCCExecuteState tccState = (TCCExecuteState) state;
-        tccState.rollback();
-
-        TCCTaskModel tccTask = changeToTCCModel(tccState);
-        getRepositoryGear().update(tccTask);
-
+        TCCTaskModel taskModel = changeToTCCModel(state);
+        getRepositoryGear().update(taskModel);
     }
     
 }

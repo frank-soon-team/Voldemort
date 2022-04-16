@@ -12,7 +12,7 @@ public class TCCNode extends CallerNode {
     private ExecuteCallerNodeException error;
 
     public TCCNode(ITCCHandler tccHandler) {
-        this(tccHandler, TCCStatus.Initail);
+        this(tccHandler, TCCStatus.TryPending);
     }
 
     public TCCNode(ITCCHandler tccHandler, TCCStatus status) {
