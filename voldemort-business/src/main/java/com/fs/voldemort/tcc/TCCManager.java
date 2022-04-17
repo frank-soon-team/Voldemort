@@ -1,7 +1,9 @@
 package com.fs.voldemort.tcc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.support.CallerContext;
@@ -304,11 +306,18 @@ public class TCCManager extends FuncLinkedList {
 
     protected ITCCState createTCCState() {
         TCCExecuteState state = new TCCExecuteState(this.size());
+        Set<String> nodeNameSet = new HashSet<>();
         // 提取TCCNode节点
         CallerNode currentNode = this.getFirstNode();
         while(currentNode != null) {
             if(currentNode instanceof TCCNode) {
-                state.addTCCNode((TCCNode)currentNode);
+                TCCNode tccNode = (TCCNode)currentNode;
+                String nodeName = tccNode.getName();
+                if(nodeNameSet.contains(nodeName)) {
+                    throw new IllegalStateException(String.format("the node name [%s] was repeated.", nodeName));
+                }
+                nodeNameSet.add(nodeName);
+                state.addTCCNode(tccNode);
             }
             currentNode = currentNode.getNextNode();
         }
