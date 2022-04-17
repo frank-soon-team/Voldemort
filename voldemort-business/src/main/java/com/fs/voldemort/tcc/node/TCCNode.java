@@ -6,9 +6,13 @@ import com.fs.voldemort.tcc.state.TCCStatus;
 
 public class TCCNode extends CallerNode {
 
+    // TCC 任务执行器
     private final ITCCHandler tccHandler;
+    // 参数
     private TCCNodeParameter nodeParameter;
+    // 状态
     private TCCStatus status;
+    // 错误信息
     private ExecuteCallerNodeException error;
 
     public TCCNode(ITCCHandler tccHandler) {
@@ -16,9 +20,12 @@ public class TCCNode extends CallerNode {
     }
 
     public TCCNode(ITCCHandler tccHandler, TCCStatus status) {
-        super(p -> tccHandler.goTry(p));
-        this.tccHandler = tccHandler;
+        super(p -> {
+            tccHandler.goTry((TCCNodeParameter) p);
+            return p.result;
+        });
         this.status = status;
+        this.tccHandler = tccHandler;
     }
 
     public void doConfirm() {
@@ -64,11 +71,7 @@ public class TCCNode extends CallerNode {
     }
 
     public String getName() {
-        if(tccHandler instanceof BaseTCCHandler) {
-            return ((BaseTCCHandler) tccHandler).getName();
-        }
-        return "";
+        return tccHandler.name();
     }
-
     
 }

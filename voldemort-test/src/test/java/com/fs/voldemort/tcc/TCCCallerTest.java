@@ -1,8 +1,6 @@
 package com.fs.voldemort.tcc;
  
 import com.fs.voldemort.core.functional.action.Action1;
-import com.fs.voldemort.core.functional.func.Func1;
-import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
@@ -12,7 +10,6 @@ import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCStateBiz;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
 import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
-import com.fs.voldemort.tcc.simple.service.model.Transfer;
 import com.fs.voldemort.tcc.state.ITCCState;
 
 import org.junit.Assert;
@@ -26,23 +23,23 @@ public class TCCCallerTest {
             .call(
                 createHandler(
                     "Coupon", 
-                    p -> { System.out.println("预留优惠券"); return true; },
+                    p -> { System.out.println("预留优惠券"); },
                     p -> { System.out.println("扣减优惠券"); },
-                    p -> System.out.println("返回优惠券"))
+                    p -> { System.out.println("返回优惠券"); })
             )
             .call(
                 createHandler(
                     "Point", 
-                    p -> { System.out.println("计算奖励积分"); return true; },
+                    p -> { System.out.println("计算奖励积分"); },
                     p -> { System.out.println("积分奖励生效"); },
-                    p -> System.out.println("积分奖励取消"))
+                    p -> { System.out.println("积分奖励取消"); })
             )
             .call(
                 createHandler(
                     "Gift", 
-                    p -> { System.out.println("预留赠品"); return true; },
+                    p -> { System.out.println("预留赠品"); },
                     p -> { System.out.println("赠品赠送"); },
-                    p -> System.out.println("赠品取消"))
+                    p -> { System.out.println("赠品取消"); })
             )
             .exec();
 
@@ -57,16 +54,15 @@ public class TCCCallerTest {
                 createHandler(
                     "Step1", 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
-                        result[0] += 1;
-                        return null;
-                    }, 
-                    p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
+                        result[0] += 1;
+                    }, 
+                    p -> {
+                        int[] result = (int[]) p.getTCCState().getParam();
                         if(result[0] > 0) {
                             result[0] -= 1;
                         }
@@ -76,16 +72,15 @@ public class TCCCallerTest {
                 createHandler(
                     "Step2", 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
-                        result[0] += 1;
-                        return null;
-                    }, 
-                    p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
+                        result[0] += 1;
+                    }, 
+                    p -> {
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] -= 1;
                     })
             )
@@ -93,16 +88,15 @@ public class TCCCallerTest {
                 createHandler(
                     "Step3", 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
-                        result[0] += 1;
-                        return null;
-                    }, 
-                    p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
+                        result[0] += 1;
+                    }, 
+                    p -> {
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] -= 1;
                     })
             );
@@ -121,16 +115,15 @@ public class TCCCallerTest {
                 createHandler(
                     "Step1", 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
-                        result[0] += 1;
-                        return result;
-                    }, 
-                    p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
+                        result[0] += 1;
+                    }, 
+                    p -> {
+                        int[] result = (int[]) p.getTCCState().getParam();
                         if(result[0] > 0) {
                             result[0] -= 1;
                         }
@@ -140,16 +133,15 @@ public class TCCCallerTest {
                 createHandler(
                     "Step2", 
                     p -> {
-                        int[] result = (int[]) p.result;
-                        result[0] += 1;
-                        return result;
-                    }, 
-                    p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
+                        result[0] += 1;
+                    }, 
+                    p -> {
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] -= 1;
                     })
             )
@@ -160,11 +152,11 @@ public class TCCCallerTest {
                         throw new IllegalStateException("throw");
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
                     }, 
                     p -> {
-                        int[] result = (int[]) ((TCCNodeParameter) p).getTCCState().getParam();
+                        int[] result = (int[]) p.getTCCState().getParam();
                         result[0] -= 1;
                     })
             );
@@ -178,21 +170,21 @@ public class TCCCallerTest {
         Assert.assertTrue(value[0] == 0);
     }
 
-    public ITCCHandler createHandler(String name, Func1<CallerParameter, Object> goTry, Action1<CallerParameter> confirm, Action1<CallerParameter> cancel) {
+    public ITCCHandler createHandler(String name, Action1<TCCNodeParameter> goTry, Action1<TCCNodeParameter> confirm, Action1<TCCNodeParameter> cancel) {
         return new BaseTCCHandler(name) {
 
             @Override
-            public Object goTry(CallerParameter parameter) {
-                return goTry.call(parameter);
+            public void goTry(TCCNodeParameter parameter) {
+                goTry.apply(parameter);
             }
 
             @Override
-            public void confirm(CallerParameter parameter) {
+            public void confirm(TCCNodeParameter parameter) {
                 confirm.apply(parameter);
             }
 
             @Override
-            public void cancel(CallerParameter parameter) {
+            public void cancel(TCCNodeParameter parameter) {
                 cancel.apply(parameter);
             }
             

@@ -10,7 +10,7 @@ public class ExecuteCallerNodeException extends IllegalStateException {
 
     private CallerNode node;
 
-    private String name;
+    private String nodeName;
 
     public ExecuteCallerNodeException(Throwable e, CallerNode node) {
         this(e, node, null);
@@ -21,7 +21,7 @@ public class ExecuteCallerNodeException extends IllegalStateException {
         this.node = node;
         this.parameter = parameter;
         if(node instanceof TCCNode) {
-            this.name = ((TCCNode) node).getName();
+            this.nodeName = ((TCCNode) node).getName();
         }
     }
 
@@ -34,7 +34,7 @@ public class ExecuteCallerNodeException extends IllegalStateException {
     }
 
     public String getName() {
-        return name;
+        return nodeName == null ? "CallerNode" : nodeName;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ExecuteCallerNodeException extends IllegalStateException {
         if(node instanceof TCCNode) {
             TCCNode tccNode = (TCCNode) node;
             return String.format("[%s][%s][%d], %s", 
-                name, 
+                getName(), 
                 tccNode.getStatus().getStage(), 
                 tccNode.getStatus().getValue(), 
                 super.getMessage());

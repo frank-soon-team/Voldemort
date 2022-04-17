@@ -23,5 +23,9 @@ public class TCCNodeParameter extends CallerParameter {
         return (ITCCState) context().get(TCC_EXECUTE_STATE);
     }
 
+    public Object getParam() {
+        ITCCState tccState = getTCCState();
+        return tccState != null ? tccState.getParam() : null;
+    }
     
 }

@@ -14,6 +14,7 @@ import com.fs.voldemort.tcc.exception.TCCTimeoutException;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNode;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;
+import com.fs.voldemort.tcc.node.TCCStateNode;
 import com.fs.voldemort.tcc.state.IStateManager;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.state.TCCExecuteState;
@@ -85,13 +86,12 @@ public class TCCManager extends FuncLinkedList {
 
     @Override
     public CallerParameter execute(CallerParameter parameter) {
-        CallerParameter currentParameter = ensureCallerParameter(parameter);
         if(this.isEmpty()) {
-            return createCallParameter(currentParameter, null);
+            return createCallParameter(null, null);
         }
 
         ITCCState state = this.tccStateGetter.call();
-        setTCCState(currentParameter, state);
+        CallerParameter currentParameter = ensureCallerParameter(parameter, state);
 
         if(state.getTaskStatus() == TCCTaskStatus.Start && state.getStatus() == TCCStatus.TryPending) {
             // 新建的TCC任务记录，状态 > Start，TCC状态 > TryPending
@@ -104,7 +104,9 @@ public class TCCManager extends FuncLinkedList {
             // 中间状态，没必要落库 stateManager.update(state);
         } else {
             // 准备进行二阶段补偿，更新任务记录
+            prepareCompensationTCCState(state);
             getTCCExecuteState(state).setTaskStatus(TCCTaskStatus.Start);
+            // 更新任务状态为 Start，以免被定时器扫出来
             stateManager.update(state);
         }
         
@@ -176,37 +178,41 @@ public class TCCManager extends FuncLinkedList {
             throw new IllegalStateException("something wrong, the tried NodeList is empty, can not commit.");
         }
 
-        TCCStatus status = tccState.getStatus();
-        if(status == TCCStatus.TrySuccess || status == TCCStatus.ConfirmFailed || status == TCCStatus.ConfirmTimeout) {
-            List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
+        if(tccState.getTaskStatus() == TCCTaskStatus.Start) {
+            TCCStatus status = tccState.getStatus();
+            if(status == TCCStatus.TrySuccess || status == TCCStatus.ConfirmFailed || status == TCCStatus.ConfirmTimeout) {
+                List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
 
-            for (TCCNode tccNode : triedNodeList) {
-                if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
-                    continue;
+                for (TCCNode tccNode : triedNodeList) {
+                    if(tccNode.getStatus() == TCCStatus.ConfirmSuccess) {
+                        continue;
+                    }
+                    try {
+                        tccNode.doConfirm();
+                        tccNode.setStatus(TCCStatus.ConfirmSuccess);
+                    } catch(RuntimeException e) {
+                        tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
+                        tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
+                        commitFailedList.add(tccNode);
+                    }
                 }
-                try {
-                    tccNode.doConfirm();
-                    tccNode.setStatus(TCCStatus.ConfirmSuccess);
-                } catch(RuntimeException e) {
-                    tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.ConfirmTimeout : TCCStatus.ConfirmFailed);
-                    tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
-                    commitFailedList.add(tccNode);
-                }
-            }
 
-            if(commitFailedList.isEmpty()) {
-                tccState.setStatus(TCCStatus.ConfirmSuccess);
-                tccState.setTaskStatus(TCCTaskStatus.Done);
+                if(commitFailedList.isEmpty()) {
+                    tccState.setStatus(TCCStatus.ConfirmSuccess);
+                    tccState.setTaskStatus(TCCTaskStatus.Done);
+                    return;
+                }
             } else {
-                tccState.setStatus(TCCStatus.ConfirmFailed);
-                tccState.setTaskStatus(TCCTaskStatus.Incomplete);
+                tccState.setStateException(
+                    new TCCStateException("TCC confirm stage error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
             }
         } else {
-            tccState.setStatus(TCCStatus.ConfirmFailed);
-            tccState.setTaskStatus(TCCTaskStatus.Incomplete);
             tccState.setStateException(
-                new TCCStateException("TCC confirm stage error", TCCStatus.TrySuccess.getValue(), tccState.getStatus().getValue()));
+                new TCCStateException("the Task Status error in TCC confirm stage error", TCCTaskStatus.Start.name(), tccState.getTaskStatus().name()));
         }
+
+        tccState.setStatus(TCCStatus.ConfirmFailed);
+        tccState.setTaskStatus(TCCTaskStatus.Incomplete);
     }
 
     protected void rollback(ITCCState state) {
@@ -217,40 +223,44 @@ public class TCCManager extends FuncLinkedList {
             throw new IllegalStateException("something wrong, the tried NodeList is empty, can not rollback.");
         }
 
-        TCCStatus status = tccState.getStatus();
-        if((status == TCCStatus.TryFaild || status == TCCStatus.TryTimeout) 
-            || (status == TCCStatus.CancelFailed || status == TCCStatus.CancelTimeout)) {
-            int count = triedNodeList.size();
-            List<TCCNode> rollbackFailedList = new ArrayList<>(count);
+        if(tccState.getTaskStatus() == TCCTaskStatus.Start) {
+            TCCStatus status = tccState.getStatus();
+            if((status == TCCStatus.TryFaild || status == TCCStatus.TryTimeout) 
+                || (status == TCCStatus.CancelFailed || status == TCCStatus.CancelTimeout)) {
+                int count = triedNodeList.size();
+                List<TCCNode> rollbackFailedList = new ArrayList<>(count);
 
-            for(int i = count - 1; i >= 0; i--) {
-                TCCNode tccNode = triedNodeList.get(i);
-                if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
-                    continue;
+                for(int i = count - 1; i >= 0; i--) {
+                    TCCNode tccNode = triedNodeList.get(i);
+                    if(tccNode.getStatus() == TCCStatus.CancelSuccess) {
+                        continue;
+                    }
+                    try {
+                        tccNode.doCancel();
+                        tccNode.setStatus(TCCStatus.CancelSuccess);
+                    } catch(RuntimeException e) {
+                        tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
+                        tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
+                        rollbackFailedList.add(tccNode);
+                    }
                 }
-                try {
-                    tccNode.doCancel();
-                    tccNode.setStatus(TCCStatus.CancelSuccess);
-                } catch(RuntimeException e) {
-                    tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.CancelTimeout : TCCStatus.CancelFailed);
-                    tccNode.setError(e instanceof TCCTimeoutException ? (TCCTimeoutException) e : new ExecuteCallerNodeException(e, tccNode));
-                    rollbackFailedList.add(tccNode);
-                }
-            }
 
-            if(rollbackFailedList.isEmpty()) {
-                tccState.setStatus(TCCStatus.CancelSuccess);
-                tccState.setTaskStatus(TCCTaskStatus.Done);
+                if(rollbackFailedList.isEmpty()) {
+                    tccState.setStatus(TCCStatus.CancelSuccess);
+                    tccState.setTaskStatus(TCCTaskStatus.Done);
+                    return;
+                }
             } else {
-                tccState.setStatus(TCCStatus.CancelFailed);
-                tccState.setTaskStatus(TCCTaskStatus.Incomplete);
+                tccState.setStateException(
+                    new TCCStateException("TCC cancel stage error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
             }
         } else {
-            tccState.setStatus(TCCStatus.CancelFailed);
-            tccState.setTaskStatus(TCCTaskStatus.Incomplete);
             tccState.setStateException(
-                new TCCStateException("TCC cancel stage error", TCCStatus.TrySuccess.getValue(), tccState.getStatus().getValue()));
+                new TCCStateException("the Task Status error in TCC cancel stage", TCCTaskStatus.Start.name(), tccState.getTaskStatus().name()));
         }
+
+        tccState.setStatus(TCCStatus.CancelFailed);
+        tccState.setTaskStatus(TCCTaskStatus.Incomplete);
     }
 
     protected void compensate(ITCCState tccState) {
@@ -269,9 +279,27 @@ public class TCCManager extends FuncLinkedList {
         return new TCCNodeParameter(parameter.result, parameter.context());
     }
 
+    protected CallerParameter ensureCallerParameter(CallerParameter parameter, ITCCState state) {
+        TCCNodeParameter tccNodeParameter = null;
+        if(state instanceof TCCExecuteState) {
+            TCCExecuteState tccState = (TCCExecuteState) state;
+            if(tccState.isCompensation()) {
+                Object result = parameter == null ? null : parameter.result;
+                tccNodeParameter = new TCCNodeParameter(result, tccState.getContext());
+            } else {
+                tccNodeParameter = (TCCNodeParameter) ensureCallerParameter(parameter);
+            }
+        } else {
+            tccNodeParameter = (TCCNodeParameter) ensureCallerParameter(parameter);
+        }
+
+        tccNodeParameter.setTCCState(state);
+        return tccNodeParameter;
+    }
+
     @Override
     protected CallerParameter createCallParameter(CallerParameter oldParameter, Object result) {
-        return new TCCNodeParameter(result, oldParameter.context());
+        return new TCCNodeParameter(result, oldParameter != null ? oldParameter.context() : null);
     }
 
     protected ITCCState createTCCState() {
@@ -284,19 +312,23 @@ public class TCCManager extends FuncLinkedList {
             }
             currentNode = currentNode.getNextNode();
         }
-
         return state;
     }
 
     protected void throwIfExceptional(ITCCState state) {
-        ExecuteCallerNodeException exception = state.getCallerNodeException();
-        if(exception != null) {
-            throw exception;
-        }
-    }
+        TCCStateException tccStateException = state.getStateException();
+        ExecuteCallerNodeException tryNodeException = state.getCallerNodeException();
 
-    private void setTCCState(CallerParameter parameter, ITCCState tccState) {
-        ((TCCNodeParameter) parameter).setTCCState(tccState);
+        if(tccStateException != null) {
+            if(tryNodeException != null) {
+                tccStateException.initCause(tryNodeException);
+            }
+            throw tccStateException;
+        }
+
+        if(tryNodeException != null) {
+            throw tryNodeException;
+        }
     }
 
     private TCCExecuteState getTCCExecuteState(CallerParameter parameter) {
@@ -308,6 +340,22 @@ public class TCCManager extends FuncLinkedList {
             return (TCCExecuteState) state;
         }
         throw new ClassCastException("the parameter state is not TCCExecuteState Type.");
+    }
+
+    private void prepareCompensationTCCState(ITCCState state) {
+        CallerNode currentNode = this.getFirstNode();
+        while(currentNode != null) {
+            if(currentNode instanceof TCCNode) {
+                TCCNode tccNode = (TCCNode)currentNode;
+                TCCNode findNode = state.findTCCNode(tccNode.getName());
+                if(findNode != null && findNode instanceof TCCStateNode) {
+                    // 如果TCCState中已存在相同节点，则需要设置TCC执行器，用于补偿
+                    TCCStateNode stateNode = ((TCCStateNode) findNode);
+                    stateNode.setTCCHandler(tccNode.getTCCHandler());
+                }
+            }
+            currentNode = currentNode.getNextNode();
+        }
     }
     
 }

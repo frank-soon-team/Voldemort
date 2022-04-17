@@ -29,6 +29,10 @@ public class SimpleTCCBeginBiz extends BaseTCCBiz implements Action1<ITCCState> 
     @Override
     public void apply(ITCCState state) {
         if(state.getTaskStatus() == TCCTaskStatus.Start && state.getStatus() == TCCStatus.TryPending) {
+            if(getBusinessSupportGear() != null) {
+                // 设置当前的tccTransactionId，设置到上下文中，可以传播到其它子系统中
+                getBusinessSupportGear().setTransactionId(state.getTCCTransactionId());
+            }
             TCCTaskModel tccModel = changeToTCCModel(state);
             getRepositoryGear().create(tccModel);
         } else {

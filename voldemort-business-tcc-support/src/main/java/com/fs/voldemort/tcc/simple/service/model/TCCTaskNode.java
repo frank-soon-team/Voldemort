@@ -47,7 +47,5 @@ public class TCCTaskNode implements Serializable {
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
-
-    
     
 }

@@ -17,6 +17,9 @@ public class TCCTaskModel implements Serializable {
 
     /** TCC 流程状态 */
     private int tccStatusCode;
+
+    /** TCC try阶段的错误信息 */
+    private String tryErrorMessage;
     
     /** TCC 执行参数 */
     private String paramStr;
@@ -65,6 +68,14 @@ public class TCCTaskModel implements Serializable {
 
     public void setTccStatusCode(int tccStatusCode) {
         this.tccStatusCode = tccStatusCode;
+    }
+
+    public String getTryErrorMessage() {
+        return tryErrorMessage;
+    }
+
+    public void setTryErrorMessage(String tryErrorMessage) {
+        this.tryErrorMessage = tryErrorMessage;
     }
 
     public String getParamStr() {

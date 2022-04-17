@@ -2,21 +2,21 @@ package com.fs.voldemort.tcc.exception;
 
 public class TCCStateException extends IllegalStateException {
 
-    private final int expectationStatusValue;
-    private final int errorStatusValue;
+    private final String expectationStatusName;
+    private final String errorStatusName;
     
-    public TCCStateException(String message, int expectationStatusValue, int errorStatusValue) {
-        super(message + String.format(", the expectation status value is [%d], but current status value is [%d].", expectationStatusValue, errorStatusValue));
-        this.expectationStatusValue = expectationStatusValue;
-        this.errorStatusValue = errorStatusValue;
+    public TCCStateException(String message, String expectationStatusName, String errorStatusName) {
+        super(message + String.format(", the expectation status value is [%s], but current status value is [%s].", expectationStatusName, errorStatusName));
+        this.expectationStatusName = expectationStatusName;
+        this.errorStatusName = errorStatusName;
     }
 
-    public int getExpectationStatusValue() {
-        return expectationStatusValue;
+    public String getExpectationStatusName() {
+        return expectationStatusName;
     }
 
-    public int getErrorStatusValue() {
-        return errorStatusValue;
+    public String getErrorStatusName() {
+        return errorStatusName;
     }
 
 }

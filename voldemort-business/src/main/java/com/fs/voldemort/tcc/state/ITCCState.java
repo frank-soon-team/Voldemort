@@ -22,6 +22,8 @@ public interface ITCCState {
 
     void addTCCNode(TCCNode node);
 
+    TCCNode findTCCNode(String nodeCode);
+
     List<TCCNode> getTCCNodeList();
 
     List<TCCNode> getTriedNodeList();

@@ -49,7 +49,7 @@ public abstract class BaseTCCBiz {
         TCCTaskModel tccModel = Transfer.toTCCModel(tccState, serializeGear);
         if(businessSupportGear != null) {
             CallerContext context = getContext(tccState);
-            if(context == null) {
+            if(context != null) {
                 tccModel.setTraceId(businessSupportGear.getTraceID(context));
                 tccModel.setBizCode(businessSupportGear.getBizCode(context));
             }

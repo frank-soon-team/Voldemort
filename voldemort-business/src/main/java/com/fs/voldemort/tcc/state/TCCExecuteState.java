@@ -11,8 +11,12 @@ import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.exception.TCCStateException;
 import com.fs.voldemort.tcc.node.TCCNode;
+import com.fs.voldemort.tcc.node.TCCNodeParameter;
 
 public class TCCExecuteState implements ITCCState {
+
+    private final static String TCC_STATE_TYPE = "TCC_STATE_TYPE";
+    public final static String TCC_STATE_COMPENSATION = "Compensation";
 
     // TCC事务ID
     private final String tccTransactionId;
@@ -110,7 +114,16 @@ public class TCCExecuteState implements ITCCState {
     @Override
     public void addTCCNode(TCCNode node) {
         tccNodeList.add(node);
+    }
 
+    @Override
+    public TCCNode findTCCNode(String name) {
+        for(TCCNode tccNode : tccNodeList) {
+            if(tccNode.getName().equals(name)) {
+                return tccNode;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -162,15 +175,41 @@ public class TCCExecuteState implements ITCCState {
     public CallerContext getContext() {
         CallerContext context = null;
 
-        if(errorCollection != null && !errorCollection.isEmpty()) {
-            ExecuteCallerNodeException executeCallerNodeException = errorCollection.get(errorCollection.size() - 1);
-            CallerParameter callerParameter = executeCallerNodeException.getParameter();
-            if(callerParameter != null) {
-                context = callerParameter.context();
+        if(tccNodeList != null && !tccNodeList.isEmpty()) {
+            TCCNodeParameter tccNodeParameter = tccNodeList.get(0).getNodeParameter();
+            if(tccNodeParameter != null) {
+                context = tccNodeParameter.context();
+            }
+        }
+
+        if(context == null) {
+            if(errorCollection != null && !errorCollection.isEmpty()) {
+                ExecuteCallerNodeException executeCallerNodeException = errorCollection.get(errorCollection.size() - 1);
+                CallerParameter callerParameter = executeCallerNodeException.getParameter();
+                if(callerParameter != null) {
+                    context = callerParameter.context();
+                }
             }
         }
 
         return context;
+    }
+
+    public void setStateType(String type) {
+        CallerContext callerContext = getContext();
+        if(callerContext == null) {
+            throw new NullPointerException("the context is null.");
+        }
+        callerContext.set(TCC_STATE_TYPE, type);
+    }
+
+    public boolean isCompensation() {
+        String stateType = null;
+        CallerContext callerContext = getContext();
+        if(callerContext != null) {
+            stateType = callerContext.getString(TCC_STATE_TYPE);
+        }
+        return TCC_STATE_COMPENSATION.equals(stateType);
     }
 
 }

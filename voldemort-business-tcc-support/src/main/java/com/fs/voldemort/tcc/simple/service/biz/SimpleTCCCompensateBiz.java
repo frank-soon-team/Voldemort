@@ -29,7 +29,6 @@ public class SimpleTCCCompensateBiz extends BaseTCCBiz implements Action1<ITCCSt
 
     @Override
     public void apply(ITCCState state) {
-
         if(state instanceof TCCExecuteState) {
             ((TCCExecuteState) state).setTaskStatus(TCCTaskStatus.WaitingForRetry);
         }
