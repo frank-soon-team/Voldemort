@@ -33,6 +33,7 @@ public interface Transfer {
         if(nodeList != null) {
             for(TCCNode node : nodeList) {
                 TCCTaskNode taskNode = new TCCTaskNode();
+                taskNode.setNodeId(node.getNodeId());
                 taskNode.setNodeName(node.getName());
                 if(node.getNodeParameter() != null) {
                     /* 
@@ -70,7 +71,7 @@ public interface Transfer {
         for(TCCTaskNode taskNode : taskNodeList) {
             TCCStateNode tccStateNode = new TCCStateNode(
                 taskNode.getNodeName(), TCCStatus.valueOf(taskNode.getStatusCode()));
-
+            tccStateNode.setNodeId(taskNode.getNodeId());
             TCCNodeParameter tccNodeParameter = new TCCNodeParameter(
                 serializeGear.deserialize(taskNode.getNodeParamStr()), callerContext);
             tccStateNode.setNodeParameter(tccNodeParameter);

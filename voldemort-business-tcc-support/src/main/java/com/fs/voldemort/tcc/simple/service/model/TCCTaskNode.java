@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 public class TCCTaskNode implements Serializable {
 
+    /** TCC 节点ID */
+    private String nodeId;
+
     /** TCC 节点名称 */
     private String nodeName;
 
@@ -15,6 +18,14 @@ public class TCCTaskNode implements Serializable {
 
     /** 节点错误信息 */
     private String errorMessage;
+
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
+    }
 
     public String getNodeName() {
         return nodeName;

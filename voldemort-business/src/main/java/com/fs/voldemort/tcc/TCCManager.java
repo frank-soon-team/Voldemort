@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.fs.voldemort.core.functional.func.Func0;
 import com.fs.voldemort.core.support.CallerContext;
@@ -86,6 +87,7 @@ public class TCCManager extends FuncLinkedList {
         }
 
         TCCNode node = new TCCNode(name, tccHandler);
+        node.setNodeId(UUID.randomUUID().toString());
         add(node);
     }
 

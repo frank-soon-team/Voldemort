@@ -16,6 +16,8 @@ public class TCCNode extends CallerNode {
     private TCCStatus status;
     // 错误信息
     private ExecuteCallerNodeException error;
+    // 节点ID
+    private String nodeId;
 
     public TCCNode(String name, ITCCHandler tccHandler) {
         this(name, tccHandler, TCCStatus.TryPending);
@@ -75,6 +77,14 @@ public class TCCNode extends CallerNode {
 
     public String getName() {
         return name;
+    }
+
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
     }
     
 }
