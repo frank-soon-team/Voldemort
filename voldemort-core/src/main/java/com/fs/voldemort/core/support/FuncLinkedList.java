@@ -18,7 +18,7 @@ public class FuncLinkedList {
 
     public CallerNode add(Func1<CallerParameter, Object> func) {
         if(func == null) {
-            throw new IllegalArgumentException("the parameter func is required.");
+            throw new IllegalArgumentException("the parameter [func] is required.");
         }
 
         CallerNode node = new CallerNode(func);

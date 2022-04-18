@@ -40,7 +40,7 @@ public class CallerNode {
 
     public void setActionFunc(Func1<CallerParameter, Object> actionFunc) {
         if(actionFunc == null) {
-            throw new IllegalArgumentException("the parameter actionFunc is required.");
+            throw new IllegalArgumentException("the parameter [actionFunc] is required.");
         }
         this.actionFunc = actionFunc;
     }

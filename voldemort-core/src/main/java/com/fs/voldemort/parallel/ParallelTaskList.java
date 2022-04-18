@@ -23,7 +23,7 @@ public class ParallelTaskList extends FuncLinkedList {
     @Override
     public CallerNode add(Func1<CallerParameter, Object> func) {
         if(func == null) {
-            throw new IllegalArgumentException("the parameter func is required.");
+            throw new IllegalArgumentException("the parameter [func] is required.");
         }
 
         ParallelTaskNode node = new ParallelTaskNode(func);

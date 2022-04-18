@@ -22,7 +22,7 @@ public class FunctionBag implements IBag<String, DynamicFunc<Object>> {
     @Override
     public void set(String key, DynamicFunc<Object> value) {
         if(key == null || key.length() == 0) {
-            throw new IllegalArgumentException("the parameter key is required.");
+            throw new IllegalArgumentException("the parameter [key] is required.");
         }
         contextStore.put(key, value);
     }
@@ -52,7 +52,7 @@ public class FunctionBag implements IBag<String, DynamicFunc<Object>> {
 
     public <R> R call(String key, Object[] args) {
         if(key == null || key.length() == 0) {
-            throw new IllegalArgumentException("the parameter key is required.");
+            throw new IllegalArgumentException("the parameter [key] is required.");
         }
         if(!contains(key)) {
             throw new IllegalArgumentException("the parameter key [" + key + "] is not exists.");

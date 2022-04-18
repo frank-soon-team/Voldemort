@@ -2,9 +2,7 @@ package com.fs.voldemort.tcc;
 
 import com.fs.voldemort.core.Caller;
 import com.fs.voldemort.core.functional.action.Action1;
-import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
-import com.fs.voldemort.tcc.node.TCCHandlerWrapper;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.state.TCCExecuteState;
@@ -19,8 +17,9 @@ import com.fs.voldemort.tcc.state.TCCExecuteState;
  * 
  *   TCCCaller caller = new TCCCaller(tccManager, message);
  *   for(UserInfo userInfo : userList) {
+ *      String nodeName = "SendMessageToUser-" + userInfo.getTenantCode();
  *      caller.call(
- *          "SendMessageToUser", 
+ *          nodeName, 
  *          p -> sendMessage(userInfo.getTenantCode(), userInfo.getUserCode(), (String) p.getParam()),
  *          p -> sendCompleted(userInfo.getTenantCode(), userInfo.getUserCode(), (String) p.getParam()),
  *          p -> cancelSend(userInfo.getTenantCode(), userInfo.getUserCode(), (String) p.getParam())
@@ -50,20 +49,13 @@ public class TCCCaller extends Caller<Void> {
         });
     }
 
-    public TCCCaller call(ITCCHandler tccHandler) {
-        getTCCManager().add(tccHandler);
-        return this;
-    }
-
-    public TCCCaller call(String rename, ITCCHandler tccHandler) {
-        if(rename == null || rename.length() > 0) {
-            throw new IllegalArgumentException("the parameter [rename] is required.");
-        }
+    public TCCCaller call(String name, ITCCHandler tccHandler) {
         if(tccHandler == null) {
             throw new IllegalArgumentException("the parameter [tccHandler] is required.");
         }
 
-        return call(new TCCHandlerWrapper(rename, tccHandler));
+        getTCCManager().add(name, tccHandler);
+        return this;
     }
 
     public TCCCaller call(
@@ -80,9 +72,6 @@ public class TCCCaller extends Caller<Void> {
         Action1<TCCNodeParameter> confirmFn,
         Action1<TCCNodeParameter> cancelFn) {
 
-        if(name == null || name.length() > 0) {
-            throw new IllegalArgumentException("the parameter [name] is required.");
-        }
         if(tryFn == null) {
             throw new IllegalArgumentException("the parameter [tryFn] is required.");
         }
@@ -90,7 +79,7 @@ public class TCCCaller extends Caller<Void> {
             throw new IllegalArgumentException("the parameter [cancelFn] is required.");
         }
         
-        getTCCManager().add(new BaseTCCHandler(name) {
+        getTCCManager().add(name, new ITCCHandler() {
 
             @Override
             public void goTry(TCCNodeParameter parameter) {

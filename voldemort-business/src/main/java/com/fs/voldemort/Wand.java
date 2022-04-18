@@ -83,7 +83,7 @@ public interface Wand {
 
         public void exec(Action1<Object> action) {
             if(action == null) {
-                throw new IllegalArgumentException("the parameter action is required.");
+                throw new IllegalArgumentException("the parameter [action] is required.");
             }
             Object result = get().exec();
             action.apply(result);

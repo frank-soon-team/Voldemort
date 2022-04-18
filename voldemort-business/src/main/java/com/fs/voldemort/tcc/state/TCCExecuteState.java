@@ -44,7 +44,7 @@ public class TCCExecuteState implements ITCCState {
     public TCCExecuteState(String tccTransactionId, int size) {
         this.tccTransactionId = tccTransactionId;
         if(this.tccTransactionId == null || this.tccTransactionId.length() == 0) {
-            throw new IllegalArgumentException("the parameter tccTransactionId is required.");
+            throw new IllegalArgumentException("the parameter [tccTransactionId] is required.");
         }
         tccNodeList = new ArrayList<>(size);
         errorCollection = new ArrayList<>(size);
@@ -73,7 +73,7 @@ public class TCCExecuteState implements ITCCState {
 
     public void setStatus(TCCStatus status) {
         if(status == null) {
-            throw new IllegalArgumentException("the parameter status is required.");
+            throw new IllegalArgumentException("the parameter [status] is required.");
         }
         this.status = status;
     }
@@ -85,7 +85,7 @@ public class TCCExecuteState implements ITCCState {
 
     public void setTaskStatus(TCCTaskStatus taskStatus) {
         if(taskStatus == null) {
-            throw new IllegalArgumentException("the parameter taskStatus is required.");
+            throw new IllegalArgumentException("the parameter [taskStatus] is required.");
         }
         this.taskStatus = taskStatus;
     }

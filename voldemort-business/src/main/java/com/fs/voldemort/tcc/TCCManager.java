@@ -77,12 +77,15 @@ public class TCCManager extends FuncLinkedList {
 
     //#endregion
 
-    public void add(ITCCHandler tccHandler) {
+    public void add(String name, ITCCHandler tccHandler) {
+        if(name == null || name.length() == 0) {
+            throw new IllegalArgumentException("the parameter [name] is required.");
+        }
         if(tccHandler == null) {
-            throw new IllegalArgumentException("the parameter tccHandler is required.");
+            throw new IllegalArgumentException("the parameter [tccHandler] is required.");
         }
 
-        TCCNode node = new TCCNode(tccHandler);
+        TCCNode node = new TCCNode(name, tccHandler);
         add(node);
     }
 

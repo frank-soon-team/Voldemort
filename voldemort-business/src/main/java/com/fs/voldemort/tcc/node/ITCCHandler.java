@@ -4,12 +4,6 @@ package com.fs.voldemort.tcc.node;
  * TCC事务节点的接口
  */
 public interface ITCCHandler {
-
-    /**
-     * TCC节点名称，在一个Caller中，name不能重复
-     * @return
-     */
-    String name();
     
     /**
      * 检查预留资源，无状态 

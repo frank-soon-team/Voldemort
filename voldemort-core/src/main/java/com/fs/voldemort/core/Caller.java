@@ -39,7 +39,7 @@ public class Caller<R> {
 
     protected Caller(FuncLinkedList funcLinkedList, CallerParameter initCallerParameter) {
         if(funcLinkedList == null) {
-            throw new IllegalArgumentException("the parameter funcLinkedList of constructor is required.");
+            throw new IllegalArgumentException("the parameter [funcLinkedList] of constructor is required.");
         }
         funcList = funcLinkedList;
         initializationParameter = initCallerParameter;
@@ -52,7 +52,7 @@ public class Caller<R> {
 
     public Caller<R> call(Caller<?> caller) {
         if(caller == null) {
-            throw new IllegalArgumentException("the parameter caller is required.");
+            throw new IllegalArgumentException("the parameter [caller] is required.");
         }
 
         funcList.add(p -> caller.exec(p));
@@ -69,7 +69,7 @@ public class Caller<R> {
 
     public void exec(Action1<R> action) {
         if(action == null) {
-            throw new IllegalArgumentException("the parameter action is required.");
+            throw new IllegalArgumentException("the parameter [action] is required.");
         }
         R result = exec();
         action.apply(result);

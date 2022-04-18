@@ -12,8 +12,6 @@ import com.fs.voldemort.tcc.simple.service.biz.SimpleTCCUpdateBiz;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
-import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
-import com.fs.voldemort.tcc.simple.service.model.Transfer;
 import com.fs.voldemort.tcc.state.IStateManager;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.strategy.ICompensateStrategy;

@@ -128,7 +128,7 @@ public class TCCTaskModel implements Serializable {
 
     public void addNode(TCCTaskNode node) {
         if(node == null) {
-            throw new IllegalArgumentException("the parameter node is required.");
+            throw new IllegalArgumentException("the parameter [node] is required.");
         }
         if(this.nodeList == null) {
             this.nodeList = new ArrayList<>();

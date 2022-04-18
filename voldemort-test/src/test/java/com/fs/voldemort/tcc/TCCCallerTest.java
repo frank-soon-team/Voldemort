@@ -2,7 +2,6 @@ package com.fs.voldemort.tcc;
  
 import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
-import com.fs.voldemort.tcc.node.BaseTCCHandler;
 import com.fs.voldemort.tcc.node.ITCCHandler;
 import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
@@ -21,22 +20,22 @@ public class TCCCallerTest {
     public void test_TCCCaller() {
         new TCCCaller(buildMananger())
             .call(
-                createHandler(
-                    "Coupon", 
+                "Coupon",
+                createHandler( 
                     p -> { System.out.println("预留优惠券"); },
                     p -> { System.out.println("扣减优惠券"); },
                     p -> { System.out.println("返回优惠券"); })
             )
             .call(
+                "Point", 
                 createHandler(
-                    "Point", 
                     p -> { System.out.println("计算奖励积分"); },
                     p -> { System.out.println("积分奖励生效"); },
                     p -> { System.out.println("积分奖励取消"); })
             )
             .call(
+                "Gift", 
                 createHandler(
-                    "Gift", 
                     p -> { System.out.println("预留赠品"); },
                     p -> { System.out.println("赠品赠送"); },
                     p -> { System.out.println("赠品取消"); })
@@ -51,8 +50,8 @@ public class TCCCallerTest {
         TCCCaller tccCaller = new TCCCaller(buildMananger(), value);
         tccCaller
             .call(
+                "Step1", 
                 createHandler(
-                    "Step1", 
                     p -> {
                         int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
@@ -69,8 +68,8 @@ public class TCCCallerTest {
                     })
             )
             .call(
+                "Step2", 
                 createHandler(
-                    "Step2", 
                     p -> {
                         int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
@@ -85,8 +84,8 @@ public class TCCCallerTest {
                     })
             )
             .call(
+                "Step3", 
                 createHandler(
-                    "Step3", 
                     p -> {
                         int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
@@ -112,8 +111,8 @@ public class TCCCallerTest {
         TCCCaller tccCaller = new TCCCaller(buildMananger(), value);
         tccCaller
             .call(
+                "Step1", 
                 createHandler(
-                    "Step1", 
                     p -> {
                         int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
@@ -130,8 +129,8 @@ public class TCCCallerTest {
                     })
             )
             .call(
+                "Step2", 
                 createHandler(
-                    "Step2", 
                     p -> {
                         int[] result = (int[]) p.getTCCState().getParam();
                         result[0] += 1;
@@ -146,8 +145,8 @@ public class TCCCallerTest {
                     })
             )
             .call(
+                "Step3", 
                 createHandler(
-                    "Step3", 
                     p -> {
                         throw new IllegalStateException("throw");
                     }, 
@@ -170,8 +169,8 @@ public class TCCCallerTest {
         Assert.assertTrue(value[0] == 0);
     }
 
-    public ITCCHandler createHandler(String name, Action1<TCCNodeParameter> goTry, Action1<TCCNodeParameter> confirm, Action1<TCCNodeParameter> cancel) {
-        return new BaseTCCHandler(name) {
+    public ITCCHandler createHandler(Action1<TCCNodeParameter> goTry, Action1<TCCNodeParameter> confirm, Action1<TCCNodeParameter> cancel) {
+        return new ITCCHandler() {
 
             @Override
             public void goTry(TCCNodeParameter parameter) {

@@ -27,7 +27,7 @@ public class ValueBag implements IBag<String, Object>, IConverter<String> {
     @Override
     public void set(String key, Object value) {
         if(key == null || key.length() == 0) {
-            throw new IllegalArgumentException("the parameter key is required.");
+            throw new IllegalArgumentException("the parameter [key] is required.");
         }
         contextStore.put(key, value);
     }
@@ -145,7 +145,7 @@ public class ValueBag implements IBag<String, Object>, IConverter<String> {
     @Override
     public Date getDateValue(String key, String dateFormatter) {
         if(dateFormatter == null || dateFormatter.length() == 0) {
-            throw new IllegalArgumentException("the parameter dateFormatter is required.");
+            throw new IllegalArgumentException("the parameter [dateFormatter] is required.");
         }
         Object value = get(key);
         if(value instanceof String) {

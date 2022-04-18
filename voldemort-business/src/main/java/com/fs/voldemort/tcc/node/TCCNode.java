@@ -6,6 +6,8 @@ import com.fs.voldemort.tcc.state.TCCStatus;
 
 public class TCCNode extends CallerNode {
 
+    // TCC 节点名称，在一个Caller中，name不能重复
+    private final String name;
     // TCC 任务执行器
     private final ITCCHandler tccHandler;
     // 参数
@@ -15,17 +17,18 @@ public class TCCNode extends CallerNode {
     // 错误信息
     private ExecuteCallerNodeException error;
 
-    public TCCNode(ITCCHandler tccHandler) {
-        this(tccHandler, TCCStatus.TryPending);
+    public TCCNode(String name, ITCCHandler tccHandler) {
+        this(name, tccHandler, TCCStatus.TryPending);
     }
 
-    public TCCNode(ITCCHandler tccHandler, TCCStatus status) {
+    public TCCNode(String name, ITCCHandler tccHandler, TCCStatus status) {
         super(p -> {
             tccHandler.goTry((TCCNodeParameter) p);
             return p.result;
         });
         this.status = status;
         this.tccHandler = tccHandler;
+        this.name = name;
     }
 
     public void doConfirm() {
@@ -71,7 +74,7 @@ public class TCCNode extends CallerNode {
     }
 
     public String getName() {
-        return tccHandler.name();
+        return name;
     }
     
 }

@@ -25,7 +25,7 @@ public class ParallelTaskResult {
 
     public void forEach(Action1<Object> actionFn) {
         if(actionFn == null) {
-            throw new IllegalArgumentException("the actionFn is required.");
+            throw new IllegalArgumentException("the parameter [actionFn] is required.");
         }
 
         for(int i = 0; i < resultValues.length; i++) {

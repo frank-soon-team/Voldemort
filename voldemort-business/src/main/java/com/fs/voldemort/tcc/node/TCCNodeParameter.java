@@ -14,7 +14,7 @@ public class TCCNodeParameter extends CallerParameter {
 
     public void setTCCState(ITCCState tccState) {
         if(tccState == null) {
-            throw new IllegalArgumentException("the parameter tccState is required.");
+            throw new IllegalArgumentException("the parameter [tccState] is required.");
         }
         context().set(TCC_EXECUTE_STATE, tccState);
     }

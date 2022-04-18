@@ -5,12 +5,12 @@ public class CallerParameter {
     public final Object result;
     private final CallerContext context;
 
-    public CallerParameter(CallerParameter parameter) {
-        if(parameter == null) {
-            throw new IllegalArgumentException("the parameter is required.");
+    public CallerParameter(CallerParameter callParameter) {
+        if(callParameter == null) {
+            throw new IllegalArgumentException("the parameter [callParameter] is required.");
         }
-        this.result = parameter.result;
-        this.context = new CallerContext(parameter.context().get());
+        this.result = callParameter.result;
+        this.context = new CallerContext(callParameter.context().get());
     }
 
     public CallerParameter(Object result, CallerContext context) {
