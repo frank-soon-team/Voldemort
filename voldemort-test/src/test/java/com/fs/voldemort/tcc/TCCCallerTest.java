@@ -164,7 +164,7 @@ public class TCCCallerTest {
     }
 
     @Test
-    public void test_confrimCompensation() {
+    public void test_confirmCompensation() {
 
         int[] value = new int[] { 0, 0, 0 };
         TCCCaller tccCaller = new TCCCaller(buildCompensationManager(TCCStatus.ConfirmFailed));
