@@ -15,8 +15,8 @@ import com.fs.voldemort.tcc.state.TCCTaskStatus;
 
 public interface Transfer {
 
-    public static TCCTaskModel toTCCModel(ITCCState tccState, ISerializeGear serializeGear) {
-        TCCTaskModel tccTaskModel = new TCCTaskModel();
+    public static TCCTask toTCCModel(ITCCState tccState, ISerializeGear serializeGear) {
+        TCCTask tccTaskModel = new TCCTask();
         tccTaskModel.setTransactionId(tccState.getTCCTransactionId());
         tccTaskModel.setStage(tccState.getStatus().getStage());
         tccTaskModel.setParamStr(serializeGear.serialize(tccState.getParam()));
@@ -56,7 +56,7 @@ public interface Transfer {
         return tccTaskModel;
     }
 
-    public static ITCCState toTCCState(TCCTaskModel model, ISerializeGear serializeGear) {
+    public static ITCCState toTCCState(TCCTask model, ISerializeGear serializeGear) {
         List<TCCTaskNode> taskNodeList = model.getNodeList();
         if(taskNodeList == null || taskNodeList.isEmpty()) {
             throw new IllegalArgumentException("the [taskNodeList] of parameter model is null or empty.");

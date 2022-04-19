@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TCCTaskModel implements Serializable {
+public class TCCTask implements Serializable {
 
     /** TCC 任务唯一标识 */
     private String transactionId;

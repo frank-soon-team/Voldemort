@@ -4,7 +4,7 @@ import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
-import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
+import com.fs.voldemort.tcc.simple.service.model.TCCTask;
 import com.fs.voldemort.tcc.state.ITCCState;
 
 public class SimpleTCCEndBiz extends BaseTCCBiz implements Action1<ITCCState> {
@@ -28,7 +28,7 @@ public class SimpleTCCEndBiz extends BaseTCCBiz implements Action1<ITCCState> {
             throw new IllegalStateException("can not end, status: " + state.getStatus());
         }
         
-        TCCTaskModel tccModel = changeToTCCModel(state);
+        TCCTask tccModel = changeToTCCModel(state);
         getRepositoryGear().update(tccModel);
     }
     

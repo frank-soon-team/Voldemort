@@ -4,7 +4,7 @@ import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
-import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
+import com.fs.voldemort.tcc.simple.service.model.TCCTask;
 import com.fs.voldemort.tcc.simple.service.model.Transfer;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.state.TCCExecuteState;
@@ -45,8 +45,8 @@ public abstract class BaseTCCBiz {
         return this.businessSupportGear;
     }
 
-    protected TCCTaskModel changeToTCCModel(ITCCState tccState) {
-        TCCTaskModel tccModel = Transfer.toTCCModel(tccState, serializeGear);
+    protected TCCTask changeToTCCModel(ITCCState tccState) {
+        TCCTask tccModel = Transfer.toTCCModel(tccState, serializeGear);
         if(businessSupportGear != null) {
             CallerContext context = getContext(tccState);
             if(context != null) {
@@ -57,7 +57,7 @@ public abstract class BaseTCCBiz {
         return tccModel;
     }
 
-    protected ITCCState changeToTCCState(TCCTaskModel tccModel) {
+    protected ITCCState changeToTCCState(TCCTask tccModel) {
         return Transfer.toTCCState(tccModel, serializeGear);
     }
 

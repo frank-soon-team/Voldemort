@@ -4,7 +4,7 @@ import com.fs.voldemort.core.functional.action.Action1;
 import com.fs.voldemort.tcc.simple.service.gear.IBusinessSupportGear;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
-import com.fs.voldemort.tcc.simple.service.model.TCCTaskModel;
+import com.fs.voldemort.tcc.simple.service.model.TCCTask;
 import com.fs.voldemort.tcc.state.ITCCState;
 import com.fs.voldemort.tcc.state.TCCExecuteState;
 import com.fs.voldemort.tcc.state.TCCTaskStatus;
@@ -33,7 +33,7 @@ public class SimpleTCCCompensateBiz extends BaseTCCBiz implements Action1<ITCCSt
             ((TCCExecuteState) state).setTaskStatus(TCCTaskStatus.WaitingForRetry);
         }
 
-        TCCTaskModel taskModel = changeToTCCModel(state);
+        TCCTask taskModel = changeToTCCModel(state);
         getRepositoryGear().update(taskModel);
     }
     

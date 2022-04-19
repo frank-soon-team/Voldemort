@@ -112,9 +112,23 @@ public class TCCManager extends FuncLinkedList {
         } else {
             // 准备进行二阶段补偿，更新任务记录
             prepareCompensationTCCState(state);
-            getTCCExecuteState(state).setTaskStatus(TCCTaskStatus.Start);
+            TCCExecuteState tccState = getTCCExecuteState(state);
+            tccState.setTaskStatus(TCCTaskStatus.Start);
             // 更新任务状态为 Start，以免被定时器扫出来
             stateManager.update(state);
+            // 将（二阶段）状态还原为对应的（一阶段），准备进行（二阶段）补偿
+            int statusCode = tccState.getStatus().getValue();
+            if(statusCode >= 20 && statusCode < 30) {
+                tccState.setStatus(TCCStatus.TrySuccess);
+            } else if(statusCode >= 30 && statusCode < 40) {
+                tccState.setStatus(TCCStatus.TryFaild);
+            } else {
+                throw new TCCStateException(
+                        "the compensation TCCStatus is invalid.", 
+                        "ConfirmFailed | ConfirmTimeout | CancelFailed | CancelTimeout", 
+                        tccState.getStatus().name());
+            }
+            
         }
         
         // * 确认阶段 （二阶段）或 补偿
@@ -187,7 +201,7 @@ public class TCCManager extends FuncLinkedList {
 
         if(tccState.getTaskStatus() == TCCTaskStatus.Start) {
             TCCStatus status = tccState.getStatus();
-            if(status == TCCStatus.TrySuccess || status == TCCStatus.ConfirmFailed || status == TCCStatus.ConfirmTimeout) {
+            if(status == TCCStatus.TrySuccess) {
                 List<TCCNode> commitFailedList = new ArrayList<>(triedNodeList.size());
 
                 for (TCCNode tccNode : triedNodeList) {
@@ -232,8 +246,7 @@ public class TCCManager extends FuncLinkedList {
 
         if(tccState.getTaskStatus() == TCCTaskStatus.Start) {
             TCCStatus status = tccState.getStatus();
-            if((status == TCCStatus.TryFaild || status == TCCStatus.TryTimeout) 
-                || (status == TCCStatus.CancelFailed || status == TCCStatus.CancelTimeout)) {
+            if(status == TCCStatus.TryFaild || status == TCCStatus.TryTimeout) {
                 int count = triedNodeList.size();
                 List<TCCNode> rollbackFailedList = new ArrayList<>(count);
 
