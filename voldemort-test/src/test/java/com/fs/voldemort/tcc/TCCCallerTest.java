@@ -213,14 +213,14 @@ public class TCCCallerTest {
                     }
                     
                 })
-                .setSerializeGear(new ISerializeGear(){
+                .setSerializeGear(new ISerializeGear() {
                     @Override
                     public String serialize(Object obj) {
                         return null;
                     }
 
                     @Override
-                    public <T> T deserialize(String serializeStr) {
+                    public Object deserialize(String serializeStr) {
                         return null;
                     }
                     

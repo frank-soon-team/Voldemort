@@ -7,7 +7,7 @@
     <groupId>io.github.frank-soon-team</groupId>
     <artifactId>voldemort-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <name>voldemort-parent</name>
 
@@ -46,11 +46,10 @@
     <modules>
         <module>voldemort-core</module>
         <module>voldemort-business</module>
-        <module>voldemort-business-tcc-support</module>
+        <module>voldemort-tcc</module>
         <module>voldemort-springboot-starter</module>
         <module>voldemort-springboot-autoconfigure</module>
         <module>voldemort-test</module>
-        <module>voldemort-example</module>
     </modules>
 
     <dependencyManagement>
@@ -106,8 +105,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>

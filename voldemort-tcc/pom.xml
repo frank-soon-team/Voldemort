@@ -9,20 +9,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>voldemort-springboot-autoconfigure</artifactId>
+    <artifactId>voldemort-tcc</artifactId>
+    <name>voldemort-tcc</name>
+
+    <description>Support The TCC Caller support</description>
+
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>io.github.frank-soon-team</groupId>
-            <artifactId>voldemort-business</artifactId>
+            <artifactId>voldemort-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
 
 </project>

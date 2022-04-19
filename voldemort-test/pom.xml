@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.frank-soon-team</groupId>
         <artifactId>voldemort-parent</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -31,7 +31,7 @@
 
         <dependency>
             <groupId>io.github.frank-soon-team</groupId>
-            <artifactId>voldemort-business-tcc-support</artifactId>
+            <artifactId>voldemort-tcc</artifactId>
             <version>${project.version}</version>
         </dependency>
 
