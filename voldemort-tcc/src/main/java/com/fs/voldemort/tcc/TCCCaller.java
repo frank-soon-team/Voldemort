@@ -12,7 +12,7 @@ import com.fs.voldemort.tcc.state.TCCExecuteState;
  * <pre>
  * // 用法：
  *   TCCManager tccManager = new TCCManager(buildManagerAdapter());
- *   String message = "Welcome to XXX";
+ *   String message = "Welcome to xxx";
  *   List<UserInfo> userList = loadUserList();
  * 
  *   TCCCaller caller = new TCCCaller(tccManager, message);

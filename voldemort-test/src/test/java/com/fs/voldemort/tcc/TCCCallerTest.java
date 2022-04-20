@@ -257,11 +257,7 @@ public class TCCCallerTest {
                 .build();
 
 
-        
-    }
-
-    private SimpleTCCManager buildCustomManager() {
-        return null;
+        // other builder
         // return SimpleTCCManager.extendBuilder()
         //     .setTCCBeginBiz(new SimpleTCCBeginBiz())
         //     .setTCCUpdateBiz(new SimpleTCCUpdateBiz())
@@ -270,6 +266,7 @@ public class TCCCallerTest {
         //     .setTCCCancelRetryBiz(new SimpleTCCCancelRetryBiz())
         //     .build();
     }
+    
 
     //#endregion
 
