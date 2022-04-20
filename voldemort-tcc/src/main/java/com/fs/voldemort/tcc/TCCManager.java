@@ -12,6 +12,7 @@ import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
+import com.fs.voldemort.tcc.exception.TCCExecuteException;
 import com.fs.voldemort.tcc.exception.TCCStateException;
 import com.fs.voldemort.tcc.exception.TCCTimeoutException;
 import com.fs.voldemort.tcc.node.ITCCHandler;
@@ -185,7 +186,7 @@ public class TCCManager extends FuncLinkedList {
                 tccNode.setStatus(e instanceof TCCTimeoutException ? TCCStatus.TryTimeout : TCCStatus.TryFaild);
             }
             tccState.setStatus(TCCStatus.TryFaild);
-            tccState.collectExceptional(new ExecuteCallerNodeException(e, currentNode, currentParameter));
+            tccState.collectExceptional(new ExecuteCallerNodeException(e, currentNode));
         }
 
         return currentParameter;
@@ -223,6 +224,7 @@ public class TCCManager extends FuncLinkedList {
                     tccState.setTaskStatus(TCCTaskStatus.Done);
                     return;
                 }
+                commitFailedList.forEach(n -> tccState.collectExceptional(n.getError()));
             } else {
                 tccState.setStateException(
                     new TCCStateException("TCC confirm stage error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
@@ -270,6 +272,7 @@ public class TCCManager extends FuncLinkedList {
                     tccState.setTaskStatus(TCCTaskStatus.Done);
                     return;
                 }
+                rollbackFailedList.forEach(n -> tccState.collectExceptional(n.getError()));
             } else {
                 tccState.setStateException(
                     new TCCStateException("TCC cancel stage error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
@@ -344,17 +347,32 @@ public class TCCManager extends FuncLinkedList {
 
     protected void throwIfExceptional(ITCCState state) {
         TCCStateException tccStateException = state.getStateException();
-        ExecuteCallerNodeException tryNodeException = state.getCallerNodeException();
+        List<ExecuteCallerNodeException> nodeExceptionList = state.getExceptionalCollection();
+        TCCExecuteException tccExecuteException = null;
+
+        if(nodeExceptionList != null && !nodeExceptionList.isEmpty()) {
+            StringBuilder msgBuilder = new StringBuilder();
+            List<StackTraceElement[]> traceElements = new ArrayList<>(nodeExceptionList.size());
+            for(ExecuteCallerNodeException e : nodeExceptionList) {
+                msgBuilder.append(e.getMessage()).append("\r\n");
+                traceElements.add(e.getStackTrace());
+            }
+            tccExecuteException = new TCCExecuteException(msgBuilder.toString());
+            ;
+            for(int index = traceElements.size() - 1; index >= 0; index--) {
+                tccExecuteException.setStackTrace(traceElements.get(index));
+            }
+        }
 
         if(tccStateException != null) {
-            if(tryNodeException != null) {
-                tccStateException.initCause(tryNodeException);
+            if(tccExecuteException != null) {
+                tccStateException.initCause(tccExecuteException);
             }
             throw tccStateException;
         }
 
-        if(tryNodeException != null) {
-            throw tryNodeException;
+        if(tccExecuteException != null) {
+            throw tccExecuteException;
         }
     }
 

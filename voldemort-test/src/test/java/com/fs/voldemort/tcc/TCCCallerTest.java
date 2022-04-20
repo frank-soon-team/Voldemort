@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
@@ -156,8 +155,9 @@ public class TCCCallerTest {
 
         try {
             tccCaller.exec();
-        } catch(ExecuteCallerNodeException e) {
+        } catch(Exception e) {
             System.out.println("Rollback > " + e.getMessage());
+            //e.printStackTrace();
         }
 
         Assert.assertTrue(value[0] == 0);

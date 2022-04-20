@@ -182,16 +182,6 @@ public class TCCExecuteState implements ITCCState {
             }
         }
 
-        if(context == null) {
-            if(errorCollection != null && !errorCollection.isEmpty()) {
-                ExecuteCallerNodeException executeCallerNodeException = errorCollection.get(errorCollection.size() - 1);
-                CallerParameter callerParameter = executeCallerNodeException.getParameter();
-                if(callerParameter != null) {
-                    context = callerParameter.context();
-                }
-            }
-        }
-
         return context;
     }
 
