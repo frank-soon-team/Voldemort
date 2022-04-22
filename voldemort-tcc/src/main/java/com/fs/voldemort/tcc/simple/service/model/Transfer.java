@@ -39,14 +39,11 @@ public interface Transfer {
                     /* 
                         NodeParameter.result 可能是其他普通CallerNode计算的结果，
                         这些CallerNode是在 Try 阶段执行的，当需要补偿时，会直接补偿 Confirm 阶段或是 Cancel 阶段，
-                        所以，需要将当前的 result和nodeResult 序列化保存，以便补偿时还原。
+                        所以，需要将当前的 result 序列化保存，以便补偿时还原。
                         多数情况下，NodeParameter.result 为 null。
                     */
-                    if(node.getNodeParameter().result != null || node.getNodeParameter().getNodeResult() != null) {
-                        TCCNodeParam tccNodeParam = new TCCNodeParam();
-                        tccNodeParam.setResult(node.getNodeParameter().result);
-                        tccNodeParam.setNodeResult(node.getNodeParameter().getNodeResult());
-                        taskNode.setNodeParamStr(serializeGear.serialize(tccNodeParam));
+                    if(node.getNodeParameter().result != null) {
+                        taskNode.setNodeParamStr(serializeGear.serialize(node.getNodeParameter().result));
                     }
                 }
                 taskNode.setStatusCode(node.getStatus().getValue());
@@ -77,11 +74,11 @@ public interface Transfer {
             TCCStateNode tccStateNode = new TCCStateNode(
                 taskNode.getNodeName(), TCCStatus.valueOf(taskNode.getStatusCode()));
             tccStateNode.setNodeId(taskNode.getNodeId());
-            TCCNodeParam tccNodeParam = null;
+            Object result = null;
             if(taskNode.getNodeParamStr() != null && taskNode.getNodeParamStr().length() > 0) {
-                tccNodeParam = (TCCNodeParam) serializeGear.deserialize(taskNode.getNodeParamStr());
+                result = serializeGear.deserialize(taskNode.getNodeParamStr());
             }
-            TCCNodeParameter tccNodeParameter = new TCCNodeParameter(tccNodeParam, callerContext);
+            TCCNodeParameter tccNodeParameter = new TCCNodeParameter(result, callerContext);
             tccStateNode.setNodeParameter(tccNodeParameter);
 
             tccState.addTCCNode(tccStateNode);

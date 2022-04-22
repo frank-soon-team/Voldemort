@@ -156,15 +156,12 @@ public class TCCManager extends FuncLinkedList {
             while(currentNode != null) {
                 Object result = null;
                 if(currentNode instanceof TCCNode) {
-                    Object nodeResult = currentParameter.context().get(ContextKeys.TccPriviousNodeResult);
-                    currentParameter.context().set(ContextKeys.TccPriviousNodeResult, null);
-
                     TCCNode tccNode = (TCCNode) currentNode;
-                    TCCNodeParameter tccNodeParameter = (TCCNodeParameter) currentParameter;
-                    tccNodeParameter.setNodeResult(nodeResult);
-                    tccNode.setNodeParameter(tccNodeParameter);
-                    result = tccNode.doAction(currentParameter);
-
+                    tccNode.setNodeParameter((TCCNodeParameter) currentParameter);
+                    tccNode.doAction(currentParameter);
+                    result = currentParameter.context().get(ContextKeys.TccCurrentNodeResult);
+                    // 清空当前返回值
+                    currentParameter.context().set(ContextKeys.TccCurrentNodeResult, null);
                     tccNode.setStatus(TCCStatus.TrySuccess);
                 } else {
                     result = currentNode.doAction(currentParameter);

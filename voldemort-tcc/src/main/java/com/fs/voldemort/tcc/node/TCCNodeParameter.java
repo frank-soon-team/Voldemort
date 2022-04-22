@@ -7,8 +7,6 @@ import com.fs.voldemort.tcc.state.ITCCState;
 
 public class TCCNodeParameter extends CallerParameter {
 
-    private Object tccNodeResult;
-
     public TCCNodeParameter(Object result, CallerContext context) {
         super(result, context);
     }
@@ -29,12 +27,8 @@ public class TCCNodeParameter extends CallerParameter {
         return tccState != null ? tccState.getParam() : null;
     }
 
-    public void setNodeResult(Object resultValue) {
-        this.context().set(ContextKeys.TccPriviousNodeResult, resultValue);
+    public void setResult(Object resultValue) {
+        this.context().set(ContextKeys.TccCurrentNodeResult, resultValue);
     }
 
-    public Object getNodeResult() {
-        return this.tccNodeResult;
-    }
-    
 }
