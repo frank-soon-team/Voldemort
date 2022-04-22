@@ -11,6 +11,7 @@ import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerNode;
 import com.fs.voldemort.core.support.CallerParameter;
 import com.fs.voldemort.core.support.FuncLinkedList;
+import com.fs.voldemort.tcc.constant.ContextKeys;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.exception.TCCExecuteException;
 import com.fs.voldemort.tcc.exception.TCCStateException;
@@ -111,25 +112,14 @@ public class TCCManager extends FuncLinkedList {
             // 更新try阶段TCC任务记录，状态 > Start, TCC状态 > TrySuccess | TryFaild
             // 中间状态，没必要落库 stateManager.update(state);
         } else {
-            // 准备进行二阶段补偿，更新任务记录
-            prepareCompensationTCCState(state);
             TCCExecuteState tccState = getTCCExecuteState(state);
+            // 准备进行二阶段补偿，更新任务记录
+            prepareCompensationTCCState(tccState);
             tccState.setTaskStatus(TCCTaskStatus.Start);
             // 更新任务状态为 Start，以免被定时器扫出来
-            stateManager.update(state);
+            stateManager.update(tccState);
             // 将（二阶段）状态还原为对应的（一阶段），准备进行（二阶段）补偿
-            int statusCode = tccState.getStatus().getValue();
-            if(statusCode >= 20 && statusCode < 30) {
-                tccState.setStatus(TCCStatus.TrySuccess);
-            } else if(statusCode >= 30 && statusCode < 40) {
-                tccState.setStatus(TCCStatus.TryFaild);
-            } else {
-                throw new TCCStateException(
-                        "the compensation TCCStatus is invalid.", 
-                        "ConfirmFailed | ConfirmTimeout | CancelFailed | CancelTimeout", 
-                        tccState.getStatus().name());
-            }
-            
+            turningToSecondPhaseStatus(tccState);
         }
         
         // * 确认阶段 （二阶段）或 补偿
@@ -166,9 +156,15 @@ public class TCCManager extends FuncLinkedList {
             while(currentNode != null) {
                 Object result = null;
                 if(currentNode instanceof TCCNode) {
+                    Object nodeResult = currentParameter.context().get(ContextKeys.TccPriviousNodeResult);
+                    currentParameter.context().set(ContextKeys.TccPriviousNodeResult, null);
+
                     TCCNode tccNode = (TCCNode) currentNode;
-                    tccNode.setNodeParameter((TCCNodeParameter) currentParameter);
+                    TCCNodeParameter tccNodeParameter = (TCCNodeParameter) currentParameter;
+                    tccNodeParameter.setNodeResult(nodeResult);
+                    tccNode.setNodeParameter(tccNodeParameter);
                     result = tccNode.doAction(currentParameter);
+
                     tccNode.setStatus(TCCStatus.TrySuccess);
                 } else {
                     result = currentNode.doAction(currentParameter);
@@ -385,6 +381,20 @@ public class TCCManager extends FuncLinkedList {
             return (TCCExecuteState) state;
         }
         throw new ClassCastException("the parameter state is not TCCExecuteState Type.");
+    }
+
+    private void turningToSecondPhaseStatus(TCCExecuteState tccState) {
+        int statusCode = tccState.getStatus().getValue();
+        if(statusCode >= 20 && statusCode < 30) {
+            tccState.setStatus(TCCStatus.TrySuccess);
+        } else if(statusCode >= 30 && statusCode < 40) {
+            tccState.setStatus(TCCStatus.TryFaild);
+        } else {
+            throw new TCCStateException(
+                    "the compensation TCCStatus is invalid.", 
+                    "ConfirmFailed | ConfirmTimeout | CancelFailed | CancelTimeout", 
+                    tccState.getStatus().name());
+        }
     }
 
     private void prepareCompensationTCCState(ITCCState state) {

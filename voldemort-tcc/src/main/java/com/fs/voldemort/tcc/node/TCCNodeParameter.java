@@ -2,11 +2,12 @@ package com.fs.voldemort.tcc.node;
 
 import com.fs.voldemort.core.support.CallerContext;
 import com.fs.voldemort.core.support.CallerParameter;
+import com.fs.voldemort.tcc.constant.ContextKeys;
 import com.fs.voldemort.tcc.state.ITCCState;
 
 public class TCCNodeParameter extends CallerParameter {
 
-    private final static String TCC_EXECUTE_STATE = "TCC_EXECUTE_STATE";
+    private Object tccNodeResult;
 
     public TCCNodeParameter(Object result, CallerContext context) {
         super(result, context);
@@ -16,16 +17,24 @@ public class TCCNodeParameter extends CallerParameter {
         if(tccState == null) {
             throw new IllegalArgumentException("the parameter [tccState] is required.");
         }
-        context().set(TCC_EXECUTE_STATE, tccState);
+        context().set(ContextKeys.TccExecuteState, tccState);
     }
 
     public ITCCState getTCCState() {
-        return (ITCCState) context().get(TCC_EXECUTE_STATE);
+        return (ITCCState) context().get(ContextKeys.TccExecuteState);
     }
 
     public Object getParam() {
         ITCCState tccState = getTCCState();
         return tccState != null ? tccState.getParam() : null;
+    }
+
+    public void setNodeResult(Object resultValue) {
+        this.context().set(ContextKeys.TccPriviousNodeResult, resultValue);
+    }
+
+    public Object getNodeResult() {
+        return this.tccNodeResult;
     }
     
 }

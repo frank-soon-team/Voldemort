@@ -173,6 +173,7 @@ public class TCCCallerTest {
             p -> { throw new IllegalStateException("补偿不会执行Try阶段"); }, 
             p -> value[0] = 1,
             p -> { throw new IllegalStateException("补偿不会执行Cancel阶段"); });
+        tccCaller.call(p -> 2);
         tccCaller.call(
             "Node2", 
             p -> { throw new IllegalStateException("补偿不会执行Try阶段"); }, 
