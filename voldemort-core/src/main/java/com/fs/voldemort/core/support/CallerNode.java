@@ -1,16 +1,15 @@
 package com.fs.voldemort.core.support;
 
-import com.fs.voldemort.core.functional.action.Action1;
-import com.fs.voldemort.core.functional.action.Action2;
 import com.fs.voldemort.core.functional.func.Func1;
+import com.fs.voldemort.core.functional.func.Func2;
 
 public class CallerNode {
 
-    private Action1<CallerParameter> beforeAction;
+    private Func1<CallerParameter, CallerParameter> beforeFunc;
     
     private Func1<CallerParameter, Object> actionFunc;
 
-    private Action2<CallerParameter, Object> afterAction;
+    private Func2<CallerParameter, Object, Object> afterFunc;
 
     private CallerNode previousNode;
 
@@ -49,20 +48,20 @@ public class CallerNode {
         return this.actionFunc;
     }
 
-    public Action1<CallerParameter> getBeforeAction() {
-        return beforeAction;
+    public Func1<CallerParameter, CallerParameter> getBeforeFunc() {
+        return beforeFunc;
     }
 
-    public void setBeforeAction(Action1<CallerParameter> beforeAction) {
-        this.beforeAction = beforeAction;
+    public void setBeforeFunc(Func1<CallerParameter, CallerParameter> beforeFunc) {
+        this.beforeFunc = beforeFunc;
     }
 
-    public Action2<CallerParameter, Object> getAfterAction() {
-        return afterAction;
+    public Func2<CallerParameter, Object, Object> getAfterFunc() {
+        return afterFunc;
     }
 
-    public void setAfterAction(Action2<CallerParameter, Object> afterAction) {
-        this.afterAction = afterAction;
+    public void setAfterFunc(Func2<CallerParameter, Object, Object> afterFunc) {
+        this.afterFunc = afterFunc;
     }
 
     //#endregion
@@ -76,28 +75,30 @@ public class CallerNode {
     }
 
     public Object doAction(CallerParameter callerParameter) {
-        onBefore(callerParameter);
+        callerParameter = onBefore(callerParameter);
 
         Object result = null;
         if(actionFunc != null) {
             result = actionFunc.call(callerParameter);
         }
         
-        onAfter(callerParameter, result);
+        result = onAfter(callerParameter, result);
 
         return result;
     }
 
-    protected void onBefore(CallerParameter callerParameter) {
-        if(beforeAction != null) {
-            beforeAction.apply(callerParameter);
+    protected CallerParameter onBefore(CallerParameter callerParameter) {
+        if(beforeFunc != null) {
+            return beforeFunc.call(callerParameter);
         }
+        return callerParameter;
     }
 
-    protected void onAfter(CallerParameter callerParameter, Object result) {
-        if(afterAction != null) {
-            afterAction.apply(callerParameter, result);
+    protected Object onAfter(CallerParameter callerParameter, Object result) {
+        if(afterFunc != null) {
+            return afterFunc.call(callerParameter, result);
         }
+        return result;
     }
 
     

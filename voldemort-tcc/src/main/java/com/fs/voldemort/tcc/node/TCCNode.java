@@ -1,6 +1,7 @@
 package com.fs.voldemort.tcc.node;
 
 import com.fs.voldemort.core.support.CallerNode;
+import com.fs.voldemort.tcc.constant.ContextKeys;
 import com.fs.voldemort.tcc.exception.ExecuteCallerNodeException;
 import com.fs.voldemort.tcc.state.TCCStatus;
 
@@ -31,6 +32,12 @@ public class TCCNode extends CallerNode {
         this.status = status;
         this.tccHandler = tccHandler;
         this.name = name;
+        this.setAfterFunc((p, r) -> {
+            Object result = p.context().get(ContextKeys.TccCurrentNodeResult);
+            // 清空当前返回值
+            p.context().set(ContextKeys.TccCurrentNodeResult, null);
+            return result;
+        });
     }
 
     public void doConfirm() {

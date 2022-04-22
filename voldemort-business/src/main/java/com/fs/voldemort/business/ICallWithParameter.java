@@ -22,7 +22,10 @@ public interface ICallWithParameter<T> {
         }
 
         if(!map.isEmpty()) {
-            node.setBeforeAction(p -> ((BFuncParameter)p).setNodeParamGetFunc(paramName -> map.get(paramName)));
+            node.setBeforeFunc(p -> {
+                ((BFuncParameter) p).setNodeParamGetFunc(paramName -> map.get(paramName));
+                return p;
+            });
         }
         
     }

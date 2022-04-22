@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fs.voldemort.tcc.node.TCCNodeParameter;
 import com.fs.voldemort.tcc.simple.SimpleTCCManager;
 import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
@@ -20,7 +21,7 @@ public class TCCCallerTest {
     
     @Test
     public void test_TCCCaller() {
-        new TCCCaller(buildMananger())
+        Void result = new TCCCaller(buildMananger())
             .call(
                 "Coupon",
                 p -> { System.out.println("预留优惠券"); },
@@ -41,6 +42,7 @@ public class TCCCallerTest {
             )
             .exec();
 
+        assert result == null;
     }
 
     @Test
@@ -165,7 +167,6 @@ public class TCCCallerTest {
 
     @Test
     public void test_confirmCompensation() {
-
         int[] value = new int[] { 0, 0, 0 };
         TCCCaller tccCaller = new TCCCaller(buildCompensationManager(TCCStatus.ConfirmFailed));
         tccCaller.call(
@@ -193,7 +194,6 @@ public class TCCCallerTest {
 
     @Test
     public void test_cancelCompensation() {
-
         int[] value = new int[] { 1, 1, 1 };
         TCCCaller tccCaller = new TCCCaller(buildCompensationManager(TCCStatus.CancelFailed));
         tccCaller.call(
@@ -216,6 +216,48 @@ public class TCCCallerTest {
         assert value[0] == 0;
         assert value[1] == 0;
         assert value[2] == 0;
+    }
+
+    @Test
+    public void test_tccNodeResult() {
+        int[] value = new int[] { 0 };
+        TCCCaller tccCaller = new TCCCaller(buildMananger(), value);
+        tccCaller.call(p -> ((TCCNodeParameter) p).getTCCState().getParam());
+        tccCaller.call(
+                "Step1",
+                p -> { 
+                    int[] param = p.castResult();
+                    param[0]++;
+                    p.setResult(param);
+                },
+                p -> { 
+                    throw new IllegalStateException("Not Support Cancel");
+                }
+            )
+            .call(
+                "Step2", 
+                p -> { 
+                    int[] param = p.castResult();
+                    param[0]++;
+                    p.setResult(param);
+                },
+                p -> { 
+                    throw new IllegalStateException("Not Support Cancel");
+                }
+            )
+            .call(
+                "Step3", 
+                p -> { 
+                    int[] param = p.castResult();
+                    param[0]++;
+                    p.setResult(param);
+                },
+                p -> { 
+                    throw new IllegalStateException("Not Support Cancel");
+                }
+            )
+            .exec();
+        assert value[0] == 3;
     }
 
     //#region TCC事务管理器
