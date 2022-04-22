@@ -10,7 +10,7 @@ public class TCCTask implements Serializable {
     private String transactionId;
 
     /** TCC 阶段标识 */
-    private String stage;
+    private String phase;
 
     /** TCC 任务状态 */
     private String taskStatus;
@@ -46,12 +46,12 @@ public class TCCTask implements Serializable {
         this.transactionId = transactionId;
     }
 
-    public String getStage() {
-        return stage;
+    public String getPhase() {
+        return phase;
     }
 
-    public void setStage(String stage) {
-        this.stage = stage;
+    public void setPhase(String phase) {
+        this.phase = phase;
     }
 
     public String getTaskStatus() {

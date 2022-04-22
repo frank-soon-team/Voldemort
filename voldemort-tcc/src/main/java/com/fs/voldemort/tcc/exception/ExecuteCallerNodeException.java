@@ -5,7 +5,7 @@ import com.fs.voldemort.tcc.node.TCCNode;
 
 public class ExecuteCallerNodeException extends IllegalStateException {
 
-    private String stage;
+    private String phase;
 
     private String statusName;
 
@@ -16,7 +16,7 @@ public class ExecuteCallerNodeException extends IllegalStateException {
         if(node instanceof TCCNode) {
             TCCNode tccNode = (TCCNode) node;
             this.nodeName = tccNode.getName();
-            this.stage = tccNode.getStatus().getStage();
+            this.phase = tccNode.getStatus().getPhase();
             this.statusName = tccNode.getStatus().name();
         }
     }
@@ -28,8 +28,8 @@ public class ExecuteCallerNodeException extends IllegalStateException {
     @Override
     public String getMessage() {
         StringBuilder builder = new StringBuilder(getName());
-        if(stage != null) {
-            builder.append("[").append(stage).append("]");
+        if(phase != null) {
+            builder.append("[").append(phase).append("]");
         }
         if(statusName != null) {
             builder.append("[").append(statusName).append("]");

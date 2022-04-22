@@ -9,7 +9,7 @@ import com.fs.voldemort.tcc.simple.service.gear.IRepositoryGear;
 import com.fs.voldemort.tcc.simple.service.gear.ISerializeGear;
 import com.fs.voldemort.tcc.simple.service.model.TCCTask;
 import com.fs.voldemort.tcc.simple.service.model.TCCTaskNode;
-import com.fs.voldemort.tcc.state.TCCStage;
+import com.fs.voldemort.tcc.state.TCCPhase;
 import com.fs.voldemort.tcc.state.TCCStatus;
 import com.fs.voldemort.tcc.state.TCCTaskStatus;
 
@@ -311,8 +311,8 @@ public class TCCCallerTest {
     private TCCTask createCompensationTCCTask(String transactionId, TCCStatus failedStatus) {
         TCCTask tccTask = new TCCTask();
         tccTask.setTransactionId(transactionId);
-        tccTask.setStage(
-            failedStatus == TCCStatus.ConfirmFailed ? TCCStage.CONFIRM : TCCStage.CONFIRM);
+        tccTask.setPhase(
+            failedStatus == TCCStatus.ConfirmFailed ? TCCPhase.CONFIRM : TCCPhase.CONFIRM);
         tccTask.setParamStr("the message content.");
         tccTask.setTccStatusCode(failedStatus.getValue());
         tccTask.setTaskStatus(TCCTaskStatus.WaitingForRetry.name());

@@ -27,13 +27,13 @@ public enum TCCStatus {
         return value;
     }
 
-    public String getStage() {
+    public String getPhase() {
         if(value >= 10 && value <= 20) {
-            return TCCStage.TRY;
+            return TCCPhase.TRY;
         } else if (value >= 20 && value <= 30) {
-            return TCCStage.CONFIRM;
+            return TCCPhase.CONFIRM;
         } else {
-            return TCCStage.CANCEL;
+            return TCCPhase.CANCEL;
         }
     }
 

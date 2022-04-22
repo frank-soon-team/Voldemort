@@ -16,17 +16,17 @@ import com.fs.voldemort.tcc.state.TCCTaskStatus;
 public interface Transfer {
 
     public static TCCTask toTCCModel(ITCCState tccState, ISerializeGear serializeGear) {
-        TCCTask tccTaskModel = new TCCTask();
-        tccTaskModel.setTransactionId(tccState.getTCCTransactionId());
-        tccTaskModel.setStage(tccState.getStatus().getStage());
-        tccTaskModel.setParamStr(serializeGear.serialize(tccState.getParam()));
-        tccTaskModel.setTaskStatus(tccState.getTaskStatus().getValue());
-        tccTaskModel.setTccStatusCode(tccState.getStatus().getValue());
-        tccTaskModel.setStatusDescription(tccState.getStatus().name());
+        TCCTask tccTask = new TCCTask();
+        tccTask.setTransactionId(tccState.getTCCTransactionId());
+        tccTask.setPhase(tccState.getStatus().getPhase());
+        tccTask.setParamStr(serializeGear.serialize(tccState.getParam()));
+        tccTask.setTaskStatus(tccState.getTaskStatus().getValue());
+        tccTask.setTccStatusCode(tccState.getStatus().getValue());
+        tccTask.setStatusDescription(tccState.getStatus().name());
 
         ExecuteCallerNodeException tryException = tccState.getCallerNodeException();
         if(tryException != null) {
-            tccTaskModel.setTryErrorMessage(tryException.getMessage());
+            tccTask.setTryErrorMessage(tryException.getMessage());
         }
 
         List<TCCNode> nodeList = tccState.getTCCNodeList();
@@ -49,11 +49,11 @@ public interface Transfer {
                     taskNode.setErrorMessage(node.getError().getMessage());
                 }
 
-                tccTaskModel.addNode(taskNode);
+                tccTask.addNode(taskNode);
             }
         }
 
-        return tccTaskModel;
+        return tccTask;
     }
 
     public static ITCCState toTCCState(TCCTask model, ISerializeGear serializeGear) {

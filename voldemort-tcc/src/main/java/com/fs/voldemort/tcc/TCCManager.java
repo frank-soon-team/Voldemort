@@ -227,11 +227,11 @@ public class TCCManager extends FuncLinkedList {
                 commitFailedList.forEach(n -> tccState.collectExceptional(n.getError()));
             } else {
                 tccState.setStateException(
-                    new TCCStateException("TCC confirm stage error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
+                    new TCCStateException("TCC confirm phase error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
             }
         } else {
             tccState.setStateException(
-                new TCCStateException("the Task Status error in TCC confirm stage error", TCCTaskStatus.Start.name(), tccState.getTaskStatus().name()));
+                new TCCStateException("the Task Status error in TCC confirm phase error", TCCTaskStatus.Start.name(), tccState.getTaskStatus().name()));
         }
 
         tccState.setStatus(TCCStatus.ConfirmFailed);
@@ -275,11 +275,11 @@ public class TCCManager extends FuncLinkedList {
                 rollbackFailedList.forEach(n -> tccState.collectExceptional(n.getError()));
             } else {
                 tccState.setStateException(
-                    new TCCStateException("TCC cancel stage error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
+                    new TCCStateException("TCC cancel phase error", TCCStatus.TrySuccess.name(), tccState.getStatus().name()));
             }
         } else {
             tccState.setStateException(
-                new TCCStateException("the Task Status error in TCC cancel stage", TCCTaskStatus.Start.name(), tccState.getTaskStatus().name()));
+                new TCCStateException("the Task Status error in TCC cancel phase", TCCTaskStatus.Start.name(), tccState.getTaskStatus().name()));
         }
 
         tccState.setStatus(TCCStatus.CancelFailed);
