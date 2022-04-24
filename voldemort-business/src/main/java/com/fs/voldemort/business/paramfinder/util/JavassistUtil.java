@@ -2,10 +2,7 @@ package com.fs.voldemort.business.paramfinder.util;
 
 import com.fs.voldemort.business.paramfinder.ParamFindResult;
 import com.fs.voldemort.business.paramfinder.SimpleFindResult;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.bytecode.*;
 
 import java.lang.annotation.Annotation;
@@ -26,6 +23,14 @@ public class JavassistUtil {
         final String methodName = method.getName();
         final Class<?> clazz = method.getDeclaringClass();
         final AnnotatedType[] at = method.getAnnotatedParameterTypes();
+
+        ClassPool cp = ClassPool.getDefault();
+        try{
+            cp.get(clazz.getName());
+        }catch (NotFoundException e){
+            ClassClassPath classClassPath = new ClassClassPath(clazz);
+            cp.insertClassPath(classClassPath);
+        }
 
         CtMethod cm = ClassPool.getDefault().get(clazz.getName()).getDeclaredMethod(methodName);
         LocalVariableAttribute attr = (LocalVariableAttribute) cm.getMethodInfo().getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
